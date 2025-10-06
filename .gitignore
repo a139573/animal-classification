@@ -31,13 +31,6 @@ lightning_logs/
 logs/
 runs/               # e.g., TensorBoard
 
-# --- Reports / Generated outputs ---
-reports/
-!reports/README.md  # optional: keep a summary template or instructions
-
-# --- My personal projects (not for versioning) ---
-my_projects/
-
 # --- System / Editor specific ---
 .DS_Store
 Thumbs.db
