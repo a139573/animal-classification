@@ -1,0 +1,63 @@
+# --- Python general ---
+__pycache__/
+*.py[cod]
+*.pyo
+*.so
+*.egg-info/
+*.egg
+*.log
+
+# --- Environments ---
+.env
+.venv/
+venv/
+env/
+.ipynb_checkpoints/
+
+# --- Jupyter ---
+*.ipynb_checkpoints
+.notebooks/*-checkpoint.ipynb
+
+# --- Data ---
+data/
+!data/README.md     # keep a small readme describing the dataset source
+
+# --- Models ---
+models/
+!models/README.md   # keep a placeholder or model architecture description
+
+# --- Lightning / Training logs ---
+lightning_logs/
+logs/
+runs/               # e.g., TensorBoard
+
+# --- Reports / Generated outputs ---
+reports/
+!reports/README.md  # optional: keep a summary template or instructions
+
+# --- My personal projects (not for versioning) ---
+my_projects/
+
+# --- System / Editor specific ---
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# --- Checkpoints or cache ---
+*.ckpt
+*.pt
+*.pth
+*.tmp
+*.bak
+
+# --- Other large / transient files ---
+*.zip
+*.tar
+*.tar.gz
+*.h5
+*.pkl
+*.npy
+*.npz
