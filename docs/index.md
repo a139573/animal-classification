@@ -27,8 +27,6 @@ To execute the project, it is necessary to download the compressed folder and th
 # How to train the model
 To train the model, you should run the following command in the terminal from the project root folder "python -m my_projects.modeling.train". It trains with a subsample that contains 6% of the data.
 
-# How to generate predictions
-To train the model, you should run the following command in the terminal from the project root folder "python -m my_projects.modeling.inference".
 
 # Enviroment used
 The enviroment that we use in this project is anaconda. The environment py311ml has been used.
