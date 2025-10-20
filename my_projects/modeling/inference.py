@@ -5,8 +5,8 @@ from torch.nn import functional as F
 import pytorch_lightning as pl
 import numpy as np
 from pathlib import Path
-from my_projects.dataset import AnimalsDataModule, subsample_dir
-from my_projects.modeling.train import VGGNet
+from my_projects.dataset import AnimalsDataModule
+from my_projects.modeling.train import VGGNet, subsample_dir
 
 
 def run_inference(model_path: Path, output_path: Path):
@@ -21,7 +21,7 @@ def run_inference(model_path: Path, output_path: Path):
         Path to save the numpy arrays with predictions and labels.
     """
     # --- Setup data module ---
-    data_module = AnimalsDataModule(data_dir=subsample_dir, batch_size=32)
+    data_module = AnimalsDataModule(data_dir=subsample_dir, batch_size=16)
     data_module.setup()
 
     val_loader = data_module.val_dataloader()

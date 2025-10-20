@@ -18,17 +18,33 @@ In this project you need to import this libraries:
  - PIL
  - pathlib
 
-# What the project do
+# What is this project
 The goal of this project is to develop a model capable of identifying which of the 90 animals is depicted in a given image. The model will be trained on a portion of the dataset, with the objective of learning features that enable it to distinguish between the different animals. Once trained, the model should be able to accurately classify animals in images it has not previously seen.
 
 # How to run the project 
 To execute the project, it is necessary to download the compressed folder and then open the Jupyter Notebook named _Project 1 Animals Image Dataset_. Afterward, run all the cells.
 
-# How to train the model
-To train the model, you should run the following command in the terminal from the project root folder "python -m my_projects.modeling.train". It trains with a subsample that contains 6% of the data.
+# Steps to follow
+## 1. Download data
+From the root folder, run "python my_projects/download_data.py". This will download the full dataset into the subdirectory "data/animals".
 
+## 2. (Optinal) Reduce data
+From the root folder, run "python my_projects/download_data.py". You can adjust the following system arguments:
+- Number of images per class (15, 30, or 60). Default: 30
+- Target image size (56, 112, or 224). Default: 224
+- Path to the original dataset directory. Default: "data/mini_animals/animals"
+- Path to save the reduced dataset. Default="data/mini_animals/animals"
+
+# 3. Train the model
+From the root folder, run "python -m my_projects.train". You will be queried to configure the following parameters:
+- Use complete dataset or subsample
+- Choose seed
+- Choose model: VGG11 or VGG16
+- Choose number of epochs to train for
+
+# 4. Inference
 
 # Enviroment used
-The enviroment that we use in this project is anaconda. The environment py311ml has been used.
+
 
 **Project developed by Andrés Malón and Roberto Aldanondo**
