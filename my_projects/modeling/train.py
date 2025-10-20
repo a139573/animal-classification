@@ -3,7 +3,7 @@ from pytorch_lightning.callbacks import ModelCheckpoint
 from pytorch_lightning.loggers import CSVLogger
 from torch import nn, optim
 from torchvision import models
-from my_projects.dataset import AnimalsDataModule, subsample_dir
+from my_projects.dataset import AnimalsDataModule
 from pathlib import Path
 import torch
 import os
@@ -12,7 +12,6 @@ import os
 class VGGNet(pl.LightningModule):
     def __init__(self, architecture="vgg16", num_classes=90, pretrained=True, lr=1e-3):
         super().__init__()
-
         # --- Choose model architecture dynamically ---
         if architecture.lower() == "vgg16":
             self.vgg = models.vgg16(weights=models.VGG16_Weights.IMAGENET1K_V1 if pretrained else None)
@@ -61,7 +60,7 @@ class VGGNet(pl.LightningModule):
         return optim.Adam(self.parameters(), lr=self.lr)
 
 
-if __name__ == "__main__":
+def main():
     # --- Ask to choose dataset ---
     dataset_choice = ""
     data_dir = os.path.join(os.getcwd(), "data")
@@ -70,10 +69,7 @@ if __name__ == "__main__":
         print("1: Full dataset (animals)")
         print("2: Reduced dataset (mini_animals)")
         dataset_choice = input("Enter 1 or 2: ")
-    if dataset_choice == "1":
-        subsample_dir = os.path.join(data_dir, "animals")
-    else:
-        subsample_dir = os.path.join(data_dir, "mini_animals")
+    subsample_dir = os.path.join(data_dir, "animals" if dataset_choice == "1" else "mini_animals")
 
     # --- Ask for seed ---
     while True:
@@ -127,22 +123,22 @@ if __name__ == "__main__":
     models_dir = Path("models")
     models_dir.mkdir(parents=True, exist_ok=True)
 
-    # --- Callbacks ---
+    # --- Callbacks (keep only best model to save space) ---
     checkpoint_callback = ModelCheckpoint(
         dirpath=str(models_dir),
-        filename=f"{architecture}-{{epoch:02d}}-{{val_acc:.4f}}",
+        filename=f"{architecture}-best",
         monitor="val_acc",
         mode="max",
-        save_top_k=1,
-        save_last=True,
-        verbose=True,
+        save_top_k=1,       # ✅ only keep best model
+        save_last=False,    # ❌ don't save 'last.ckpt'
+        verbose=False,
     )
 
     logger = CSVLogger(save_dir="logs", name=f"{architecture}_runs")
 
     # --- Trainer ---
     trainer = pl.Trainer(
-        max_epochs=5,
+        max_epochs=max_epochs,
         accelerator="gpu",
         devices=1,
         val_check_interval=10.0,
@@ -156,7 +152,10 @@ if __name__ == "__main__":
     trainer.fit(net, datamodule=data_module)
 
     # --- Save final artifacts ---
-    trainer.save_checkpoint(str(models_dir / f"{architecture}_last.ckpt"))
     torch.save(net.state_dict(), str(models_dir / f"{architecture}_state_dict.pth"))
 
     print(f"Best checkpoint: {checkpoint_callback.best_model_path}")
+
+
+if __name__ == "__main__":
+    main()
