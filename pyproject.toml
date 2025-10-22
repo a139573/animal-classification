@@ -31,7 +31,10 @@ dependencies = [
     "torchvision",
     "pytorch-lightning",
     "pillow",
-    "kagglehub"
+    "kagglehub",
+    "gradio",
+    "matplotlib",
+    "seaborn"
 ]
 
 [project.urls]

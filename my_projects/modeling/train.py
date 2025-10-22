@@ -56,6 +56,7 @@ class VGGNet(pl.LightningModule):
     def configure_optimizers(self):
         return optim.Adam(self.parameters(), lr=self.lr)
 
+import gradio as gr
 
 def main(
     architecture: str = "vgg16",
@@ -63,7 +64,8 @@ def main(
     seed: int = 42,
     test_frac: float = 0.2,
     max_epochs: int = 5,
-    batch_size: int = 32
+    batch_size: int = 16,
+    progress: gr.Progress =None
 ):
     data_dir = Path("data")
     subsample_dir = data_dir / ("animals" if dataset_choice == "full" else "mini_animals")
@@ -98,11 +100,12 @@ def main(
         max_epochs=max_epochs,
         accelerator="gpu" if torch.cuda.is_available() else "cpu",
         devices=1,
+        precision=16,
         val_check_interval=10.0,
         num_sanity_val_steps=0,
         callbacks=[checkpoint_callback],
         logger=logger,
-        log_every_n_steps=100,
+        log_every_n_steps=100
     )
 
     trainer.fit(net, datamodule=data_module)

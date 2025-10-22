@@ -3,17 +3,23 @@ import random
 import argparse
 from pathlib import Path
 from PIL import Image
+from tqdm import tqdm
 
-def reduce_dataset(data_dir, output_dir, images_per_class, image_size):
+
+def reduce_dataset(data_dir, output_dir, images_per_class, image_size, progress=None):
     """Reduce the dataset by sampling a subset of images per class and resizing them."""
     data_dir = Path(data_dir)
     output_dir = Path(output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    for class_folder in data_dir.iterdir():
+    classes = [c for c in data_dir.iterdir() if c.is_dir()]
+    total = len(classes)
+
+    for i, class_folder in enumerate(classes):
         print(f"Class folder is {class_folder}")
         if not class_folder.is_dir():
             continue
+        print(f"DEBUG: updating progress {i/total} for class {class_folder.name}")
 
         class_name = class_folder.name
         mini_class_folder = output_dir / class_name
@@ -29,7 +35,9 @@ def reduce_dataset(data_dir, output_dir, images_per_class, image_size):
         sampled_images = random.sample(images, images_per_class)
 
         # Resize and save
-        for img_path in sampled_images:
+        for j, img_path in enumerate(sampled_images):
+            if progress is not None:
+                progress((i + j / len(sampled_images)) / total, desc=f"{class_name}: {j+1}/{len(sampled_images)} images")
             with Image.open(img_path).convert("RGB") as img:
                 img = img.resize((image_size, image_size))
                 img.save(mini_class_folder / img_path.name)
