@@ -5,29 +5,19 @@ from pathlib import Path
 from my_projects.dataset import AnimalsDataModule
 from my_projects.modeling.train import VGGNet
 import os
+import argparse
 
 
-def run_inference(model_path: Path, data_dir: Path, architecture: str, output_path: Path):
+def run_inference(model_path: Path, data_dir: Path, architecture: str, output_path: Path, batch_size: int = 16):
     """
     Run inference using a trained VGG model (VGG11 or VGG16).
-
-    Parameters
-    ----------
-    model_path : Path
-        Path to the trained model state_dict (.pth file).
-    data_dir : Path
-        Path to the dataset directory.
-    architecture : str
-        Model architecture, "vgg16" or "vgg11".
-    output_path : Path
-        Path to save predictions and labels as .npy files.
     """
     print(f"\n🔍 Loading model: {model_path}")
     print(f"📁 Using dataset: {data_dir}")
     print(f"🧠 Architecture: {architecture}")
 
     # --- Setup data module ---
-    data_module = AnimalsDataModule(data_dir=data_dir, batch_size=16)
+    data_module = AnimalsDataModule(data_dir=data_dir, batch_size=batch_size)
     data_module.setup()
     val_loader = data_module.val_dataloader()
     num_classes = len(data_module.class_names)
@@ -64,34 +54,30 @@ def run_inference(model_path: Path, data_dir: Path, architecture: str, output_pa
     print(f"\n✅ Saved validation predictions to: {output_path}")
 
 
-def main():
-    # --- Choose dataset ---
-    dataset_choice = ""
-    data_dir = os.path.join(os.getcwd(), "data")
-    while dataset_choice not in ["1", "2"]:
-        print("Select the dataset to use:")
-        print("1: Full dataset (animals)")
-        print("2: Reduced dataset (mini_animals)")
-        dataset_choice = input("Enter 1 or 2: ")
-
-    subsample_dir = os.path.join(data_dir, "animals" if dataset_choice == "1" else "mini_animals")
-
-    # --- Choose architecture ---
-    architecture = ""
-    while architecture.lower() not in ["vgg16", "vgg11"]:
-        architecture = input("Choose model architecture to load (vgg16 or vgg11): ").lower()
-
-    # --- Paths ---
+def main(
+    architecture: str = "vgg16",
+    dataset_choice: str = "mini",  # "full" or "mini"
+    batch_size: int = 16
+):
+    data_dir = Path("data")
+    subsample_dir = data_dir / ("animals" if dataset_choice == "full" else "mini_animals")
     models_dir = Path("models")
     output_dir = Path("predictions")
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    # --- Load corresponding model ---
     model_path = models_dir / f"{architecture}_state_dict.pth"
-
-    # --- Run inference ---
-    run_inference(model_path=model_path, data_dir=subsample_dir, architecture=architecture, output_path=output_dir)
+    run_inference(model_path=model_path, data_dir=subsample_dir, architecture=architecture, output_path=output_dir, batch_size=batch_size)
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(description="Run inference on a trained VGG model for the Animals dataset.")
+    parser.add_argument("--architecture", default="vgg16", choices=["vgg16", "vgg11"])
+    parser.add_argument("--dataset-choice", default="mini", choices=["full", "mini"])
+    parser.add_argument("--batch-size", type=int, default=16)
+
+    args = parser.parse_args()
+    main(
+        architecture=args.architecture,
+        dataset_choice=args.dataset_choice,
+        batch_size=args.batch_size
+    )
