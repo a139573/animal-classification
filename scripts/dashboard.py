@@ -56,7 +56,7 @@ def run_inference_gr(dataset_choice, model_choice, batch_size):
     output_dir = PROJECT_ROOT / "predictions"
     output_dir.mkdir(parents=True, exist_ok=True)
     model_path = PROJECT_ROOT / "models" / f"{model_choice.lower()}_state_dict.pth"
-    data_dir = DATA_DIR / ("animals" if dataset_str == "full" else "mini_animals")
+    data_dir = DATA_DIR / ("animals/animals" if dataset_str == "full" else "mini_animals/animals")
 
     # run inference and get metrics
     results = run_inference(

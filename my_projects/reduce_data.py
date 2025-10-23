@@ -1,41 +1,36 @@
 import os
 import random
-import argparse
+import shutil
 from pathlib import Path
 from PIL import Image
 from tqdm import tqdm
 
-
-def reduce_dataset(data_dir, output_dir, images_per_class, image_size, progress=None):
-    """Reduce the dataset by sampling a subset of images per class and resizing them."""
+def reduce_dataset(data_dir, output_dir, images_per_class, image_size, progress=None, seed=123):
+    """Reduce dataset by sampling a fixed subset of images per class and resizing them."""
+    random.seed(seed)
     data_dir = Path(data_dir)
     output_dir = Path(output_dir)
+
+    # 🧹 clear previous output to prevent duplicates
+    if output_dir.exists():
+        shutil.rmtree(output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
 
     classes = [c for c in data_dir.iterdir() if c.is_dir()]
     total = len(classes)
 
     for i, class_folder in enumerate(classes):
-        print(f"Class folder is {class_folder}")
-        if not class_folder.is_dir():
-            continue
-        print(f"DEBUG: updating progress {i/total} for class {class_folder.name}")
-
         class_name = class_folder.name
         mini_class_folder = output_dir / class_name
         mini_class_folder.mkdir(parents=True, exist_ok=True)
 
-        # Get all image files
-        images = [img for img in class_folder.iterdir() if img.is_file()]
-
-        # Check and sample
+        images = sorted([img for img in class_folder.iterdir() if img.is_file()])
         if len(images) < images_per_class:
-            raise ValueError(f"Class '{class_name}' has only {len(images)} images (less than {images_per_class}).")
+            raise ValueError(f"Class '{class_name}' has only {len(images)} images (<{images_per_class}).")
 
         sampled_images = random.sample(images, images_per_class)
 
-        # Resize and save
-        for j, img_path in enumerate(sampled_images):
+        for j, img_path in enumerate(tqdm(sampled_images, desc=f"Processing {class_name}")):
             if progress is not None:
                 progress((i + j / len(sampled_images)) / total, desc=f"{class_name}: {j+1}/{len(sampled_images)} images")
             with Image.open(img_path).convert("RGB") as img:
