@@ -3,7 +3,7 @@ from pytorch_lightning.callbacks import ModelCheckpoint
 from pytorch_lightning.loggers import CSVLogger
 from torch import nn, optim
 from torchvision import models
-from my_projects.dataset import AnimalsDataModule
+from ..dataset import AnimalsDataModule
 from pathlib import Path
 import torch
 import argparse

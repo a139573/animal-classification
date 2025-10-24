@@ -1,3 +1,13 @@
+import torch
+from torch.nn import functional as F
+import numpy as np
+from pathlib import Path
+from ..dataset import AnimalsDataModule
+from ..modeling.train import VGGNet
+from sklearn.metrics import accuracy_score, confusion_matrix, f1_score, RocCurveDisplay
+from sklearn.calibration import calibration_curve
+import matplotlib.pyplot as plt
+
 """
 Model Inference and Evaluation Script.
 
@@ -6,16 +16,6 @@ dataset. It calculates key performance metrics, saves raw predictions,
 and generates diagnostic plots such as the confusion matrix, ROC curve,
 and calibration plot.
 """
-
-import torch
-from torch.nn import functional as F
-import numpy as np
-from pathlib import Path
-from my_projects.dataset import AnimalsDataModule
-from my_projects.modeling.train import VGGNet
-from sklearn.metrics import accuracy_score, confusion_matrix, f1_score, RocCurveDisplay
-from sklearn.calibration import calibration_curve
-import matplotlib.pyplot as plt
 
 def run_inference(model_path: Path, data_dir: Path, architecture: str, output_path: Path, batch_size: int = 16):
     """

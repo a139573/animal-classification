@@ -11,9 +11,9 @@ the project's three main workflows:
 import gradio as gr
 import matplotlib.image as mpimg
 from pathlib import Path
-from my_projects.modeling.train import main as train_main
-from my_projects.modeling.inference import run_inference
-from my_projects.reduce_data import reduce_dataset
+from ..modeling.train import main as train_main
+from ..modeling.inference import run_inference
+from ..reduce_data import reduce_dataset
 
 # === PATHS ===
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
