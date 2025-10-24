@@ -10,7 +10,7 @@ packages = ["my_projects"]
 
 [project]
 name = "animal-classification"
-version = "0.2.0"
+version = "0.2.1"
 description = "A deep learning project to classify 90 different animals using VGG architectures."
 readme = "README.md"
 requires-python = ">=3.9"
