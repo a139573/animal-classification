@@ -1,10 +1,13 @@
-﻿# Readme Practice 1
+﻿# Animal-Classification-Project
 
 In this README, we will explain where the data was obtained from, as well as list the libraries necessary to execute the files and how to run this project.
 
+[![Dataset](https://img.shields.io/badge/🤗_dataset-kaggle-red.svg)](https://www.kaggle.com/datasets/iamsouravbanerjee/animal-image-dataset-90-different-animals)
+[![Pypi packages](https://img.shields.io/badge/packages-TestPyPI-blue.svg)](https://test.pypi.org/project/animal-classification/)
+
 
 # Data Source
-The dataset was obtained from the Kaggle website. The dataset is titled **Animal Image Dataset (90 Different Animals)**. The dataset is available at the following URL: [https://www.kaggle.com/datasets/iamsouravbanerjee/animal-image-dataset-90-different-animals](https://www.kaggle.com/datasets/iamsouravbanerjee/animal-image-dataset-90-different-animals). This dataset contains 5400 Animal Images Across 90 Diverse Classes
+The dataset was obtained from the Kaggle website. The dataset is titled **Animal Image Dataset (90 Different Animals)**. This dataset contains 5400 Animal Images Across 90 Diverse Classes
 
 
 # Libraries to import
