@@ -50,14 +50,10 @@ animal-download-data = "my_projects.download_data:main"
 animal-reduce-data = "my_projects.reduce_data:main"
 animal-train = "my_projects.modeling.train:main"
 animal-infer = "my_projects.modeling.inference:main"
-<<<<<<< HEAD
-animal-dashboard = "my_projects.scrits.dashboard:main"
+animal-dashboard = "my_projects.scripts.dashboard:main"
 
 
 [dependency-groups]
 dev = [
     "pdoc>=15.0.4",
 ]
-=======
-animal-dashboard = "my_projects.scripts.dashboard:main"
->>>>>>> interfaces
