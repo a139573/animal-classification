@@ -10,15 +10,15 @@ packages = ["my_projects"]
 
 [project]
 name = "animal-classification"
-version = "0.1.0"
+version = "0.1.1"
 description = "A deep learning project to classify 90 different animals using VGG architectures."
 readme = "README.md"
 requires-python = ">=3.9"
 license = "MIT"  # SPDX expression
 license-files = ["LICENSE"]  # optional, if you include a LICENSE file
 authors = [
-  { name="Andrés Malón" },
-  { name="Roberto Aldanondo" }
+  { name="Andrés Malón" ,email = "andresmalon@gmail.com"},
+  { name="Roberto Aldanondo", email = "robertoaj02@gmail.com" }
 ]
 keywords = ["deep-learning", "computer-vision", "animals", "image-classification", "pytorch"]
 classifiers = [
@@ -31,7 +31,14 @@ dependencies = [
     "torchvision",
     "pytorch-lightning",
     "pillow",
-    "kagglehub"
+    "kagglehub",
+    "build>=1.3.0",
+    "gradio>=4.44.1",
+    "numpy>=2.0.2",
+    "pandas>=2.3.3",
+    "seaborn>=0.13.2",
+    "twine>=6.2.0",
+    "matplotlib>=3.9.4",
 ]
 
 [project.urls]
@@ -43,3 +50,10 @@ animal-download-data = "my_projects.download_data:main"
 animal-reduce-data = "my_projects.reduce_data:main"
 animal-train = "my_projects.modeling.train:main"
 animal-infer = "my_projects.modeling.inference:main"
+animal-dashboard = "my_projects.scrits.dashboard:main"
+
+
+[dependency-groups]
+dev = [
+    "pdoc>=15.0.4",
+]
