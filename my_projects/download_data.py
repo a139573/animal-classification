@@ -41,7 +41,7 @@ def flatten_folder(path: Path) -> Path:
     return path
 
 def main():
-	"""
+    """
     Main function to download, process, and organize the dataset.
 
     Downloads the Kaggle animal dataset, flattens any nested

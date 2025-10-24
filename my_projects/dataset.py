@@ -11,7 +11,7 @@ from torch.utils.data import DataLoader, random_split
 from torchvision import datasets, transforms
 
 class AnimalsDataModule(pl.LightningDataModule):
-	"""
+    """
     PyTorch Lightning DataModule for an animal classification dataset.
 
     This class handles the loading, transformation, and splitting (training,
@@ -37,7 +37,7 @@ class AnimalsDataModule(pl.LightningDataModule):
         Test data subset.
     """
     def __init__(self, data_dir=".", batch_size=32, num_workers=4, test_frac=0.2, seed=123):
-		"""
+        """
         Initializes the DataModule.
 
         Parameters
@@ -66,7 +66,7 @@ class AnimalsDataModule(pl.LightningDataModule):
         ])
 
     def setup(self, stage=None):
-		"""
+        """
         Prepares the data and performs the train/val/test split.
 
         This method is called automatically by PyTorch Lightning. It loads the
@@ -94,7 +94,7 @@ class AnimalsDataModule(pl.LightningDataModule):
             )
 
     def train_dataloader(self):
-		"""
+        """
         Creates the DataLoader for the training set.
 
         Returns
@@ -105,7 +105,7 @@ class AnimalsDataModule(pl.LightningDataModule):
         return DataLoader(self.train_data, batch_size=self.batch_size, num_workers=self.num_workers, shuffle=True)
 
     def val_dataloader(self):
-		"""
+        """
         Creates the DataLoader for the validation set.
 
         Returns
@@ -116,7 +116,7 @@ class AnimalsDataModule(pl.LightningDataModule):
         return DataLoader(self.val_data, batch_size=self.batch_size, num_workers=self.num_workers)
 
     def test_dataloader(self):
-		"""
+        """
         Creates the DataLoader for the test set.
 
         Returns

@@ -10,7 +10,7 @@ import os
 
 def get_category_images(category_path):
 
-	"""
+    """
 	Retrieves the list of images for a specific category.
 
 	Parameters
@@ -23,7 +23,7 @@ def get_category_images(category_path):
 	list of str
 		A list containing the filenames of valid images 
 		(.jpg, .jpeg, .png, .bmp, .gif) within the folder.
-	"""
+    """
     imagenes = [f for f in os.listdir(category_path)
                 if os.path.isfile(os.path.join(category_path, f))
                 and f.lower().endswith(('.jpg', '.jpeg', '.png', '.bmp', '.gif'))]
@@ -42,7 +42,7 @@ def get_category_names(data_dir):
 	-------
 	list of str
 		A list of category names (one per line in the file).
-	"""
+    """
     path_names_category = data_dir / 'name of the animals.txt'
     with open(path_names_category, 'r') as f:
         category_names = [line.strip() for line in f if line.strip()]
@@ -61,7 +61,7 @@ def calculate_rgb_averages(data_dir):
 	-------
 	dict
 		A dictionary with categories as keys and the [R, G, B] averages as values.
-	"""
+    """
     category_names = get_category_names(data_dir)
     animals_dir = data_dir / 'mini_animals'
     # Diccionario para guardar la media por clase
@@ -91,7 +91,7 @@ def calculate_rgb_averages(data_dir):
     return medias_rgb
 
 def plot_rgb_heatmap(df, path):
-	"""
+    """
     Generates a heatmap of average R, G, B values per class.
 
     Parameters
