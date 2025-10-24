@@ -7,9 +7,7 @@ In this README, we will explain where the data was obtained from, as well as lis
 The dataset was obtained from the Kaggle website. The dataset is titled **Animal Image Dataset (90 Different Animals)**. The dataset is available at the following URL: [https://www.kaggle.com/datasets/iamsouravbanerjee/animal-image-dataset-90-different-animals](https://www.kaggle.com/datasets/iamsouravbanerjee/animal-image-dataset-90-different-animals). This dataset contains 5400 Animal Images Across 90 Diverse Classes
 
 
-
-
-# Libraries to import (put as commands)
+# Libraries to import
 To install the necessary dependencies for the environment you can use:
 
 ```bash
@@ -22,7 +20,7 @@ The goal of this project is to develop a model capable of identifying which of t
 # How to run the project 
 To execute the project, it is necessary to download the compressed folder and then open the Jupyter Notebook named _Project 1 Animals Image Dataset_. Afterward, run all the cells.
 
-# Steps to follow (change for publication)
+# Steps to follow
 ## 1. Download data
 From the root folder, run "animal-download-data
 ". This will download the full dataset into the subdirectory "data/animals".
@@ -48,6 +46,13 @@ From the root folder, run "animal-infer". You will be queried to configure the f
 - Choose model: VGG11 or VGG16
 
 # Enviroment used
+# 👥 Team
+## Authors
+* Andrés Malón - Public University of Navarre, Spain
+* Roberto Aldanondo - Public University of Navarre, Spain 
+
+
+
 
 
 **Project developed by Andrés Malón and Roberto Aldanondo**
