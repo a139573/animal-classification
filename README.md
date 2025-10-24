@@ -45,14 +45,13 @@ From the root folder, run "animal-infer". You will be queried to configure the f
 - Use complete dataset or subsample
 - Choose model: VGG11 or VGG16
 
-# Enviroment used
+
 # 👥 Team
 ## Authors
 * Andrés Malón - Public University of Navarre, Spain
 * Roberto Aldanondo - Public University of Navarre, Spain 
+# 📧 Contact 
+For any question or issues, please:
+1. Open an issue in this repository
+2. Contact one of the corresponding authors: andresmalon@gmail.com, robertoaj02@gmail.com 
 
-
-
-
-
-**Project developed by Andrés Malón and Roberto Aldanondo**
