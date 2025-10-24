@@ -1,6 +1,21 @@
 import os
 import re
 from pathlib import Path
+"""
+Script to clean dataset folders by deleting specific files.
+
+This script iterates through subdirectories of a root data folder
+(e.g., class folders like 'cat', 'dog') and deletes files
+whose names match a specific regex pattern.
+
+It is designed to remove files that may be artifacts from a renaming
+process, such as "cat_1.jpg", "lion_12.png", etc.
+
+Notes
+-----
+The variables `root_dir` and `pattern` must be set manually
+within this script before execution.
+"""
 
 root_dir = Path("/home/alumno/Documents/software/animal-classification/data/mini_animals/animals")
 

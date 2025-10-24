@@ -5,25 +5,25 @@ import numpy as np
 import pandas as pd
 import pdoc
 import os
-#import scipy
-#import torch
+
 
 
 def get_category_images(category_path):
-    """
-    Obtiene la lista de imágenes de una categoría específica.
 
-    Parameters
-    ----------
-    category_path : str or Path
-        Ruta a la carpeta de la categoría.
+	"""
+	Retrieves the list of images for a specific category.
 
-    Returns
-    -------
-    list of str
-        Lista con los nombres de archivos de imágenes válidas 
-        (.jpg, .jpeg, .png, .bmp, .gif) en la carpeta.
-    """
+	Parameters
+	----------
+	category_path : str or Path
+		The path to the category folder.
+
+	Returns
+	-------
+	list of str
+		A list containing the filenames of valid images 
+		(.jpg, .jpeg, .png, .bmp, .gif) within the folder.
+	"""
     imagenes = [f for f in os.listdir(category_path)
                 if os.path.isfile(os.path.join(category_path, f))
                 and f.lower().endswith(('.jpg', '.jpeg', '.png', '.bmp', '.gif'))]
@@ -31,18 +31,18 @@ def get_category_images(category_path):
 
 def get_category_names(data_dir):
     """
-    Lee los nombres de las categorías desde un archivo de texto.
+	Reads the category names from a text file.
 
-    Parameters
-    ----------
-    data_dir : Path
-        Ruta al directorio que contiene el archivo 'name of the animals.txt'.
+	Parameters
+	----------
+	data_dir : Path
+		Path to the directory containing the 'name of the animals.txt' file.
 
-    Returns
-    -------
-    list of str
-        Lista con los nombres de las categorías (una por línea en el archivo).
-    """
+	Returns
+	-------
+	list of str
+		A list of category names (one per line in the file).
+	"""
     path_names_category = data_dir / 'name of the animals.txt'
     with open(path_names_category, 'r') as f:
         category_names = [line.strip() for line in f if line.strip()]
@@ -50,18 +50,18 @@ def get_category_names(data_dir):
 
 def calculate_rgb_averages(data_dir):
     """
-    Calcula los valores promedio de R, G y B por categoría de imágenes.
+	Calculates the average R, G, and B values per image category.
 
-    Parameters
-    ----------
-    data_dir : Path
-        Ruta al directorio de datos que contiene las imágenes dentro de 'mini_animals'.
+	Parameters
+	----------
+	data_dir : Path
+		Path to the data directory containing the images within 'mini_animals'.
 
-    Returns
-    -------
-    dict
-        Diccionario con las categorías como claves y los promedios [R, G, B] como valores.
-    """
+	Returns
+	-------
+	dict
+		A dictionary with categories as keys and the [R, G, B] averages as values.
+	"""
     category_names = get_category_names(data_dir)
     animals_dir = data_dir / 'mini_animals'
     # Diccionario para guardar la media por clase
@@ -91,15 +91,15 @@ def calculate_rgb_averages(data_dir):
     return medias_rgb
 
 def plot_rgb_heatmap(df, path):
-    """
-    Genera un mapa de calor (heatmap) de valores promedio R, G, B por clase.
+	"""
+    Generates a heatmap of average R, G, B values per class.
 
     Parameters
     ----------
     df : pandas.DataFrame
-        DataFrame con columnas ['R', 'G', 'B', 'luminance'].
+        DataFrame with columns ['R', 'G', 'B', 'luminance'].
     path : Path
-        Ruta donde se guardará la figura.
+        Path where the figure will be saved.
     """
     # Ordenar df_norm completo por luminancia
     df_sorted = df.sort_values('luminance')
@@ -116,14 +116,14 @@ def plot_rgb_heatmap(df, path):
 
 def plot_clustermap(df, path):
     """
-    Genera un clustermap jerárquico de los valores R, G y B.
+    Generates a hierarchical clustermap of R, G, and B values.
 
     Parameters
     ----------
-    df : pandas.DataFrame
-        DataFrame con columnas ['R', 'G', 'B'] normalizadas.
+    df_norm : pandas.DataFrame
+        DataFrame with normalized ['R', 'G', 'B'] columns.
     path : Path
-        Ruta donde se guardará la figura.
+        Path where the figure will be saved.
     """
     sns.clustermap(
         df_norm[['R','G','B']], 
@@ -136,14 +136,14 @@ def plot_clustermap(df, path):
 
 def plot_avg_colors(df, path):
     """
-    Genera una visualización de los colores promedio por clase.
+    Generates a visualization of the average colors per class.
 
     Parameters
     ----------
     df : pandas.DataFrame
-        DataFrame con columnas ['class', 'R', 'G', 'B'].
+        DataFrame with columns ['class', 'R', 'G', 'B'].
     path : Path
-        Ruta donde se guardará la figura.
+        Path where the figure will be saved.
     """
     fig, axes = plt.subplots(nrows=15, ncols=6, figsize=(10, 20))  # ajustar rows/cols
     axes = axes.flatten()
@@ -157,21 +157,21 @@ def plot_avg_colors(df, path):
 
 def get_df_with_rgb_avg(medias_rgb):
     """
-    Convierte un diccionario de promedios RGB en un DataFrame y añade métricas adicionales.
+    Converts a dictionary of RGB averages into a DataFrame and adds metrics.
 
     Parameters
     ----------
-    medias_rgb : dict
-        Diccionario con categorías como claves y valores [R, G, B] promedios.
+    rgb_averages : dict
+        Dictionary with categories as keys and average [R, G, B] values.
 
     Returns
     -------
     pandas.DataFrame
-        DataFrame con columnas:
-        - 'class': nombre de la clase.
-        - 'R', 'G', 'B': valores normalizados (0-1).
-        - 'luminance': luminancia perceptual.
-        - 'colorfulness': medida de colorfulness aproximada.
+        DataFrame with columns:
+        - 'class': The class name.
+        - 'R', 'G', 'B': Normalized values (0.0-1.0).
+        - 'luminance': Perceptual luminance.
+        - 'colorfulness': An approximate colorfulness metric.
     """
     df = pd.DataFrame.from_dict(medias_rgb, orient='index', columns=['R','G','B'])
     df.index.name = 'class'

@@ -1,12 +1,32 @@
 import shutil
 from pathlib import Path
 import kagglehub
+"""
+Dataset Preparation Script.
 
+This script automates the process of downloading the "Animal Image Dataset"
+from Kaggle, flattening its directory structure, and organizing the
+class folders into a local './data/animals' directory.
+"""
 def flatten_folder(path: Path) -> Path:
     """
-    If the folder contains exactly one folder and no files,
-    return that subfolder instead (flattening).
-    Repeat recursively until we reach the actual content.
+    Recursively flattens a directory structure.
+
+    If a folder contains exactly one subfolder and no files,
+    this function descends into that subfolder. This process is
+    repeated until the directory contains multiple items (files or
+    other folders). This is useful for "unwrapping" archives
+    that have a redundant top-level folder.
+
+    Parameters
+    ----------
+    path : Path
+        The starting directory path to flatten.
+
+    Returns
+    -------
+    Path
+        The path to the "real" content folder.
     """
     while True:
         items = list(path.iterdir())
@@ -21,6 +41,13 @@ def flatten_folder(path: Path) -> Path:
     return path
 
 def main():
+	"""
+    Main function to download, process, and organize the dataset.
+
+    Downloads the Kaggle animal dataset, flattens any nested
+    directory structures, and copies the contents (class folders)
+    into a clean 'data/animals' directory.
+    """
     target_dir = Path("data/animals")
     target_dir.mkdir(parents=True, exist_ok=True)
 

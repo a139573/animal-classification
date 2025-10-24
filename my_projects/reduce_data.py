@@ -4,9 +4,44 @@ import shutil
 from pathlib import Path
 from PIL import Image
 from tqdm import tqdm
+"""
+Dataset Reduction Utility.
 
+This script provides a command-line interface to create a smaller,
+resized subset of an image classification dataset.
+
+It works by iterating through class subdirectories, sampling a
+fixed number of images from each, resizing them to a uniform
+square size, and saving them to a new output directory, preserving
+the original class folder structure.
+"""
 def reduce_dataset(data_dir, output_dir, images_per_class, image_size, progress=None, seed=123):
-    """Reduce dataset by sampling a fixed subset of images per class and resizing them."""
+    """
+    Reduces an image dataset by sampling and resizing images.
+
+    Parameters
+    ----------
+    data_dir : str or Path
+        Path to the original, full dataset directory (e.g., 'data/animals').
+    output_dir : str or Path
+        Path to the directory where the reduced dataset will be saved 
+        (e.g., 'data/mini_animals').
+    images_per_class : int
+        The exact number of images to sample from each class.
+    image_size : int
+        The target size (width and height) for resizing (e.g., 224).
+    progress : callable, optional
+        An optional callback function for reporting progress (e.g., for a
+        Gradio or Streamlit GUI). It should accept `(float, desc=str)`.
+    seed : int, optional
+        A random seed to ensure reproducible sampling (default is 123).
+
+    Raises
+    ------
+    ValueError
+        If a class folder is found to contain fewer images than
+        the requested `images_per_class`.
+    """
     random.seed(seed)
     data_dir = Path(data_dir)
     output_dir = Path(output_dir)
