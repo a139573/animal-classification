@@ -10,13 +10,11 @@ The dataset was obtained from the Kaggle website. The dataset is titled **Animal
 
 
 # Libraries to import (put as commands)
+To install the necessary dependencies for the environment you can use:
 
-In this project you need to import this libraries:
-
- - Torch
- - Torchvision
- - PIL
- - pathlib
+```bash
+pip install -r requirements.txt
+```
 
 # What is this project
 The goal of this project is to develop a model capable of identifying which of the 90 animals is depicted in a given image. The model will be trained on a portion of the dataset, with the objective of learning features that enable it to distinguish between the different animals. Once trained, the model should be able to accurately classify animals in images it has not previously seen.
