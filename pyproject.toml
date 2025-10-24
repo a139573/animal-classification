@@ -54,7 +54,7 @@ animal-infer = "my_projects.modeling.inference:main"
 animal-dashboard = "my_projects.scripts.dashboard:main"
 
 
-[dependency-groups]
+[project.optional-dependencies]
 dev = [
     "pdoc>=15.0.4",
 ]
