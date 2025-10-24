@@ -200,6 +200,7 @@ name = "animal-classification"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [
+<<<<<<< HEAD
     { name = "build" },
     { name = "gradio", version = "4.44.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.10'" },
     { name = "gradio", version = "5.49.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.10'" },
@@ -228,6 +229,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
+<<<<<<< HEAD
     { name = "build", specifier = ">=1.3.0" },
     { name = "gradio", specifier = ">=4.44.1" },
     { name = "kagglehub" },
@@ -245,6 +247,18 @@ requires-dist = [
 [package.metadata.requires-dev]
 dev = [{ name = "pdoc", specifier = ">=15.0.4" }]
 
+=======
+    { name = "gradio" },
+    { name = "kagglehub" },
+    { name = "matplotlib" },
+    { name = "pillow" },
+    { name = "pytorch-lightning" },
+    { name = "seaborn" },
+    { name = "torch" },
+    { name = "torchvision" },
+]
+
+>>>>>>> interfaces
 [[package]]
 name = "annotated-types"
 version = "0.7.0"
@@ -344,6 +358,7 @@ wheels = [
 ]
 
 [[package]]
+<<<<<<< HEAD
 name = "backports-tarfile"
 version = "1.2.0"
 source = { registry = "https://pypi.org/simple" }
@@ -353,6 +368,8 @@ wheels = [
 ]
 
 [[package]]
+=======
+>>>>>>> interfaces
 name = "brotli"
 version = "1.1.0"
 source = { registry = "https://pypi.org/simple" }
@@ -439,6 +456,7 @@ wheels = [
 ]
 
 [[package]]
+<<<<<<< HEAD
 name = "build"
 version = "1.3.0"
 source = { registry = "https://pypi.org/simple" }
@@ -455,6 +473,8 @@ wheels = [
 ]
 
 [[package]]
+=======
+>>>>>>> interfaces
 name = "certifi"
 version = "2025.10.5"
 source = { registry = "https://pypi.org/simple" }
@@ -464,6 +484,7 @@ wheels = [
 ]
 
 [[package]]
+<<<<<<< HEAD
 name = "cffi"
 version = "2.0.0"
 source = { registry = "https://pypi.org/simple" }
@@ -525,6 +546,8 @@ wheels = [
 ]
 
 [[package]]
+=======
+>>>>>>> interfaces
 name = "charset-normalizer"
 version = "3.4.4"
 source = { registry = "https://pypi.org/simple" }
@@ -907,6 +930,7 @@ wheels = [
 ]
 
 [[package]]
+<<<<<<< HEAD
 name = "cryptography"
 version = "46.0.3"
 source = { registry = "https://pypi.org/simple" }
@@ -956,6 +980,8 @@ wheels = [
 ]
 
 [[package]]
+=======
+>>>>>>> interfaces
 name = "cycler"
 version = "0.12.1"
 source = { registry = "https://pypi.org/simple" }
@@ -965,6 +991,7 @@ wheels = [
 ]
 
 [[package]]
+<<<<<<< HEAD
 name = "docutils"
 version = "0.22.2"
 source = { registry = "https://pypi.org/simple" }
@@ -974,11 +1001,17 @@ wheels = [
 ]
 
 [[package]]
+=======
+>>>>>>> interfaces
 name = "exceptiongroup"
 version = "1.3.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
+<<<<<<< HEAD
     { name = "typing-extensions", marker = "python_full_version < '3.11'" },
+=======
+    { name = "typing-extensions", marker = "python_full_version < '3.12'" },
+>>>>>>> interfaces
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/0b/9f/a65090624ecf468cdca03533906e7c69ed7588582240cfe7cc9e770b50eb/exceptiongroup-1.3.0.tar.gz", hash = "sha256:b241f5885f560bc56a59ee63ca4c6a8bfa46ae4ad651af316d4e81817bb9fd88", size = 29749, upload-time = "2025-05-10T17:42:51.123Z" }
 wheels = [
@@ -1001,11 +1034,19 @@ wheels = [
 
 [[package]]
 name = "ffmpy"
+<<<<<<< HEAD
 version = "0.6.3"
 source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/85/dd/80760526c2742074c004e5a434665b577ddaefaedad51c5b8fa4526c77e0/ffmpy-0.6.3.tar.gz", hash = "sha256:306f3e9070e11a3da1aee3241d3a6bd19316ff7284716e15a1bc98d7a1939eaf", size = 4975, upload-time = "2025-10-11T07:34:56.609Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/e9/50/e9409c94a0e9a9d1ec52c6f60e086c52aa0178a0f6f00d7f5e809a201179/ffmpy-0.6.3-py3-none-any.whl", hash = "sha256:f7b25c85a4075bf5e68f8b4eb0e332cb8f1584dfc2e444ff590851eaef09b286", size = 5495, upload-time = "2025-10-11T07:34:55.124Z" },
+=======
+version = "0.6.4"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/d1/c6/bf76e2f5e2fa603988b9ea4f5ead8cacbdcdf87133e329d25a60251d861a/ffmpy-0.6.4.tar.gz", hash = "sha256:9533ad21f878b609ab1a5235668f5c514cb0953361e266e34d33614c3f6712d1", size = 5074, upload-time = "2025-10-22T12:10:57.913Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/36/f3/3e1cbf8cc0d2642de1a34fa6ff5a6dfbd0df4d90a52409f7b3a9e18480b4/ffmpy-0.6.4-py3-none-any.whl", hash = "sha256:21fbf9cd3116279e0629e0f2bf5892306b3336d588165c8db1b5f6361118d811", size = 5596, upload-time = "2025-10-22T12:10:56.915Z" },
+>>>>>>> interfaces
 ]
 
 [[package]]
@@ -1464,6 +1505,7 @@ wheels = [
 ]
 
 [[package]]
+<<<<<<< HEAD
 name = "id"
 version = "1.5.0"
 source = { registry = "https://pypi.org/simple" }
@@ -1476,6 +1518,8 @@ wheels = [
 ]
 
 [[package]]
+=======
+>>>>>>> interfaces
 name = "idna"
 version = "3.11"
 source = { registry = "https://pypi.org/simple" }
@@ -1489,7 +1533,11 @@ name = "importlib-metadata"
 version = "8.7.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
+<<<<<<< HEAD
     { name = "zipp", marker = "python_full_version < '3.12'" },
+=======
+    { name = "zipp", marker = "python_full_version < '3.10'" },
+>>>>>>> interfaces
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/76/66/650a33bd90f786193e4de4b3ad86ea60b53c89b669a5c7be931fac31cdb0/importlib_metadata-8.7.0.tar.gz", hash = "sha256:d13b81ad223b890aa16c5471f2ac3056cf76c5f10f82d6f9292f0b415f389000", size = 56641, upload-time = "2025-04-27T15:29:01.736Z" }
 wheels = [
@@ -1509,6 +1557,7 @@ wheels = [
 ]
 
 [[package]]
+<<<<<<< HEAD
 name = "jaraco-classes"
 version = "3.4.0"
 source = { registry = "https://pypi.org/simple" }
@@ -1554,6 +1603,8 @@ wheels = [
 ]
 
 [[package]]
+=======
+>>>>>>> interfaces
 name = "jinja2"
 version = "3.1.6"
 source = { registry = "https://pypi.org/simple" }
@@ -1582,6 +1633,7 @@ wheels = [
 ]
 
 [[package]]
+<<<<<<< HEAD
 name = "keyring"
 version = "25.6.0"
 source = { registry = "https://pypi.org/simple" }
@@ -1601,6 +1653,8 @@ wheels = [
 ]
 
 [[package]]
+=======
+>>>>>>> interfaces
 name = "kiwisolver"
 version = "1.4.7"
 source = { registry = "https://pypi.org/simple" }
@@ -2171,6 +2225,7 @@ wheels = [
 ]
 
 [[package]]
+<<<<<<< HEAD
 name = "more-itertools"
 version = "10.8.0"
 source = { registry = "https://pypi.org/simple" }
@@ -2180,6 +2235,8 @@ wheels = [
 ]
 
 [[package]]
+=======
+>>>>>>> interfaces
 name = "mpmath"
 version = "1.3.0"
 source = { registry = "https://pypi.org/simple" }
@@ -2383,6 +2440,7 @@ wheels = [
 ]
 
 [[package]]
+<<<<<<< HEAD
 name = "nh3"
 version = "0.3.1"
 source = { registry = "https://pypi.org/simple" }
@@ -2416,6 +2474,8 @@ wheels = [
 ]
 
 [[package]]
+=======
+>>>>>>> interfaces
 name = "numpy"
 version = "2.0.2"
 source = { registry = "https://pypi.org/simple" }
@@ -2942,6 +3002,7 @@ wheels = [
 ]
 
 [[package]]
+<<<<<<< HEAD
 name = "pdoc"
 version = "15.0.4"
 source = { registry = "https://pypi.org/simple" }
@@ -2957,6 +3018,8 @@ wheels = [
 ]
 
 [[package]]
+=======
+>>>>>>> interfaces
 name = "pillow"
 version = "10.4.0"
 source = { registry = "https://pypi.org/simple" }
@@ -3285,6 +3348,7 @@ wheels = [
 ]
 
 [[package]]
+<<<<<<< HEAD
 name = "pycparser"
 version = "2.23"
 source = { registry = "https://pypi.org/simple" }
@@ -3294,6 +3358,8 @@ wheels = [
 ]
 
 [[package]]
+=======
+>>>>>>> interfaces
 name = "pydantic"
 version = "2.11.10"
 source = { registry = "https://pypi.org/simple" }
@@ -3445,6 +3511,7 @@ wheels = [
 ]
 
 [[package]]
+<<<<<<< HEAD
 name = "pyproject-hooks"
 version = "1.2.0"
 source = { registry = "https://pypi.org/simple" }
@@ -3454,6 +3521,8 @@ wheels = [
 ]
 
 [[package]]
+=======
+>>>>>>> interfaces
 name = "python-dateutil"
 version = "2.9.0.post0"
 source = { registry = "https://pypi.org/simple" }
@@ -3504,6 +3573,7 @@ wheels = [
 ]
 
 [[package]]
+<<<<<<< HEAD
 name = "pywin32-ctypes"
 version = "0.2.3"
 source = { registry = "https://pypi.org/simple" }
@@ -3513,6 +3583,8 @@ wheels = [
 ]
 
 [[package]]
+=======
+>>>>>>> interfaces
 name = "pyyaml"
 version = "6.0.3"
 source = { registry = "https://pypi.org/simple" }
@@ -3586,6 +3658,7 @@ wheels = [
 ]
 
 [[package]]
+<<<<<<< HEAD
 name = "readme-renderer"
 version = "44.0"
 source = { registry = "https://pypi.org/simple" }
@@ -3600,6 +3673,8 @@ wheels = [
 ]
 
 [[package]]
+=======
+>>>>>>> interfaces
 name = "requests"
 version = "2.32.5"
 source = { registry = "https://pypi.org/simple" }
@@ -3615,6 +3690,7 @@ wheels = [
 ]
 
 [[package]]
+<<<<<<< HEAD
 name = "requests-toolbelt"
 version = "1.0.0"
 source = { registry = "https://pypi.org/simple" }
@@ -3636,6 +3712,8 @@ wheels = [
 ]
 
 [[package]]
+=======
+>>>>>>> interfaces
 name = "rich"
 version = "14.2.0"
 source = { registry = "https://pypi.org/simple" }
@@ -3705,6 +3783,7 @@ wheels = [
 ]
 
 [[package]]
+<<<<<<< HEAD
 name = "secretstorage"
 version = "3.3.3"
 source = { registry = "https://pypi.org/simple" }
@@ -3740,6 +3819,8 @@ wheels = [
 ]
 
 [[package]]
+=======
+>>>>>>> interfaces
 name = "semantic-version"
 version = "2.10.0"
 source = { registry = "https://pypi.org/simple" }
@@ -3810,6 +3891,7 @@ wheels = [
 ]
 
 [[package]]
+<<<<<<< HEAD
 name = "tomli"
 version = "2.3.0"
 source = { registry = "https://pypi.org/simple" }
@@ -3859,6 +3941,8 @@ wheels = [
 ]
 
 [[package]]
+=======
+>>>>>>> interfaces
 name = "tomlkit"
 version = "0.12.0"
 source = { registry = "https://pypi.org/simple" }
@@ -4166,6 +4250,7 @@ wheels = [
 ]
 
 [[package]]
+<<<<<<< HEAD
 name = "twine"
 version = "6.2.0"
 source = { registry = "https://pypi.org/simple" }
@@ -4187,6 +4272,8 @@ wheels = [
 ]
 
 [[package]]
+=======
+>>>>>>> interfaces
 name = "typer"
 version = "0.20.0"
 source = { registry = "https://pypi.org/simple" }

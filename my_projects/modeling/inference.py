@@ -4,30 +4,18 @@ import numpy as np
 from pathlib import Path
 from my_projects.dataset import AnimalsDataModule
 from my_projects.modeling.train import VGGNet
+from sklearn.metrics import accuracy_score, confusion_matrix
+import matplotlib.pyplot as plt
 import os
+import argparse
 
-
-def run_inference(model_path: Path, data_dir: Path, architecture: str, output_path: Path):
-    """
-    Run inference using a trained VGG model (VGG11 or VGG16).
-
-    Parameters
-    ----------
-    model_path : Path
-        Path to the trained model state_dict (.pth file).
-    data_dir : Path
-        Path to the dataset directory.
-    architecture : str
-        Model architecture, "vgg16" or "vgg11".
-    output_path : Path
-        Path to save predictions and labels as .npy files.
-    """
+def run_inference(model_path: Path, data_dir: Path, architecture: str, output_path: Path, batch_size: int = 16):
     print(f"\n🔍 Loading model: {model_path}")
     print(f"📁 Using dataset: {data_dir}")
     print(f"🧠 Architecture: {architecture}")
 
     # --- Setup data module ---
-    data_module = AnimalsDataModule(data_dir=data_dir, batch_size=16)
+    data_module = AnimalsDataModule(data_dir=data_dir, batch_size=batch_size)
     data_module.setup()
     val_loader = data_module.val_dataloader()
     num_classes = len(data_module.class_names)
@@ -38,14 +26,12 @@ def run_inference(model_path: Path, data_dir: Path, architecture: str, output_pa
     model.load_state_dict(state_dict)
     model.eval()
 
-    # --- Use GPU if available ---
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model.to(device)
     print(f"⚙️  Running on: {device}")
 
     all_probs, all_labels = [], []
 
-    # --- Inference loop ---
     with torch.no_grad():
         for xb, yb in val_loader:
             xb = xb.to(device)
@@ -57,41 +43,29 @@ def run_inference(model_path: Path, data_dir: Path, architecture: str, output_pa
     all_probs = np.concatenate(all_probs)
     all_labels = np.concatenate(all_labels)
 
-    # --- Save to disk ---
+    # --- Save predictions ---
+    output_path.mkdir(parents=True, exist_ok=True)
     np.save(output_path / f"{architecture}_val_probs.npy", all_probs)
     np.save(output_path / f"{architecture}_val_labels.npy", all_labels)
-
     print(f"\n✅ Saved validation predictions to: {output_path}")
 
+    # --- Compute simple metrics ---
+    preds = all_probs.argmax(axis=1)
+    acc = accuracy_score(all_labels, preds)
+    cm = confusion_matrix(all_labels, preds)
 
-def main():
-    # --- Choose dataset ---
-    dataset_choice = ""
-    data_dir = os.path.join(os.getcwd(), "data")
-    while dataset_choice not in ["1", "2"]:
-        print("Select the dataset to use:")
-        print("1: Full dataset (animals)")
-        print("2: Reduced dataset (mini_animals)")
-        dataset_choice = input("Enter 1 or 2: ")
+    print(f"Validation Accuracy: {acc:.3f}")
+    print("Confusion Matrix:")
+    print(cm)
 
-    subsample_dir = os.path.join(data_dir, "animals" if dataset_choice == "1" else "mini_animals")
+    # --- Save confusion matrix figure ---
+    plt.figure(figsize=(6,6))
+    plt.imshow(cm, cmap="Blues")
+    plt.title("Confusion Matrix")
+    plt.colorbar()
+    plt.xlabel("Predicted")
+    plt.ylabel("True")
+    plt.savefig(output_path / f"{architecture}_confusion_matrix.png")
+    plt.close()
 
-    # --- Choose architecture ---
-    architecture = ""
-    while architecture.lower() not in ["vgg16", "vgg11"]:
-        architecture = input("Choose model architecture to load (vgg16 or vgg11): ").lower()
-
-    # --- Paths ---
-    models_dir = Path("models")
-    output_dir = Path("predictions")
-    output_dir.mkdir(parents=True, exist_ok=True)
-
-    # --- Load corresponding model ---
-    model_path = models_dir / f"{architecture}_state_dict.pth"
-
-    # --- Run inference ---
-    run_inference(model_path=model_path, data_dir=subsample_dir, architecture=architecture, output_path=output_dir)
-
-
-if __name__ == "__main__":
-    main()
+    return {"val_acc": acc, "confusion_matrix": cm}
