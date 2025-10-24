@@ -1,3 +1,12 @@
+"""
+Model Inference and Evaluation Script.
+
+This script runs inference using a trained model checkpoint on a specified
+dataset. It calculates key performance metrics, saves raw predictions,
+and generates diagnostic plots such as the confusion matrix, ROC curve,
+and calibration plot.
+"""
+
 import torch
 from torch.nn import functional as F
 import numpy as np
@@ -9,6 +18,30 @@ from sklearn.calibration import calibration_curve
 import matplotlib.pyplot as plt
 
 def run_inference(model_path: Path, data_dir: Path, architecture: str, output_path: Path, batch_size: int = 16):
+    """
+    Runs model inference, calculates metrics, and saves plots.
+
+    Parameters
+    ----------
+    model_path : pathlib.Path
+        Path to the saved model state dictionary (.pth file).
+    data_dir : pathlib.Path
+        Path to the root data directory (e.g., '.../mini_animals/animals').
+    architecture : str
+        The model architecture name (e.g., "vgg16") to instantiate.
+    output_path : pathlib.Path
+        Directory where predictions (.npy) and plots (.png) will be saved.
+    batch_size : int, optional
+        Batch size for the validation DataLoader (default is 16).
+
+    Returns
+    -------
+    dict
+        A dictionary containing key validation metrics:
+        - "val_acc" (float): Validation accuracy.
+        - "f1_score" (float): Macro F1-score.
+        - "confusion_matrix" (np.ndarray): The confusion matrix.
+    """
     print(f"\n🔍 Loading model: {model_path}")
     print(f"📁 Using dataset: {data_dir}")
     print(f"🧠 Architecture: {architecture}")

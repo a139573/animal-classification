@@ -1,3 +1,13 @@
+"""
+Gradio Interface for the Animal Classification Project.
+
+This script creates an interactive web dashboard using Gradio to run
+the project's three main workflows:
+1.  Data Reduction (creating the 'mini_animals' dataset).
+2.  Model Training (VGG16, VGG11).
+3.  Inference and metric visualization (Confusion Matrix, ROC, etc.).
+"""
+
 import gradio as gr
 import matplotlib.image as mpimg
 from pathlib import Path
@@ -12,6 +22,25 @@ REPORTS_DIR = (PROJECT_ROOT / "reports" / "figures").absolute()
 
 # === DATA REDUCTION ===
 def reduce_and_visualize(images_per_class, image_size, progress=gr.Progress(track_tqdm=True)):
+    """
+    Runs the dataset reduction and provides feedback to the Gradio UI.
+
+    Parameters
+    ----------
+    images_per_class : int
+        Number of images to save for each class.
+    image_size : int
+        The size (width and height) to resize images to.
+    progress : gradio.Progress, optional
+        Gradio object to track and display progress in the UI.
+        Automatically injected if `track_tqdm=True` is enabled
+        in the Gradio component.
+
+    Returns
+    -------
+    str
+        A status message indicating the operation's result.
+    """
     data_dir = DATA_DIR / "animals" / "animals"
     output_dir = DATA_DIR / "mini_animals" / "animals"
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -22,6 +51,33 @@ def reduce_and_visualize(images_per_class, image_size, progress=gr.Progress(trac
 
 # === TRAINING ===
 def run_training(dataset_choice, model_choice, seed, epochs, progress=gr.Progress(track_tqdm=True)):
+    """
+    Runs the model training script and returns metrics.
+
+    Gradio wrapper for the `train_main` function.
+
+    Parameters
+    ----------
+    dataset_choice : str
+        Dataset selection ("Full dataset" or "Reduced dataset").
+    model_choice : str
+        Model architecture to train (e.g., "VGG16").
+    seed : int or float
+        Random seed for reproducibility. Will be cast to int.
+    epochs : int or float
+        Maximum number of epochs. Will be cast to int.
+    progress : gradio.Progress, optional
+        Gradio object to track training progress.
+
+    Returns
+    -------
+    None
+        A placeholder for the plot output (currently unused).
+    str
+        A formatted string with performance metrics (Test Accuracy).
+    str
+        A simple status message indicating completion.
+    """
     dataset_str = "full" if dataset_choice == "Full dataset" else "mini"
     progress(0, desc="Starting training...")
     results = train_main(
@@ -39,6 +95,32 @@ def run_training(dataset_choice, model_choice, seed, epochs, progress=gr.Progres
 
 # === INFERENCE ===
 def run_inference_gr(dataset_choice, model_choice, batch_size):
+    """
+    Runs inference on the validation set and generates visualizations.
+
+    Gradio wrapper for the `run_inference` function. Loads the
+    generated metric images (confusion matrix, ROC, calibration).
+
+    Parameters
+    ----------
+    dataset_choice : str
+        Dataset selection ("Full dataset" or "Reduced dataset").
+    model_choice : str
+        Model architecture to use (e.g., "VGG16").
+    batch_size : int or float
+        Batch size for inference. Will be cast to int.
+
+    Returns
+    -------
+    metrics_text : str
+        Formatted string with metrics (Accuracy, F1-Score).
+    cm_img : np.ndarray or None
+        Confusion matrix image loaded via mpimg.
+    roc_img : np.ndarray or None
+        ROC curve image loaded via mpimg.
+    cal_img : np.ndarray or None
+        Calibration plot image loaded via mpimg.
+    """
     dataset_str = "full" if dataset_choice=="Full dataset" else "mini"
     output_dir = REPORTS_DIR
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -107,6 +189,9 @@ with gr.Blocks(title="Animal Classification Dashboard") as demo:
         )
 
 def main():
+    """
+    Launches the Gradio web application.
+    """
     demo.launch()
 
 if __name__ == "__main__":
