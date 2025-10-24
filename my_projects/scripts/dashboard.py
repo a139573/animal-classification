@@ -6,7 +6,8 @@ from my_projects.modeling.train import main as train_main
 from my_projects.modeling.inference import run_inference
 from my_projects.reduce_data import reduce_dataset
 
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
+# Go two levels up to reach project root
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
 REPORTS_DIR = PROJECT_ROOT / "reports" / "figures"
 DATA_DIR = PROJECT_ROOT / "data"
 
@@ -124,5 +125,9 @@ with gr.Blocks(title="Animal Classification Dashboard") as demo:
         )
 
 
-if __name__ == "__main__":
+def main():
+    """Entry point for CLI (animal-dashboard)."""
     demo.launch()
+
+if __name__ == "__main__":
+    main()
