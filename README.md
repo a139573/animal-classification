@@ -1,60 +1,151 @@
-﻿# Animal-Classification-Project
-
-In this README, we will explain where the data was obtained from, as well as list the libraries necessary to execute the files and how to run this project.
+﻿# 🐾 Animal Classification Project
 
 [![Dataset](https://img.shields.io/badge/🤗_dataset-kaggle-red.svg)](https://www.kaggle.com/datasets/iamsouravbanerjee/animal-image-dataset-90-different-animals)
-[![Pypi packages](https://img.shields.io/badge/packages-TestPyPI-blue.svg)](https://test.pypi.org/project/animal-classification/)
+[![PyPI](https://img.shields.io/badge/PyPI-TestPyPI-blue.svg)](https://test.pypi.org/project/animal-classification/)
 
+---
 
-# Data Source
-The dataset was obtained from the Kaggle website. The dataset is titled **Animal Image Dataset (90 Different Animals)**. This dataset contains 5400 Animal Images Across 90 Diverse Classes
+## 📘 Overview
+This project trains VGG-based deep learning models to classify images of 90 animal species.
+It uses PyTorch and PyTorch Lightning for modeling and provides command-line tools for:
 
+- Data downloading and preprocessing
 
-# Libraries to import
-To install the necessary dependencies for the environment you can use:
+- Model training and inference
 
+- Visualization and dashboards via Gradio
+
+The project follows a modular cookiecutter-style structure, with code organized inside animal_classification/my_projects/.
+
+---
+
+## 📂 Dataset
+Dataset: **[Animal Image Dataset (90 Different Animals)](https://www.kaggle.com/datasets/iamsouravbanerjee/animal-image-dataset-90-different-animals)**  
+Contains **5,400 images** across **90 classes**.
+
+---
+
+## ⚙️ Installation Options
+
+### Option 1 – Install from TestPyPI
 ```bash
-pip install -r requirements.txt
+uv pip install -i https://test.pypi.org/simple/ animal-classification
 ```
 
-# What is this project
-The goal of this project is to develop a model capable of identifying which of the 90 animals is depicted in a given image. The model will be trained on a portion of the dataset, with the objective of learning features that enable it to distinguish between the different animals. Once trained, the model should be able to accurately classify animals in images it has not previously seen.
+### Option 2 – Install from local wheel
+If you downloaded the .whl file (for example animal_classification-0.2.2-py3-none-any.whl):
+```bash
+uv pip install dist/animal_classification-0.2.2-py3-none-any.whl
+```
 
-# How to run the project 
-To execute the project, it is necessary to download the compressed folder and then open the Jupyter Notebook named _Project 1 Animals Image Dataset_. Afterward, run all the cells.
+### Option 3 - Local environment setup
+Create a virtual environment and install dependencies:
+```bash
+uv venv .venv
+source .venv/bin/activate  # (on Windows: .venv\Scripts\activate)
+uv pip install -r requirements.txt
+```
 
-# Steps to follow
-## 1. Download data
-From the root folder, run "animal-download-data
-". This will download the full dataset into the subdirectory "data/animals".
+## 🚀 Usage
 
-## 2. (Optinal) Reduce data
-From the root folder, run "animal-reduce-data
-". You can adjust the following system arguments:
-- Number of images per class (15, 30, or 60). Default: 30
-- Target image size (56, 112, or 224). Default: 224
-- Path to the original dataset directory. Default: "data/mini_animals/animals"
-- Path to save the reduced dataset. Default="data/mini_animals/animals"
+After installation, several CLI commands are available:
 
-# 3. Train the model
-From the root folder, run "animal-train". You will be queried to configure the following parameters:
-- Use complete dataset or subsample
-- Choose seed
-- Choose model: VGG11 or VGG16
-- Choose number of epochs to train for
+### 1️⃣ Download data
+```bash
+animal-download-data
+```
 
-# 4. Inference
-From the root folder, run "animal-infer". You will be queried to configure the following parameters:
-- Use complete dataset or subsample
-- Choose model: VGG11 or VGG16
+Downloads the dataset into data/animals/.
+
+### 2️⃣ (Optional) Reduce data
+```bash
+animal-reduce-data
+```
+
+Arguments:
+
+--num-images [15|30|60] (default: 30)
+
+--img-size [56|112|224] (default: 224)
+
+--input-dir (default: "data/animals")
+
+--output-dir (default: "data/mini_animals/animals")
+
+### 3️⃣ Train model
+```bash
+animal-train
+```
+
+Interactive prompts:
+
+Choose dataset (full or reduced)
+
+Select model (VGG11 or VGG16)
+
+Set seed and epochs
+
+### 4️⃣ Run inference
+```bash
+animal-infer
+```
+
+Predict classes for test images using trained models.
+
+### 5️⃣ Launch dashboard
+```bash
+animal-dashboard
+```
+
+Opens an interactive visualization dashboard (Gradio-based).
+
+## 🧱 Development
+
+If you want to build and publish your own version:
+
+```bash
+uv build
+uv publish --repository testpypi
+```
 
 
-# 👥 Team
-## Authors
-* Andrés Malón - Public University of Navarre, Spain
-* Roberto Aldanondo - Public University of Navarre, Spain 
-# 📧 Contact 
-For any question or issues, please:
-1. Open an issue in this repository
-2. Contact one of the corresponding authors: andresmalon@gmail.com, robertoaj02@gmail.com 
+If needed, you can still upload manually:
 
+```bash
+python -m build
+twine upload --repository testpypi dist/*
+```
+
+## 🧩 Project Structure
+```
+animal_classification/
+│
+├── my_projects/
+│   ├── dataset.py
+│   ├── download_data.py
+│   ├── reduce_data.py
+│   ├── plots.py
+│   ├── modeling/
+│   └── scripts/
+│
+├── notebooks/
+├── reports/
+├── pyproject.toml
+└── README.md
+```
+
+## 👥 Authors
+
+Andrés Malón – Public University of Navarre, Spain
+
+Roberto Aldanondo – Public University of Navarre, Spain
+
+## 📧 Contact:
+
+andresmalon@gmail.com
+
+robertoaj02@gmail.com
+
+## 📝 License
+
+MIT License – see LICENSE file for details.
