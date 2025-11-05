@@ -2,11 +2,10 @@
 requires = ["setuptools>=64", "wheel"]
 build-backend = "setuptools.build_meta"
 
-[tool.setuptools]
-packages = ["my_projects"]
-# Optional: if you want to exclude non-package folders
-# include = ["my_projects/*"]
-# exclude = ["data", "models", "logs", "predictions", "notebooks", "reports", "lightning_logs"]
+[tool.setuptools.packages.find]
+where = ["animal_classification"]
+include = ["animal_classification*", "animal_classification/my_projects*"]
+exclude = ["notebooks*", "reports*", "data*", "models*", "logs*", "predictions*", "lightning_logs*"]
 
 [project]
 name = "animal-classification"
@@ -14,47 +13,51 @@ version = "0.2.2"
 description = "A deep learning project to classify 90 different animals using VGG architectures."
 readme = "README.md"
 requires-python = ">=3.9"
-license = "MIT"  # SPDX expression
-license-files = ["LICENSE"]  # optional, if you include a LICENSE file
+license = { text = "MIT" }
+
 authors = [
-  { name="Andrés Malón" ,email = "andresmalon@gmail.com"},
-  { name="Roberto Aldanondo", email = "robertoaj02@gmail.com" }
+  { name = "Andrés Malón", email = "andresmalon@gmail.com" },
+  { name = "Roberto Aldanondo", email = "robertoaj02@gmail.com" }
 ]
+
 keywords = ["deep-learning", "computer-vision", "animals", "image-classification", "pytorch"]
+
 classifiers = [
-    "Programming Language :: Python :: 3",
-    "Operating System :: OS Independent"
+  "Programming Language :: Python :: 3",
+  "Operating System :: OS Independent"
 ]
 
 dependencies = [
-    "torch",
-    "torchvision",
-    "pytorch-lightning",
-    "pillow",
-    "kagglehub",
-    "build>=1.3.0",
-    "gradio>=4.44.1",
-    "numpy>=2.0.2",
-    "pandas>=2.3.3",
-    "seaborn>=0.13.2",
-    "twine>=6.2.0",
-    "matplotlib>=3.9.4",
-    "scikit-learn>=1.6.1",
+  "torch",
+  "torchvision",
+  "pytorch-lightning",
+  "pillow",
+  "kagglehub",
+  "build>=1.3.0",
+  "gradio>=4.44.1",
+  "numpy>=2.0.2",
+  "pandas>=2.3.3",
+  "seaborn>=0.13.2",
+  "twine>=6.2.0",
+  "matplotlib>=3.9.4",
+  "scikit-learn>=1.6.1",
 ]
+
+[project.optional-dependencies]
+dev = ["pdoc>=15.0.4"]
 
 [project.urls]
 Homepage = "https://github.com/yourusername/animal-classification"
 Repository = "https://github.com/yourusername/animal-classification"
 
 [project.scripts]
-animal-download-data = "my_projects.download_data:main"
-animal-reduce-data = "my_projects.reduce_data:main"
-animal-train = "my_projects.modeling.train:main"
-animal-infer = "my_projects.modeling.inference:main"
-animal-dashboard = "my_projects.scripts.dashboard:main"
+animal-download-data = "animal_classification.my_projects.download_data:main"
+animal-reduce-data = "animal_classification.my_projects.reduce_data:main"
+animal-train = "animal_classification.my_projects.modeling.train:main"
+animal-infer = "animal_classification.my_projects.modeling.inference:main"
+animal-dashboard = "animal_classification.my_projects.scripts.dashboard:main"
 
-
-[project.optional-dependencies]
-dev = [
-    "pdoc>=15.0.4",
-]
+# ✅ UV section — helps manage environment + packaging
+[tool.uv]
+managed-environment = true
+package = true
