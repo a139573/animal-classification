@@ -3,9 +3,17 @@ requires = ["setuptools>=64", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
-where = ["animal_classification"]
-include = ["animal_classification*", "animal_classification/my_projects*"]
-exclude = ["notebooks*", "reports*", "data*", "models*", "logs*", "predictions*", "lightning_logs*"]
+where = ["."]
+include = ["my_projects*"]
+exclude = [
+    "notebooks*",
+    "reports*",
+    "data*",
+    "models*",
+    "logs*",
+    "predictions*",
+    "lightning_logs*"
+]
 
 [project]
 name = "animal-classification"
@@ -13,7 +21,7 @@ version = "0.2.2"
 description = "A deep learning project to classify 90 different animals using VGG architectures."
 readme = "README.md"
 requires-python = ">=3.9"
-license = { text = "MIT" }
+license = "MIT"
 
 authors = [
   { name = "Andrés Malón", email = "andresmalon@gmail.com" },
@@ -27,6 +35,7 @@ classifiers = [
   "Operating System :: OS Independent"
 ]
 
+# Full dependencies (training + inference)
 dependencies = [
   "torch",
   "torchvision",
@@ -40,24 +49,33 @@ dependencies = [
   "seaborn>=0.13.2",
   "twine>=6.2.0",
   "matplotlib>=3.9.4",
-  "scikit-learn>=1.6.1",
+  "scikit-learn>=1.6.1"
 ]
 
+# Optional dependencies
 [project.optional-dependencies]
 dev = ["pdoc>=15.0.4"]
+demo = [
+    "gradio>=4.44.1",
+    "numpy>=2.0.2",
+    "pandas>=2.3.3",
+    "seaborn>=0.13.2",
+    "matplotlib>=3.9.4",
+    "pillow"
+]
 
 [project.urls]
 Homepage = "https://github.com/yourusername/animal-classification"
 Repository = "https://github.com/yourusername/animal-classification"
 
 [project.scripts]
-animal-download-data = "animal_classification.my_projects.download_data:main"
-animal-reduce-data = "animal_classification.my_projects.reduce_data:main"
-animal-train = "animal_classification.my_projects.modeling.train:main"
-animal-infer = "animal_classification.my_projects.modeling.inference:main"
-animal-dashboard = "animal_classification.my_projects.scripts.dashboard:main"
+animal-download-data = "my_projects.download_data:main"
+animal-reduce-data = "my_projects.reduce_data:main"
+animal-train = "my_projects.modeling.train:main"
+animal-infer = "my_projects.modeling.inference:run_inference"
+animal-dashboard = "my_projects.scripts.dashboard:main"
 
-# ✅ UV section — helps manage environment + packaging
+# ✅ UV single-command demo
 [tool.uv]
-managed-environment = true
+entry-point = "animal-dashboard"
 package = true

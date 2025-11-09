@@ -65,6 +65,9 @@ class VGGNet(pl.LightningModule):
         return optim.Adam(self.parameters(), lr=self.lr)
 
 
+import tempfile
+import contextlib
+
 def main(
     architecture: str = "vgg16",
     dataset_choice: str = "mini",
@@ -73,6 +76,7 @@ def main(
     max_epochs: int = 5,
     batch_size: int = 16,
     progress: gr.Progress = None,
+    is_demo: bool = False,  # 👈 add this flag
 ):
     data_dir = Path("data")
     subsample_dir = data_dir / ("animals/animals" if dataset_choice == "full" else "mini_animals/animals")
@@ -88,12 +92,21 @@ def main(
 
     net = VGGNet(architecture=architecture, num_classes=num_classes)
 
-    models_dir = Path("models")
-    models_dir.mkdir(parents=True, exist_ok=True)
-    logs_dir = Path("logs")
-    logs_dir.mkdir(parents=True, exist_ok=True)
-    reports_dir = Path("reports/figures")
-    reports_dir.mkdir(parents=True, exist_ok=True)
+    # 👇 handle directories conditionally
+    if is_demo:
+        temp_dir = tempfile.TemporaryDirectory()
+        base_path = Path(temp_dir.name)
+        models_dir = base_path / "models"
+        logs_dir = base_path / "logs"
+        reports_dir = base_path / "reports/figures"
+    else:
+        models_dir = Path("models")
+        logs_dir = Path("logs")
+        reports_dir = Path("reports/figures")
+
+    # ensure dirs exist
+    for d in [models_dir, logs_dir, reports_dir]:
+        d.mkdir(parents=True, exist_ok=True)
 
     checkpoint_callback = ModelCheckpoint(
         dirpath=models_dir,
@@ -122,22 +135,21 @@ def main(
         progress(0, desc="Starting training...")
 
     trainer.fit(net, datamodule=data_module)
-
-    # Optional: run test set if available
     test_results = trainer.test(net, datamodule=data_module)
 
     if progress:
         progress(1, desc="Training complete!")
 
-    # Save model
-    torch.save(net.state_dict(), models_dir / f"{architecture}_state_dict.pth")
+    # Save model (only permanent if not demo)
+    model_path = models_dir / f"{architecture}_state_dict.pth"
+    torch.save(net.state_dict(), model_path)
     print(f"✅ Best checkpoint: {checkpoint_callback.best_model_path}")
 
     # Load CSV logs for visualization
     csv_path = Path(logger.log_dir) / "metrics.csv"
     df = pd.read_csv(csv_path)
 
-    # Clean and plot validation accuracy
+    # Plot validation accuracy
     if "val_acc" in df.columns:
         plt.figure(figsize=(6, 4))
         plt.plot(df["epoch"], df["val_acc"], marker="o", label="Validation Accuracy")
@@ -156,12 +168,26 @@ def main(
     final_val_acc = df["val_acc"].dropna().iloc[-1] if "val_acc" in df.columns else None
     test_acc = test_results[0]["test_acc"] if test_results else None
 
-    return {
-        "val_acc": float(final_val_acc) if final_val_acc is not None else None,
-        "test_acc": float(test_acc) if test_acc is not None else None,
-        "log_path": str(csv_path),
-        "plot_path": str(acc_plot_path) if acc_plot_path else None,
-    }
+    if is_demo:
+        result = {
+            "model": net,         # trained PyTorch Lightning model
+            "data_module": data_module,  # optional, so inference can reuse val loader
+            "metrics": {'val_acc': final_val_acc, 'test_acc': test_acc}    # dictionary with validation/test metrics and paths
+        }
+    else:
+        result = {
+            "val_acc": float(final_val_acc) if final_val_acc is not None else None,
+            "test_acc": float(test_acc) if test_acc is not None else None,
+            "log_path": str(csv_path),
+            "plot_path": str(acc_plot_path) if acc_plot_path else None,
+        }
+
+    # 👇 Clean up temporary directories automatically
+    if is_demo:
+        temp_dir.cleanup()
+
+    return result
+
 
 
 if __name__ == "__main__":
@@ -181,4 +207,5 @@ if __name__ == "__main__":
         test_frac=args.test_frac,
         max_epochs=args.max_epochs,
         batch_size=args.batch_size,
+        is_demo=False
     )

@@ -85,66 +85,64 @@ def run_training(dataset_choice, model_choice, seed, epochs, progress=gr.Progres
         dataset_choice=dataset_str,
         seed=int(seed),
         max_epochs=int(epochs),
+        is_demo=True,
         progress=progress
     )
     progress(1, desc="Training finished!")
-    test_acc = results.get("test_acc", None)
+    trained_model = results.get("model", None)
+    val_acc = results['metrics']['val_acc']
+    test_acc = results['metrics']['test_acc'] 
     test_acc_str = f"{test_acc:.3f}" if test_acc is not None else "N/A"
     metrics_text = f"✅ **Training finished for {model_choice} on {dataset_choice} dataset.**\n**Test Accuracy:** {test_acc_str}"
-    return None, metrics_text, "✅ Training completed"
+    return trained_model, metrics_text, "✅ Training completed"
 
 # === INFERENCE ===
-def run_inference_gr(dataset_choice, model_choice, batch_size):
+def run_inference_gr(trained_model, dataset_choice, model_choice, batch_size):
     """
     Runs inference on the validation set and generates visualizations.
 
-    Gradio wrapper for the `run_inference` function. Loads the
-    generated metric images (confusion matrix, ROC, calibration).
+    If a trained_model is provided (from demo memory), it is used directly.
+    Otherwise, the function loads a model checkpoint from disk.
 
-    Parameters
-    ----------
-    dataset_choice : str
-        Dataset selection ("Full dataset" or "Reduced dataset").
-    model_choice : str
-        Model architecture to use (e.g., "VGG16").
-    batch_size : int or float
-        Batch size for inference. Will be cast to int.
-
-    Returns
-    -------
-    metrics_text : str
-        Formatted string with metrics (Accuracy, F1-Score).
-    cm_img : np.ndarray or None
-        Confusion matrix image loaded via mpimg.
-    roc_img : np.ndarray or None
-        ROC curve image loaded via mpimg.
-    cal_img : np.ndarray or None
-        Calibration plot image loaded via mpimg.
+    Metrics are displayed in the dashboard but not stored on disk.
     """
-    dataset_str = "full" if dataset_choice=="Full dataset" else "mini"
-    output_dir = REPORTS_DIR
-    output_dir.mkdir(parents=True, exist_ok=True)
-    model_path = PROJECT_ROOT / "models" / f"{model_choice.lower()}_state_dict.pth"
-    data_dir = DATA_DIR / ("animals/animals" if dataset_str=="full" else "mini_animals/animals")
+    dataset_str = "full" if dataset_choice == "Full dataset" else "mini"
+    data_dir = DATA_DIR / ("animals/animals" if dataset_str == "full" else "mini_animals/animals")
 
+    # 👇 Always run in demo mode so outputs go to a temp dir
     results = run_inference(
-        model_path=model_path,
+        trained_model=trained_model if trained_model else None,
+        model_path=(
+            PROJECT_ROOT / "models" / f"{model_choice.lower()}_state_dict.pth"
+            if trained_model is None else None
+        ),
         data_dir=data_dir,
-        architecture=model_choice.lower(),
-        output_path=output_dir,
-        batch_size=int(batch_size)
+        architecture=model_choice.lower() if trained_model is None else None,
+        batch_size=int(batch_size),
+        is_demo=True,   # ensures temporary storage only
     )
 
-    metrics_text = f"✅ **Validation Accuracy:** {results['val_acc']:.3f} | **F1-Score:** {results['f1_score']:.3f}"
+    # --- Format metrics for display only ---
+    val_acc = results["val_acc"]
+    f1 = results["f1_score"]
+    metrics_text = f"✅ **Validation Accuracy:** {val_acc:.3f} | **F1-Score:** {f1:.3f}"
+
+    # --- Try loading plots from the temporary directory ---
+    output_path = Path(results["output_path"])
 
     def load_img(path):
         return mpimg.imread(path) if path.exists() else None
 
-    cm_img = load_img(output_dir / f"{model_choice.lower()}_confusion_matrix.png")
-    roc_img = load_img(output_dir / f"{model_choice.lower()}_roc_curve.png")
-    cal_img = load_img(output_dir / f"{model_choice.lower()}_calibration.png")
+    cm_img = load_img(output_path / "confusion_matrix.png")
+    roc_img = load_img(output_path / "roc_curve.png")
+    cal_img = load_img(output_path / "calibration_plot.png")
+
+    # --- Optional cleanup ---
+    # In demo mode, run_inference() already calls temp_dir.cleanup()
+    # so we don't need to manually delete anything here.
 
     return metrics_text, cm_img, roc_img, cal_img
+
 
 # === DASHBOARD ===
 with gr.Blocks(title="Animal Classification Dashboard") as demo:
@@ -166,10 +164,13 @@ with gr.Blocks(title="Animal Classification Dashboard") as demo:
         plot_output = gr.Plot()
         metrics_output = gr.Markdown()
         status_output = gr.Markdown()
+
+        trained_model = gr.State()
+
         run_train_button.click(
             fn=run_training,
             inputs=[dataset_choice, model_choice, seed, epochs],
-            outputs=[plot_output, metrics_output, status_output]
+            outputs=[trained_model, metrics_output, status_output]
         )
 
     # --- Inference Tab ---
@@ -184,7 +185,7 @@ with gr.Blocks(title="Animal Classification Dashboard") as demo:
         infer_cal = gr.Image(label="Calibration Plot")
         run_inference_btn.click(
             fn=run_inference_gr,
-            inputs=[infer_dataset_choice, infer_model_choice, infer_batch_size],
+            inputs=[trained_model, infer_dataset_choice, infer_model_choice, infer_batch_size],
             outputs=[infer_metrics, infer_cm, infer_roc, infer_cal]
         )
 
