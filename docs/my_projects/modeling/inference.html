@@ -456,27 +456,30 @@
             <div class="docstring"><p>Run model inference on the validation dataset.<br />
 Uses an in-memory model if provided, otherwise loads from checkpoint.</p>
 
-<h2 id="parameters">Parameters</h2>
+<h6 id="parameters">Parameters</h6>
 
-<p>trained_model : torch.nn.Module, optional
-    A trained model instance already loaded in memory.
-model_path : Path, optional
-    Path to a saved model state dictionary (.pth).
-data_dir : Path, optional
-    Path to the dataset directory.
-architecture : str, optional
-    Model architecture name ("vgg16" or "vgg11").
-output_path : Path, optional
-    Where to save predictions and plots.
-batch_size : int, optional
-    Validation batch size.
-is_demo : bool, optional
-    Whether to use a temporary folder for outputs (auto-cleaned).</p>
+<ul>
+<li><strong>trained_model</strong> (torch.nn.Module, optional):
+A trained model instance already loaded in memory.</li>
+<li><strong>model_path</strong> (Path, optional):
+Path to a saved model state dictionary (.pth).</li>
+<li><strong>data_dir</strong> (Path, optional):
+Path to the dataset directory.</li>
+<li><strong>architecture</strong> (str, optional):
+Model architecture name ("vgg16" or "vgg11").</li>
+<li><strong>output_path</strong> (Path, optional):
+Where to save predictions and plots.</li>
+<li><strong>batch_size</strong> (int, optional):
+Validation batch size.</li>
+<li><strong>is_demo</strong> (bool, optional):
+Whether to use a temporary folder for outputs (auto-cleaned).</li>
+</ul>
 
-<h2 id="returns">Returns</h2>
+<h6 id="returns">Returns</h6>
 
-<p>dict
-    { "val_acc": float, "f1_score": float, "confusion_matrix": np.ndarray }</p>
+<ul>
+<li><strong>dict</strong>: { "val_acc": float, "f1_score": float, "confusion_matrix": np.ndarray }</li>
+</ul>
 </div>
 
 

@@ -365,21 +365,24 @@ the project's three main workflows:</p>
 
             <div class="docstring"><p>Runs the dataset reduction and provides feedback to the Gradio UI.</p>
 
-<h2 id="parameters">Parameters</h2>
+<h6 id="parameters">Parameters</h6>
 
-<p>images_per_class : int
-    Number of images to save for each class.
-image_size : int
-    The size (width and height) to resize images to.
-progress : gradio.Progress, optional
-    Gradio object to track and display progress in the UI.
-    Automatically injected if <code>track_tqdm=True</code> is enabled
-    in the Gradio component.</p>
+<ul>
+<li><strong>images_per_class</strong> (int):
+Number of images to save for each class.</li>
+<li><strong>image_size</strong> (int):
+The size (width and height) to resize images to.</li>
+<li><strong>progress</strong> (gradio.Progress, optional):
+Gradio object to track and display progress in the UI.
+Automatically injected if <code>track_tqdm=True</code> is enabled
+in the Gradio component.</li>
+</ul>
 
-<h2 id="returns">Returns</h2>
+<h6 id="returns">Returns</h6>
 
-<p>str
-    A status message indicating the operation's result.</p>
+<ul>
+<li><strong>str</strong>: A status message indicating the operation's result.</li>
+</ul>
 </div>
 
 
@@ -447,27 +450,28 @@ progress : gradio.Progress, optional
 
 <p>Gradio wrapper for the <code>train_main</code> function.</p>
 
-<h2 id="parameters">Parameters</h2>
+<h6 id="parameters">Parameters</h6>
 
-<p>dataset_choice : str
-    Dataset selection ("Full dataset" or "Reduced dataset").
-model_choice : str
-    Model architecture to train (e.g., "VGG16").
-seed : int or float
-    Random seed for reproducibility. Will be cast to int.
-epochs : int or float
-    Maximum number of epochs. Will be cast to int.
-progress : gradio.Progress, optional
-    Gradio object to track training progress.</p>
+<ul>
+<li><strong>dataset_choice</strong> (str):
+Dataset selection ("Full dataset" or "Reduced dataset").</li>
+<li><strong>model_choice</strong> (str):
+Model architecture to train (e.g., "VGG16").</li>
+<li><strong>seed</strong> (int or float):
+Random seed for reproducibility. Will be cast to int.</li>
+<li><strong>epochs</strong> (int or float):
+Maximum number of epochs. Will be cast to int.</li>
+<li><strong>progress</strong> (gradio.Progress, optional):
+Gradio object to track training progress.</li>
+</ul>
 
-<h2 id="returns">Returns</h2>
+<h6 id="returns">Returns</h6>
 
-<p>None
-    A placeholder for the plot output (currently unused).
-str
-    A formatted string with performance metrics (Test Accuracy).
-str
-    A simple status message indicating completion.</p>
+<ul>
+<li><strong>None</strong>: A placeholder for the plot output (currently unused).</li>
+<li><strong>str</strong>: A formatted string with performance metrics (Test Accuracy).</li>
+<li><strong>str</strong>: A simple status message indicating completion.</li>
+</ul>
 </div>
 
 

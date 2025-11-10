@@ -362,24 +362,26 @@
 <p>This class handles the loading, transformation, and splitting (training,
 validation, test) of the image dataset.</p>
 
-<h2 id="attributes">Attributes</h2>
+<h6 id="attributes">Attributes</h6>
 
-<p>data_dir : str
-    Path to the data directory.
-batch_size : int
-    Number of samples per batch.
-num_workers : int
-    Number of subprocesses for data loading.
-transform : torchvision.transforms.Compose
-    Transformations applied to each image.
-class_names : list[str]
-    Names of the dataset classes. Defined in <code><a href="#AnimalsDataModule.setup">setup()</a></code>.
-train_data : torch.utils.data.Dataset
-    Training data subset.
-val_data : torch.utils.data.Dataset
-    Validation data subset.
-test_data : torch.utils.data.Dataset
-    Test data subset.</p>
+<ul>
+<li><strong>data_dir</strong> (str):
+Path to the data directory.</li>
+<li><strong>batch_size</strong> (int):
+Number of samples per batch.</li>
+<li><strong>num_workers</strong> (int):
+Number of subprocesses for data loading.</li>
+<li><strong>transform</strong> (torchvision.transforms.Compose):
+Transformations applied to each image.</li>
+<li><strong>class_names</strong> (list[str]):
+Names of the dataset classes. Defined in <code><a href="#AnimalsDataModule.setup">setup()</a></code>.</li>
+<li><strong>train_data</strong> (torch.utils.data.Dataset):
+Training data subset.</li>
+<li><strong>val_data</strong> (torch.utils.data.Dataset):
+Validation data subset.</li>
+<li><strong>test_data</strong> (torch.utils.data.Dataset):
+Test data subset.</li>
+</ul>
 </div>
 
 
@@ -426,18 +428,20 @@ test_data : torch.utils.data.Dataset
 
             <div class="docstring"><p>Initializes the DataModule.</p>
 
-<h2 id="parameters">Parameters</h2>
+<h6 id="parameters">Parameters</h6>
 
-<p>data_dir : str, optional
-    Directory containing the dataset (default is ".").
-batch_size : int, optional
-    Batch size for the DataLoaders (default is 32).
-num_workers : int, optional
-    Number of workers for the DataLoaders (default is 4).
-test_frac : float, optional
-    Fraction of the dataset to reserve for testing (default is 0.2).
-seed : int, optional
-    Random seed for data splitting (default is 123).</p>
+<ul>
+<li><strong>data_dir</strong> (str, optional):
+Directory containing the dataset (default is ".").</li>
+<li><strong>batch_size</strong> (int, optional):
+Batch size for the DataLoaders (default is 32).</li>
+<li><strong>num_workers</strong> (int, optional):
+Number of workers for the DataLoaders (default is 4).</li>
+<li><strong>test_frac</strong> (float, optional):
+Fraction of the dataset to reserve for testing (default is 0.2).</li>
+<li><strong>seed</strong> (int, optional):
+Random seed for data splitting (default is 123).</li>
+</ul>
 </div>
 
 
@@ -555,11 +559,13 @@ seed : int, optional
 full dataset, calculates the splits, and assigns the
 <code>train_data</code>, <code>val_data</code>, and <code>test_data</code> subsets.</p>
 
-<h2 id="parameters">Parameters</h2>
+<h6 id="parameters">Parameters</h6>
 
-<p>stage : str, optional
-    Lightning stage (e.g., "fit", "test"). Not used in this
-    implementation, as the data is split only once.</p>
+<ul>
+<li><strong>stage</strong> (str, optional):
+Lightning stage (e.g., "fit", "test"). Not used in this
+implementation, as the data is split only once.</li>
+</ul>
 </div>
 
 
@@ -590,10 +596,11 @@ full dataset, calculates the splits, and assigns the
 
             <div class="docstring"><p>Creates the DataLoader for the training set.</p>
 
-<h2 id="returns">Returns</h2>
+<h6 id="returns">Returns</h6>
 
-<p>torch.utils.data.DataLoader
-    The training DataLoader, with shuffling (shuffle=True).</p>
+<ul>
+<li><strong>torch.utils.data.DataLoader</strong>: The training DataLoader, with shuffling (shuffle=True).</li>
+</ul>
 </div>
 
 
@@ -624,10 +631,11 @@ full dataset, calculates the splits, and assigns the
 
             <div class="docstring"><p>Creates the DataLoader for the validation set.</p>
 
-<h2 id="returns">Returns</h2>
+<h6 id="returns">Returns</h6>
 
-<p>torch.utils.data.DataLoader
-    The validation DataLoader (shuffle=False).</p>
+<ul>
+<li><strong>torch.utils.data.DataLoader</strong>: The validation DataLoader (shuffle=False).</li>
+</ul>
 </div>
 
 
@@ -658,10 +666,11 @@ full dataset, calculates the splits, and assigns the
 
             <div class="docstring"><p>Creates the DataLoader for the test set.</p>
 
-<h2 id="returns">Returns</h2>
+<h6 id="returns">Returns</h6>
 
-<p>torch.utils.data.DataLoader
-    The test DataLoader (shuffle=False).</p>
+<ul>
+<li><strong>torch.utils.data.DataLoader</strong>: The test DataLoader (shuffle=False).</li>
+</ul>
 </div>
 
 

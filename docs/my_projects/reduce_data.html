@@ -231,28 +231,31 @@
 
             <div class="docstring"><p>Reduces an image dataset by sampling and resizing images.</p>
 
-<h2 id="parameters">Parameters</h2>
+<h6 id="parameters">Parameters</h6>
 
-<p>data_dir : str or Path
-    Path to the original, full dataset directory (e.g., 'data/animals').
-output_dir : str or Path
-    Path to the directory where the reduced dataset will be saved 
-    (e.g., 'data/mini_animals').
-images_per_class : int
-    The exact number of images to sample from each class.
-image_size : int
-    The target size (width and height) for resizing (e.g., 224).
-progress : callable, optional
-    An optional callback function for reporting progress (e.g., for a
-    Gradio or Streamlit GUI). It should accept <code>(float, desc=str)</code>.
-seed : int, optional
-    A random seed to ensure reproducible sampling (default is 123).</p>
+<ul>
+<li><strong>data_dir</strong> (str or Path):
+Path to the original, full dataset directory (e.g., 'data/animals').</li>
+<li><strong>output_dir</strong> (str or Path):
+Path to the directory where the reduced dataset will be saved 
+(e.g., 'data/mini_animals').</li>
+<li><strong>images_per_class</strong> (int):
+The exact number of images to sample from each class.</li>
+<li><strong>image_size</strong> (int):
+The target size (width and height) for resizing (e.g., 224).</li>
+<li><strong>progress</strong> (callable, optional):
+An optional callback function for reporting progress (e.g., for a
+Gradio or Streamlit GUI). It should accept <code>(float, desc=str)</code>.</li>
+<li><strong>seed</strong> (int, optional):
+A random seed to ensure reproducible sampling (default is 123).</li>
+</ul>
 
-<h2 id="raises">Raises</h2>
+<h6 id="raises">Raises</h6>
 
-<p>ValueError
-    If a class folder is found to contain fewer images than
-    the requested <code>images_per_class</code>.</p>
+<ul>
+<li><strong>ValueError</strong>: If a class folder is found to contain fewer images than
+the requested <code>images_per_class</code>.</li>
+</ul>
 </div>
 
 
