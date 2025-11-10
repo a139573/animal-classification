@@ -29,7 +29,7 @@ Contains **5,400 images** across **90 classes**.
 
 ### Option 1 – Install from TestPyPI
 ```bash
-uv pip install -i https://test.pypi.org/simple/ animal-classification
+uv pip install --index-url [https://test.pypi.org/simple](https://test.pypi.org/simple) --extra-index-url [https://pypi.org/simple](https://pypi.org/simple) animal-classification
 ```
 
 ### Option 2 – Install from local wheel
