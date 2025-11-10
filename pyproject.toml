@@ -79,3 +79,6 @@ animal-dashboard = "my_projects.scripts.dashboard:main"
 [tool.uv]
 entry-point = "animal-dashboard"
 package = true
+
+[tool.pdoc]
+docformat = "numpy"
