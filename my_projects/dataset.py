@@ -17,24 +17,6 @@ class AnimalsDataModule(pl.LightningDataModule):
     This class handles the loading, transformation, and splitting (training,
     validation, test) of the image dataset.
 
-    Attributes
-    ----------
-    data_dir : str
-        Path to the data directory.
-    batch_size : int
-        Number of samples per batch.
-    num_workers : int
-        Number of subprocesses for data loading.
-    transform : torchvision.transforms.Compose
-        Transformations applied to each image.
-    class_names : list[str]
-        Names of the dataset classes. Defined in `setup()`.
-    train_data : torch.utils.data.Dataset
-        Training data subset.
-    val_data : torch.utils.data.Dataset
-        Validation data subset.
-    test_data : torch.utils.data.Dataset
-        Test data subset.
     """
     def __init__(self, data_dir=".", batch_size=32, num_workers=4, test_frac=0.2, seed=123):
         """
@@ -55,16 +37,22 @@ class AnimalsDataModule(pl.LightningDataModule):
         """
         super().__init__()
         self.data_dir = data_dir
+        """Path to the data directory."""
         self.batch_size = batch_size
+        """Number of samples per batch."""
         self.num_workers = num_workers
+        """Number of subprocesses for data loading."""
         self.test_frac = test_frac
+        """Fraction of the dataset to reserve for testing."""
         self.seed = seed
+        """Random seed for data splitting."""
         self.transform = transforms.Compose([
             transforms.Resize((224, 224)),
             transforms.ToTensor(),
             transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
         ])
-
+        """Transformations applied to each image."""
+        
     def setup(self, stage=None):
         """
         Prepares the data and performs the train/val/test split.
