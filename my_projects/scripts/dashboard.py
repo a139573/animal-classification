@@ -19,11 +19,15 @@ import pandas as pd
 
 # === PATHS ===
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
+"""Dynamically calculated project root path."""
 DATA_DIR = PROJECT_ROOT / "data" / "mini_animals" / "animals"
+"""Directory where the reduced dataset is stored."""
 # REPORTS_DIR = (PROJECT_ROOT / "reports" / "figures").absolute()
 
 VGG11 = None
+"""Placeholder for the VGG11 model."""
 VGG16 = None
+"""Placeholder for the VGG16 model."""
 
 # === DATA REDUCTION ===
 # def reduce_and_visualize(images_per_class, image_size, progress=gr.Progress(track_tqdm=True)):

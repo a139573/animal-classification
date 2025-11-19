@@ -36,7 +36,9 @@ class VGGNet(pl.LightningModule):
         self.vgg.classifier[6] = nn.Linear(in_features, num_classes)
 
         self.loss_fn = nn.CrossEntropyLoss()
+        """Standard CrossEntropyLoss for classification tasks."""
         self.lr = lr
+        """Learning rate used by the optimizer."""
 
     def forward(self, x):
         return self.vgg(x)
@@ -69,13 +71,53 @@ class VGGNet(pl.LightningModule):
 
 
 class GradioProgressCallback(pl.Callback):
+    """
+    Custom PyTorch Lightning callback to report training progress to the Gradio UI.
+
+    This callback hooks into the training loop and updates a Gradio progress bar
+    after every batch, calculating the overall percentage based on the total
+    number of epochs and batches.
+    """
     def __init__(self, progress_fn, max_epochs):
+        """
+        Initializes the callback.
+
+        Parameters
+        ----------
+        progress_fn : callable
+            The Gradio progress update function (usually `gradio.Progress()`).
+        max_epochs : int
+            The total number of epochs to train for. Used to calculate
+            the completion percentage.
+        """
         super().__init__()
         self.progress_fn = progress_fn
+        """Gradio function to update the UI progress bar."""
         self.max_epochs = max_epochs
+        """Total number of epochs scheduled for training."""
         self.total_batches = None
+        """Cached number of batches per epoch (lazy-loaded)."""
 
     def on_train_batch_end(self, trainer, pl_module, outputs, batch, batch_idx):
+        """
+        Updates the Gradio progress bar at the end of each training batch.
+
+        Calculates the global step count and updates the progress percentage
+        and description string in the UI.
+
+        Parameters
+        ----------
+        trainer : pl.Trainer
+            The PyTorch Lightning trainer instance.
+        pl_module : pl.LightningModule
+            The model being trained.
+        outputs : dict
+            The outputs of the training step.
+        batch : Any
+            The current batch of data.
+        batch_idx : int
+            The index of the current batch.
+        """
         # Get total batches once (Lightning has dataloader ready now)
         if self.total_batches is None:
             self.total_batches = len(trainer.train_dataloader)
