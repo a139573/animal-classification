@@ -19,7 +19,7 @@ import pandas as pd
 
 # === PATHS ===
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
-DATA_DIR = PROJECT_ROOT / "data" / "mini_animals"
+DATA_DIR = PROJECT_ROOT / "data" / "mini_animals" / "animals"
 # REPORTS_DIR = (PROJECT_ROOT / "reports" / "figures").absolute()
 
 VGG11 = None
@@ -55,7 +55,7 @@ VGG16 = None
 #     return f"✅ Reduced dataset created with {images_per_class} images per class, size {image_size}×{image_size}."
 
 # === TRAINING ===
-def run_training(dataset_choice, model_choice, seed, epochs, progress=gr.Progress(track_tqdm=True)):
+def run_training(model_choice, seed, epochs, progress=gr.Progress()):
     """
     Runs the model training script and returns metrics.
 
@@ -83,8 +83,7 @@ def run_training(dataset_choice, model_choice, seed, epochs, progress=gr.Progres
     str
         A simple status message indicating completion.
     """
-    #dataset_str = "full" if dataset_choice == "Full dataset" else "mini"
-    progress(0, desc="Starting training...")
+
     results = train_main(
         architecture=model_choice.lower(),
         dataset_choice="mini",
@@ -102,25 +101,62 @@ def run_training(dataset_choice, model_choice, seed, epochs, progress=gr.Progres
     val_losses = results.get("val_loss_list", None)
     val_accs = results.get("val_acc_list", None)
 
-    fig, ax = plt.subplots(figsize=(6, 4))
+    # --- FIGURE 1: LOSSES ---
+    fig_loss, ax_loss = plt.subplots(figsize=(6, 4))
+
     if train_losses:
-        ax.plot(range(1, len(train_losses)+1), train_losses, label="Train Loss", marker="o")
+        ax_loss.plot(
+            range(1, len(train_losses) + 1),
+            train_losses,
+            label="Train Loss",
+            marker="o"
+        )
+
     if val_losses:
-        ax.plot(range(1, len(val_losses)+1), val_losses, label="Validation Loss", marker="x")
+        ax_loss.plot(
+            range(1, len(val_losses) + 1),
+            val_losses,
+            label="Validation Loss",
+            marker="x"
+        )
+
+    ax_loss.set_xlabel("Epoch")
+    ax_loss.set_ylabel("Loss")
+    ax_loss.set_title(f"{model_choice} — Loss Convergence")
+    ax_loss.grid(True)
+    ax_loss.legend()
+
+   # loss_img = fig_to_image(fig_loss)  # or save if not demo
+
+
+
+    # --- FIGURE 2: VALIDATION ACCURACY ---
     if val_accs:
-        ax.plot(range(1, len(val_accs)+1), val_accs, label="Validation Acc", marker="s")
+        fig_acc, ax_acc = plt.subplots(figsize=(6, 4))
 
-    ax.set_xlabel("Epoch")
-    ax.set_ylabel("Value")
-    ax.set_title(f"{model_choice} Convergence")
-    ax.grid(True)
-    ax.legend()
+        ax_acc.plot(
+            range(1, len(val_accs) + 1),
+            val_accs,
+            label="Validation Accuracy",
+            marker="s"
+        )
 
-    metrics_text = f"✅ **Training finished for {model_choice} on {dataset_choice} dataset.**\n**Final val Accuracy:** {val_acc_str}"
-    return results.get("model", None), metrics_text, "✅ Training completed", fig
+        ax_acc.set_xlabel("Epoch")
+        ax_acc.set_ylabel("Accuracy")
+        ax_acc.set_title(f"{model_choice} — Validation Accuracy")
+        ax_acc.grid(True)
+        ax_acc.legend()
+
+       # acc_img = fig_to_image(fig_acc)
+   # else:
+   #     acc_img = None
+
+
+    metrics_text = f"✅ **Training finished for {model_choice} on reduced dataset.**\n**Final val Accuracy:** {val_acc_str}"
+    return results.get("model", None), metrics_text, fig_loss, fig_acc
 
 # === INFERENCE ===
-def run_inference_gr(trained_model, batch_size):
+def run_inference_gr(trained_model, batch_size, num_workers):
     """
     Runs inference on the validation set and generates visualizations.
 
@@ -137,6 +173,7 @@ def run_inference_gr(trained_model, batch_size):
         architecture=None,
         output_path=None,
         batch_size=int(batch_size),
+        num_workers=num_workers,
         is_demo=True
     )
 
@@ -168,36 +205,39 @@ with gr.Blocks(title="Animal Classification Dashboard", theme=dark_theme) as dem
 
     # --- Train Tab ---
     with gr.Tab("Train"):
-        dataset_choice = gr.Dropdown(["Full dataset","Reduced dataset"], value="Full dataset", label="Dataset")
         seed = gr.Number(value=123, label="Random Seed")
         model_choice = gr.Dropdown(["VGG16","VGG11"], value="VGG16", label="Model")
         epochs = gr.Number(value=2, label="Epochs")
         run_train_button = gr.Button("Run Training")
-        plot_output = gr.Plot()
         metrics_output = gr.Markdown()
-        status_output = gr.Markdown()
-        train_convergence = gr.Plot(label="Loss and accuracy convergence")
+        train_losses = gr.Plot(label="Loss convergence")
+        train_accs = gr.Plot(label="Accuracy convergence")
         trained_model = gr.State()
         run_train_button.click(
             fn=run_training,
-            inputs=[dataset_choice, model_choice, seed, epochs],
-            outputs=[trained_model, metrics_output, status_output, train_convergence]
+            inputs=[model_choice, seed, epochs],
+            outputs=[trained_model, metrics_output, train_losses, train_accs]
         )
 
     # --- Inference Tab ---
     with gr.Tab("Inference"):
-        infer_dataset_choice = gr.Dropdown(["Full dataset","Reduced dataset"], value="Full dataset", label="Dataset")
-        # infer_model_choice = gr.Dropdown(["VGG16","VGG11"], value="VGG16", label="Model")
+        infer_num_workers = gr.Slider(
+            minimum=1,
+            maximum=16,
+            step=1,
+            value=2,
+            label="Num workers"
+        )
         infer_batch_size = gr.Number(value=16, label="Batch size")
         run_inference_btn = gr.Button("Run Inference")
-        infer_table = gr.Dataframe(headers=["True Label", "Predicted Prob"], interactive=False, label="Predictions Table")
         infer_metrics = gr.Markdown()
         infer_cm = gr.Image(label="Confusion Matrix")
         infer_roc = gr.Image(label="ROC Curve")
         infer_cal = gr.Image(label="Calibration Plot")
+        infer_table = gr.Dataframe(headers=["True Label", "Predicted Prob for True Label"], interactive=False, label="Predictions Table")
         run_inference_btn.click(
             fn=run_inference_gr,
-            inputs=[trained_model, infer_batch_size],
+            inputs=[trained_model, infer_batch_size, infer_num_workers],
             outputs=[infer_metrics, infer_cm, infer_roc, infer_cal, infer_table]
         )
 

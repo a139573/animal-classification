@@ -4,7 +4,7 @@ import numpy as np
 from pathlib import Path
 from ..dataset import AnimalsDataModule
 from ..modeling.train import VGGNet
-from sklearn.metrics import accuracy_score, confusion_matrix, f1_score, RocCurveDisplay
+from sklearn.metrics import accuracy_score, confusion_matrix, f1_score, RocCurveDisplay, roc_auc_score
 from sklearn.calibration import calibration_curve
 import matplotlib.pyplot as plt
 import pytorch_lightning as pl
@@ -30,7 +30,7 @@ def fig_to_image():
     plt.close()
     return img
 
-def run_inference(model_path: Path = None, data_dir: Path = None, architecture: str = None, trained_model: pl.LightningModule = None, output_path: Path = None, batch_size: int = 16, is_demo: bool = False):
+def run_inference(model_path: Path = None, data_dir: Path = None, architecture: str = None, trained_model: pl.LightningModule = None, output_path: Path = None, batch_size: int = 16, num_workers: int = 2, is_demo: bool = False):
     """
     Run model inference on the validation dataset.  
     Uses an in-memory model if provided, otherwise loads from checkpoint.
@@ -71,7 +71,7 @@ def run_inference(model_path: Path = None, data_dir: Path = None, architecture: 
         print(f"✅ Plots and predictions will be saved to: {output_path}")
 
     # --- Setup DataModule ---
-    data_module = AnimalsDataModule(data_dir=data_dir, batch_size=batch_size)
+    data_module = AnimalsDataModule(data_dir=data_dir, batch_size=batch_size, num_workers=num_workers)
     data_module.setup()
     val_loader = data_module.val_dataloader()
     num_classes = len(data_module.class_names)
@@ -123,34 +123,101 @@ def run_inference(model_path: Path = None, data_dir: Path = None, architecture: 
     plt.tight_layout()
     cm_img = fig_to_image() if is_demo else plt.savefig(output_path / f"{architecture}_confusion_matrix.png")
 
-    # --- ROC curve ---
+    # --- Macro-average ROC curve ---
     try:
-        plt.figure()
+        plt.figure(figsize=(8, 6))
+
+        unique_labels = np.unique(all_labels)
         y_true_onehot = np.eye(num_classes)[all_labels]
-        RocCurveDisplay.from_predictions(y_true_onehot, all_probs, multi_class='ovr')
-        plt.title("ROC Curve")
+
+        # Keep only the columns corresponding to present classes
+        y_true_onehot_present = y_true_onehot[:, unique_labels]
+        all_probs_present = all_probs[:, unique_labels]
+
+        auc_score = roc_auc_score(
+            y_true_onehot_present,
+            all_probs_present,
+            average="macro",
+            multi_class="ovr"
+        )
+        print(f"AUC score is {auc_score:.3f}")
+
+
+        # Compute per-class ROC points and aggregate via interpolation
+        fpr_interp = np.linspace(0, 1, 100)
+        tpr_all = []
+
+        for i in range(num_classes):
+            y_true_i = y_true_onehot[:, i]
+            y_prob_i = all_probs[:, i]
+
+            # Skip class if it has only one label present
+            if np.sum(y_true_i) == 0 or np.sum(y_true_i) == len(y_true_i):
+                continue
+
+            display = RocCurveDisplay.from_predictions(
+                y_true_i,
+                y_prob_i,
+                name=None,
+                color='blue',
+                alpha=0.1
+            )
+            # Interpolate TPR at fixed FPR points
+            tpr_interp = np.interp(fpr_interp, display.fpr, display.tpr)
+            tpr_all.append(tpr_interp)
+
+        # Average TPR across classes
+        if tpr_all:
+            tpr_mean = np.mean(tpr_all, axis=0)
+            plt.plot(fpr_interp, tpr_mean, color='red', label=f'Macro-average ROC (AUC={auc_score:.3f})')
+
+        plt.plot([0, 1], [0, 1], "--", color="gray")
+        plt.xlabel("False Positive Rate")
+        plt.ylabel("True Positive Rate")
+        plt.title("ROC Curve (macro-average)")
+        plt.legend()
         plt.tight_layout()
         roc_img = fig_to_image() if is_demo else plt.savefig(output_path / f"{architecture}_roc_curve.png")
     except Exception as e:
         print("⚠️ ROC plot failed:", e)
         roc_img = None
 
-    # --- Calibration plot ---
+    # --- Average Calibration Curve ---
     try:
         plt.figure(figsize=(6, 6))
-        y_true = (preds == all_labels).astype(int)
-        y_prob = all_probs.max(axis=1)
-        prob_true, prob_pred = calibration_curve(y_true, y_prob, n_bins=10, strategy="uniform")
-        plt.plot(prob_pred, prob_true, marker="o")
+        fixed_bins = np.linspace(0, 1, 10)
+        prob_true_all = []
+
+        for i in range(num_classes):
+            y_true_i = y_true_onehot[:, i]
+            y_prob_i = all_probs[:, i]
+
+            # Skip classes without positive samples
+            if np.sum(y_true_i) == 0:
+                continue
+
+            prob_true, prob_pred = calibration_curve(y_true_i, y_prob_i, n_bins=10)
+            # Interpolate to fixed bins
+            prob_true_interp = np.interp(fixed_bins, prob_pred, prob_true)
+            prob_true_all.append(prob_true_interp)
+
+        if prob_true_all:
+            prob_true_mean = np.mean(prob_true_all, axis=0)
+            plt.plot(fixed_bins, prob_true_mean, marker="o", color="blue", label="Average calibration")
+
         plt.plot([0, 1], [0, 1], "--", color="gray")
         plt.xlabel("Predicted probability")
         plt.ylabel("True probability")
-        plt.title("Calibration Plot")
+        plt.title("Multiclass Calibration Plot (average)")
+        plt.legend()
         plt.tight_layout()
         cal_img = fig_to_image() if is_demo else plt.savefig(output_path / f"{architecture}_calibration.png")
     except Exception as e:
         print("⚠️ Calibration plot failed:", e)
         cal_img = None
+
+
+
 
     # --- Now you can return these images directly to Gradio ---
     if is_demo:

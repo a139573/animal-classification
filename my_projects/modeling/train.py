@@ -73,10 +73,16 @@ class GradioProgressCallback(pl.Callback):
         super().__init__()
         self.progress_fn = progress_fn
         self.max_epochs = max_epochs
+        self.total_batches = None
 
     def on_train_batch_end(self, trainer, pl_module, outputs, batch, batch_idx):
+        # Get total batches once (Lightning has dataloader ready now)
+        if self.total_batches is None:
+            self.total_batches = len(trainer.train_dataloader)
+
+        total_batches = self.total_batches
+
         current_epoch = trainer.current_epoch
-        total_batches = trainer.num_training_batches
         global_step = current_epoch * total_batches + batch_idx + 1
         total_steps = self.max_epochs * total_batches
 
@@ -88,6 +94,7 @@ class GradioProgressCallback(pl.Callback):
         )
 
 
+
 def main(
     architecture: str = "vgg16",
     dataset_choice: str = "mini",
@@ -97,10 +104,11 @@ def main(
     batch_size: int = 16,
     is_demo: bool = False,
     progress: gr.Progress = None,
-    is_demo: bool = False,  # 👈 add this flag
 ):
     data_dir = Path("data")
-    subsample_dir = data_dir / ("animals/animals" if dataset_choice == "full" else "mini_animals/animals")
+    subsample_dir = data_dir / (
+        "animals/animals" if dataset_choice == "full" else "mini_animals/animals"
+    )
 
     data_module = AnimalsDataModule(
         data_dir=subsample_dir,
@@ -126,7 +134,6 @@ def main(
         reports_dir = Path("reports/figures")
         reports_dir.mkdir(parents=True, exist_ok=True)
 
-        
         checkpoint_callback = ModelCheckpoint(
             dirpath=models_dir,
             filename=f"{architecture}-best",
@@ -151,16 +158,10 @@ def main(
         log_every_n_steps=10,
     )
 
-    if progress:
-        progress(0, desc="Starting training...")
-
     trainer.fit(net, datamodule=data_module)
 
     # Optional: run test set if available. NO, this on inference
     # test_results = trainer.test(net, datamodule=data_module)
-
-    if progress:
-        progress(1, desc="Training complete!")
 
     # Save model
     if not is_demo:
@@ -209,7 +210,9 @@ def main(
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Train a VGG model on the Animals dataset.")
+    parser = argparse.ArgumentParser(
+        description="Train a VGG model on the Animals dataset."
+    )
     parser.add_argument("--architecture", default="vgg16", choices=["vgg16", "vgg11"])
     parser.add_argument("--dataset-choice", default="mini", choices=["full", "mini"])
     parser.add_argument("--seed", type=int, default=42)
@@ -225,5 +228,5 @@ if __name__ == "__main__":
         test_frac=args.test_frac,
         max_epochs=args.max_epochs,
         batch_size=args.batch_size,
-        is_demo=False
+        is_demo=False,
     )
