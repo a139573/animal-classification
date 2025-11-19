@@ -7,6 +7,10 @@ from ..modeling.train import VGGNet
 from sklearn.metrics import accuracy_score, confusion_matrix, f1_score, RocCurveDisplay
 from sklearn.calibration import calibration_curve
 import matplotlib.pyplot as plt
+import pytorch_lightning as pl
+
+from PIL import Image
+import io
 
 """
 Model Inference and Evaluation Script.
@@ -17,7 +21,16 @@ and generates diagnostic plots such as the confusion matrix, ROC curve,
 and calibration plot.
 """
 
-def run_inference(model_path: Path, data_dir: Path, architecture: str, output_path: Path, batch_size: int = 16):
+# Helper to convert matplotlib figure to PIL Image
+def fig_to_image():
+    buf = io.BytesIO()
+    plt.savefig(buf, format="png")
+    buf.seek(0)
+    img = Image.open(buf)
+    plt.close()
+    return img
+
+def run_inference(model_path: Path = None, data_dir: Path = None, architecture: str = None, trained_model: pl.LightningModule = None, output_path: Path = None, batch_size: int = 16, is_demo: bool = False):
     """
     Runs model inference, calculates metrics, and saves plots.
 
@@ -42,14 +55,18 @@ def run_inference(model_path: Path, data_dir: Path, architecture: str, output_pa
         - "f1_score" (float): Macro F1-score.
         - "confusion_matrix" (np.ndarray): The confusion matrix.
     """
-    print(f"\n🔍 Loading model: {model_path}")
+    if model_path is not None:
+        print(f"\n🔍 Loading model: {model_path}")
+    else:
+        print("Model loaded from training")
     print(f"📁 Using dataset: {data_dir}")
     print(f"🧠 Architecture: {architecture}")
 
     # --- Ensure absolute path exists ---
-    output_path = Path(output_path).absolute()
-    output_path.mkdir(parents=True, exist_ok=True)
-    print(f"✅ Plots and predictions will be saved to: {output_path}")
+    if output_path is not None: # if it is None, we don't want to store (demo)
+        output_path = Path(output_path).absolute()
+        output_path.mkdir(parents=True, exist_ok=True)
+        print(f"✅ Plots and predictions will be saved to: {output_path}")
 
     # --- Setup data module ---
     data_module = AnimalsDataModule(data_dir=data_dir, batch_size=batch_size)
@@ -58,19 +75,20 @@ def run_inference(model_path: Path, data_dir: Path, architecture: str, output_pa
     num_classes = len(data_module.class_names)
 
     # --- Load model ---
-    model = VGGNet(architecture=architecture, num_classes=num_classes, pretrained=False)
-    state_dict = torch.load(model_path, map_location="cpu")
-    model.load_state_dict(state_dict)
-    model.eval()
+    if trained_model is None:
+        trained_model = VGGNet(architecture=architecture, num_classes=num_classes, pretrained=False)
+        state_dict = torch.load(model_path, map_location="cpu")
+        trained_model.load_state_dict(state_dict)
+    trained_model.eval()
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    model.to(device)
+    trained_model.to(device)
 
     # --- Collect predictions ---
     all_probs, all_labels = [], []
     with torch.no_grad():
         for xb, yb in val_loader:
             xb = xb.to(device)
-            out = model(xb)
+            out = trained_model(xb)
             probs = F.softmax(out, dim=1)
             all_probs.append(probs.cpu().numpy())
             all_labels.append(yb.numpy())
@@ -85,8 +103,13 @@ def run_inference(model_path: Path, data_dir: Path, architecture: str, output_pa
     cm = confusion_matrix(all_labels, preds)
 
     # --- Save predictions ---
-    np.save(output_path / f"{architecture}_val_probs.npy", all_probs)
-    np.save(output_path / f"{architecture}_val_labels.npy", all_labels)
+    if not is_demo:
+        np.save(output_path / f"{architecture}_val_probs.npy", all_probs)
+        np.save(output_path / f"{architecture}_val_labels.npy", all_labels)
+    else:
+        # Keep in memory for demo
+        val_probs = all_probs
+        val_labels = all_labels
 
     # --- Confusion matrix ---
     plt.figure(figsize=(6,6))
@@ -96,20 +119,19 @@ def run_inference(model_path: Path, data_dir: Path, architecture: str, output_pa
     plt.xlabel("Predicted")
     plt.ylabel("True")
     plt.tight_layout()
-    plt.savefig(output_path / f"{architecture}_confusion_matrix.png")
-    plt.close()
+    cm_img = fig_to_image() if is_demo else plt.savefig(output_path / f"{architecture}_confusion_matrix.png")
 
     # --- ROC curve ---
     try:
         plt.figure()
         y_true_onehot = np.eye(num_classes)[all_labels]
-        RocCurveDisplay.from_predictions(y_true_onehot.ravel(), all_probs.ravel())
+        RocCurveDisplay.from_predictions(y_true_onehot, all_probs, multi_class='ovr')
         plt.title("ROC Curve")
         plt.tight_layout()
-        plt.savefig(output_path / f"{architecture}_roc_curve.png")
-        plt.close()
+        roc_img = fig_to_image() if is_demo else plt.savefig(output_path / f"{architecture}_roc_curve.png")
     except Exception as e:
         print("⚠️ ROC plot failed:", e)
+        roc_img = None
 
     # --- Calibration plot (top-class correctness) ---
     try:
@@ -123,11 +145,13 @@ def run_inference(model_path: Path, data_dir: Path, architecture: str, output_pa
         plt.ylabel("True probability")
         plt.title("Calibration Plot (Top-Class Correctness)")
         plt.tight_layout()
-        plt.savefig(output_path / f"{architecture}_calibration.png")
-        plt.close()
+        cal_img = fig_to_image() if is_demo else plt.savefig(output_path / f"{architecture}_calibration.png")
     except Exception as e:
         print("⚠️ Calibration plot failed:", e)
+        cal_img = None
 
-    print(f"\n✅ Saved validation predictions and plots to: {output_path}")
-    print(f"Validation Accuracy: {acc:.3f}, F1-score: {f1:.3f}")
-    return {"val_acc": acc, "f1_score": f1, "confusion_matrix": cm}
+    # --- Now you can return these images directly to Gradio ---
+    if is_demo:
+        return val_probs, val_labels, acc, f1, cm_img, roc_img, cal_img
+    else:
+        return {"output_path": output_path, "val_acc": acc, "f1_score": f1, "confusion_matrix": cm}

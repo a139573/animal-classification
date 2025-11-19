@@ -10,6 +10,7 @@ import argparse
 import pandas as pd
 import matplotlib.pyplot as plt
 import gradio as gr
+import tempfile
 
 torch.set_float32_matmul_precision("medium")
 
@@ -44,15 +45,17 @@ class VGGNet(pl.LightningModule):
         xb, yb = batch
         out = self(xb)
         loss = self.loss_fn(out, yb)
-        self.log("train_loss", loss)
+        self.log("train_loss", loss, prog_bar=True)
         return loss
 
     def validation_step(self, batch, batch_idx):
         xb, yb = batch
         out = self(xb)
+        loss = self.loss_fn(out, yb)
         preds = out.argmax(1)
         acc = (preds == yb).float().mean()
         self.log("val_acc", acc, prog_bar=True)
+        self.log("val_loss", loss, prog_bar=True)
 
     def test_step(self, batch, batch_idx):
         xb, yb = batch
@@ -65,6 +68,26 @@ class VGGNet(pl.LightningModule):
         return optim.Adam(self.parameters(), lr=self.lr)
 
 
+class GradioProgressCallback(pl.Callback):
+    def __init__(self, progress_fn, max_epochs):
+        super().__init__()
+        self.progress_fn = progress_fn
+        self.max_epochs = max_epochs
+
+    def on_train_batch_end(self, trainer, pl_module, outputs, batch, batch_idx):
+        current_epoch = trainer.current_epoch
+        total_batches = trainer.num_training_batches
+        global_step = current_epoch * total_batches + batch_idx + 1
+        total_steps = self.max_epochs * total_batches
+
+        pct = global_step / total_steps
+
+        self.progress_fn(
+            pct,
+            desc=f"Epoch {current_epoch+1}/{self.max_epochs} — batch {batch_idx+1}/{total_batches}"
+        )
+
+
 def main(
     architecture: str = "vgg16",
     dataset_choice: str = "mini",
@@ -72,6 +95,7 @@ def main(
     test_frac: float = 0.2,
     max_epochs: int = 5,
     batch_size: int = 16,
+    is_demo: bool = False,
     progress: gr.Progress = None,
 ):
     data_dir = Path("data")
@@ -88,21 +112,29 @@ def main(
 
     net = VGGNet(architecture=architecture, num_classes=num_classes)
 
-    models_dir = Path("models")
-    models_dir.mkdir(parents=True, exist_ok=True)
-    logs_dir = Path("logs")
-    logs_dir.mkdir(parents=True, exist_ok=True)
-    reports_dir = Path("reports/figures")
-    reports_dir.mkdir(parents=True, exist_ok=True)
+    callbacks = []
+    if is_demo:
+        tmp_dir = tempfile.TemporaryDirectory()
+        logs_dir = Path(tmp_dir.name)
+        callbacks.append(GradioProgressCallback(progress, max_epochs))
+    else:
+        models_dir = Path("models")
+        models_dir.mkdir(parents=True, exist_ok=True)
+        logs_dir = Path("logs")
+        logs_dir.mkdir(parents=True, exist_ok=True)
+        reports_dir = Path("reports/figures")
+        reports_dir.mkdir(parents=True, exist_ok=True)
 
-    checkpoint_callback = ModelCheckpoint(
-        dirpath=models_dir,
-        filename=f"{architecture}-best",
-        monitor="val_acc",
-        mode="max",
-        save_top_k=1,
-        save_last=False,
-    )
+        
+        checkpoint_callback = ModelCheckpoint(
+            dirpath=models_dir,
+            filename=f"{architecture}-best",
+            monitor="val_acc",
+            mode="max",
+            save_top_k=1,
+            save_last=False,
+        )
+        callbacks.append(checkpoint_callback)
 
     logger = CSVLogger(save_dir=logs_dir, name=f"{architecture}_runs")
 
@@ -113,7 +145,7 @@ def main(
         precision="16-mixed",
         val_check_interval=1.0,
         num_sanity_val_steps=0,
-        callbacks=[checkpoint_callback],
+        callbacks=callbacks,
         logger=logger,
         log_every_n_steps=10,
     )
@@ -123,44 +155,55 @@ def main(
 
     trainer.fit(net, datamodule=data_module)
 
-    # Optional: run test set if available
-    test_results = trainer.test(net, datamodule=data_module)
+    # Optional: run test set if available. NO, this on inference
+    # test_results = trainer.test(net, datamodule=data_module)
 
     if progress:
         progress(1, desc="Training complete!")
 
     # Save model
-    torch.save(net.state_dict(), models_dir / f"{architecture}_state_dict.pth")
-    print(f"✅ Best checkpoint: {checkpoint_callback.best_model_path}")
+    if not is_demo:
+        torch.save(net.state_dict(), models_dir / f"{architecture}_state_dict.pth")
+        print(f"✅ Best checkpoint: {checkpoint_callback.best_model_path}")
 
     # Load CSV logs for visualization
     csv_path = Path(logger.log_dir) / "metrics.csv"
     df = pd.read_csv(csv_path)
 
-    # Clean and plot validation accuracy
-    if "val_acc" in df.columns:
+    if not is_demo:
+        # --- Permanent mode: save plots ---
         plt.figure(figsize=(6, 4))
         plt.plot(df["epoch"], df["val_acc"], marker="o", label="Validation Accuracy")
+        plt.plot(df["epoch"], df["val_loss"], marker="x", label="Validation Loss")
+        plt.plot(df["epoch"], df["train_loss"], marker="x", label="Training Loss")
         plt.xlabel("Epoch")
-        plt.ylabel("Accuracy")
-        plt.title(f"{architecture.upper()} Validation Accuracy")
+        plt.ylabel("Value")
+        plt.title(f"{architecture.upper()} Convergence")
         plt.legend()
         plt.grid(True)
-        acc_plot_path = reports_dir / f"{architecture}_val_acc.png"
-        plt.savefig(acc_plot_path)
+        conv_plot_path = reports_dir / f"{architecture}_convergence.png"
+        plt.savefig(conv_plot_path)
         plt.close()
     else:
-        acc_plot_path = None
+        # --- Demo mode: return lists for Gradio plotting ---
+        val_acc_list = df["val_acc"].tolist()
+        val_loss_list = df["val_loss"].tolist()
+        train_loss_list = df["train_loss"].tolist()
+        conv_plot_path = None  # no file in demo mode
 
     # Extract final metrics
-    final_val_acc = df["val_acc"].dropna().iloc[-1] if "val_acc" in df.columns else None
-    test_acc = test_results[0]["test_acc"] if test_results else None
+    final_val_acc = df["val_acc"].dropna().iloc[-1]
+    # test_acc = test_results[0]["test_acc"] if test_results else None
 
     return {
+        "model": net,
         "val_acc": float(final_val_acc) if final_val_acc is not None else None,
-        "test_acc": float(test_acc) if test_acc is not None else None,
+        # "test_acc": float(test_acc) if test_acc is not None else None,
         "log_path": str(csv_path),
-        "plot_path": str(acc_plot_path) if acc_plot_path else None,
+        "plot_path": str(conv_plot_path) if conv_plot_path else None,
+        "val_acc_list": val_acc_list if is_demo else None,
+        "val_loss_list": val_loss_list if is_demo else None,
+        "train_loss_list": train_loss_list if is_demo else None,
     }
 
 
