@@ -155,14 +155,14 @@ the project's three main workflows:</p>
 </span><span id="L-67"><a href="#L-67"><span class="linenos"> 67</span></a>
 </span><span id="L-68"><a href="#L-68"><span class="linenos"> 68</span></a><span class="sd">    Parameters</span>
 </span><span id="L-69"><a href="#L-69"><span class="linenos"> 69</span></a><span class="sd">    ----------</span>
-</span><span id="L-70"><a href="#L-70"><span class="linenos"> 70</span></a><span class="sd">    dataset_choice : str</span>
-</span><span id="L-71"><a href="#L-71"><span class="linenos"> 71</span></a><span class="sd">        Dataset selection (&quot;Full dataset&quot; or &quot;Reduced dataset&quot;).</span>
-</span><span id="L-72"><a href="#L-72"><span class="linenos"> 72</span></a><span class="sd">    model_choice : str</span>
-</span><span id="L-73"><a href="#L-73"><span class="linenos"> 73</span></a><span class="sd">        Model architecture to train (e.g., &quot;VGG16&quot;).</span>
-</span><span id="L-74"><a href="#L-74"><span class="linenos"> 74</span></a><span class="sd">    seed : int or float</span>
-</span><span id="L-75"><a href="#L-75"><span class="linenos"> 75</span></a><span class="sd">        Random seed for reproducibility. Will be cast to int.</span>
-</span><span id="L-76"><a href="#L-76"><span class="linenos"> 76</span></a><span class="sd">    epochs : int or float</span>
-</span><span id="L-77"><a href="#L-77"><span class="linenos"> 77</span></a><span class="sd">        Maximum number of epochs. Will be cast to int.</span>
+</span><span id="L-70"><a href="#L-70"><span class="linenos"> 70</span></a><span class="sd">    model_choice : str</span>
+</span><span id="L-71"><a href="#L-71"><span class="linenos"> 71</span></a><span class="sd">        Model architecture to train (e.g., &quot;VGG16&quot;).</span>
+</span><span id="L-72"><a href="#L-72"><span class="linenos"> 72</span></a><span class="sd">    seed : int or float</span>
+</span><span id="L-73"><a href="#L-73"><span class="linenos"> 73</span></a><span class="sd">        Random seed for reproducibility. Will be cast to int.</span>
+</span><span id="L-74"><a href="#L-74"><span class="linenos"> 74</span></a><span class="sd">    epochs : int or float</span>
+</span><span id="L-75"><a href="#L-75"><span class="linenos"> 75</span></a><span class="sd">        Maximum number of epochs. Will be cast to int.</span>
+</span><span id="L-76"><a href="#L-76"><span class="linenos"> 76</span></a><span class="sd">    num_workers : int</span>
+</span><span id="L-77"><a href="#L-77"><span class="linenos"> 77</span></a><span class="sd">        Number of subprocesses to use for data loading.</span>
 </span><span id="L-78"><a href="#L-78"><span class="linenos"> 78</span></a><span class="sd">    progress : gradio.Progress, optional</span>
 </span><span id="L-79"><a href="#L-79"><span class="linenos"> 79</span></a><span class="sd">        Gradio object to track training progress.</span>
 </span><span id="L-80"><a href="#L-80"><span class="linenos"> 80</span></a>
@@ -429,14 +429,14 @@ the project's three main workflows:</p>
 </span><span id="run_training-68"><a href="#run_training-68"><span class="linenos"> 68</span></a>
 </span><span id="run_training-69"><a href="#run_training-69"><span class="linenos"> 69</span></a><span class="sd">    Parameters</span>
 </span><span id="run_training-70"><a href="#run_training-70"><span class="linenos"> 70</span></a><span class="sd">    ----------</span>
-</span><span id="run_training-71"><a href="#run_training-71"><span class="linenos"> 71</span></a><span class="sd">    dataset_choice : str</span>
-</span><span id="run_training-72"><a href="#run_training-72"><span class="linenos"> 72</span></a><span class="sd">        Dataset selection (&quot;Full dataset&quot; or &quot;Reduced dataset&quot;).</span>
-</span><span id="run_training-73"><a href="#run_training-73"><span class="linenos"> 73</span></a><span class="sd">    model_choice : str</span>
-</span><span id="run_training-74"><a href="#run_training-74"><span class="linenos"> 74</span></a><span class="sd">        Model architecture to train (e.g., &quot;VGG16&quot;).</span>
-</span><span id="run_training-75"><a href="#run_training-75"><span class="linenos"> 75</span></a><span class="sd">    seed : int or float</span>
-</span><span id="run_training-76"><a href="#run_training-76"><span class="linenos"> 76</span></a><span class="sd">        Random seed for reproducibility. Will be cast to int.</span>
-</span><span id="run_training-77"><a href="#run_training-77"><span class="linenos"> 77</span></a><span class="sd">    epochs : int or float</span>
-</span><span id="run_training-78"><a href="#run_training-78"><span class="linenos"> 78</span></a><span class="sd">        Maximum number of epochs. Will be cast to int.</span>
+</span><span id="run_training-71"><a href="#run_training-71"><span class="linenos"> 71</span></a><span class="sd">    model_choice : str</span>
+</span><span id="run_training-72"><a href="#run_training-72"><span class="linenos"> 72</span></a><span class="sd">        Model architecture to train (e.g., &quot;VGG16&quot;).</span>
+</span><span id="run_training-73"><a href="#run_training-73"><span class="linenos"> 73</span></a><span class="sd">    seed : int or float</span>
+</span><span id="run_training-74"><a href="#run_training-74"><span class="linenos"> 74</span></a><span class="sd">        Random seed for reproducibility. Will be cast to int.</span>
+</span><span id="run_training-75"><a href="#run_training-75"><span class="linenos"> 75</span></a><span class="sd">    epochs : int or float</span>
+</span><span id="run_training-76"><a href="#run_training-76"><span class="linenos"> 76</span></a><span class="sd">        Maximum number of epochs. Will be cast to int.</span>
+</span><span id="run_training-77"><a href="#run_training-77"><span class="linenos"> 77</span></a><span class="sd">    num_workers : int</span>
+</span><span id="run_training-78"><a href="#run_training-78"><span class="linenos"> 78</span></a><span class="sd">        Number of subprocesses to use for data loading.</span>
 </span><span id="run_training-79"><a href="#run_training-79"><span class="linenos"> 79</span></a><span class="sd">    progress : gradio.Progress, optional</span>
 </span><span id="run_training-80"><a href="#run_training-80"><span class="linenos"> 80</span></a><span class="sd">        Gradio object to track training progress.</span>
 </span><span id="run_training-81"><a href="#run_training-81"><span class="linenos"> 81</span></a>
@@ -530,14 +530,14 @@ the project's three main workflows:</p>
 
 <h2 id="parameters">Parameters</h2>
 
-<p>dataset_choice : str
-    Dataset selection ("Full dataset" or "Reduced dataset").
-model_choice : str
+<p>model_choice : str
     Model architecture to train (e.g., "VGG16").
 seed : int or float
     Random seed for reproducibility. Will be cast to int.
 epochs : int or float
     Maximum number of epochs. Will be cast to int.
+num_workers : int
+    Number of subprocesses to use for data loading.
 progress : gradio.Progress, optional
     Gradio object to track training progress.</p>
 

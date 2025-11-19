@@ -23,6 +23,17 @@ and calibration plot.
 
 # Helper to convert matplotlib figure to PIL Image
 def fig_to_image():
+    """
+    Converts the current Matplotlib figure into a PIL Image.
+
+    It saves the figure to an in-memory buffer and re-opens it as an image,
+    closing the plot afterwards to free memory.
+
+    Returns
+    -------
+    PIL.Image.Image
+        The plot rendered as an image object.
+    """
     buf = io.BytesIO()
     plt.savefig(buf, format="png")
     buf.seek(0)

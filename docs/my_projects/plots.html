@@ -194,13 +194,13 @@
 </span><span id="L-120"><a href="#L-120"><span class="linenos">120</span></a>
 </span><span id="L-121"><a href="#L-121"><span class="linenos">121</span></a><span class="sd">    Parameters</span>
 </span><span id="L-122"><a href="#L-122"><span class="linenos">122</span></a><span class="sd">    ----------</span>
-</span><span id="L-123"><a href="#L-123"><span class="linenos">123</span></a><span class="sd">    df_norm : pandas.DataFrame</span>
+</span><span id="L-123"><a href="#L-123"><span class="linenos">123</span></a><span class="sd">    df : pandas.DataFrame</span>
 </span><span id="L-124"><a href="#L-124"><span class="linenos">124</span></a><span class="sd">        DataFrame with normalized [&#39;R&#39;, &#39;G&#39;, &#39;B&#39;] columns.</span>
 </span><span id="L-125"><a href="#L-125"><span class="linenos">125</span></a><span class="sd">    path : Path</span>
 </span><span id="L-126"><a href="#L-126"><span class="linenos">126</span></a><span class="sd">        Path where the figure will be saved.</span>
 </span><span id="L-127"><a href="#L-127"><span class="linenos">127</span></a><span class="sd">    &quot;&quot;&quot;</span>
 </span><span id="L-128"><a href="#L-128"><span class="linenos">128</span></a>    <span class="n">sns</span><span class="o">.</span><span class="n">clustermap</span><span class="p">(</span>
-</span><span id="L-129"><a href="#L-129"><span class="linenos">129</span></a>        <span class="n">df_norm</span><span class="p">[[</span><span class="s1">&#39;R&#39;</span><span class="p">,</span><span class="s1">&#39;G&#39;</span><span class="p">,</span><span class="s1">&#39;B&#39;</span><span class="p">]],</span> 
+</span><span id="L-129"><a href="#L-129"><span class="linenos">129</span></a>        <span class="n">df</span><span class="p">[[</span><span class="s1">&#39;R&#39;</span><span class="p">,</span><span class="s1">&#39;G&#39;</span><span class="p">,</span><span class="s1">&#39;B&#39;</span><span class="p">]],</span> 
 </span><span id="L-130"><a href="#L-130"><span class="linenos">130</span></a>        <span class="n">method</span><span class="o">=</span><span class="s1">&#39;ward&#39;</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="s1">&#39;euclidean&#39;</span><span class="p">,</span> 
 </span><span id="L-131"><a href="#L-131"><span class="linenos">131</span></a>        <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;viridis&#39;</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">12</span><span class="p">)</span>
 </span><span id="L-132"><a href="#L-132"><span class="linenos">132</span></a>    <span class="p">)</span>
@@ -235,7 +235,7 @@
 </span><span id="L-161"><a href="#L-161"><span class="linenos">161</span></a>
 </span><span id="L-162"><a href="#L-162"><span class="linenos">162</span></a><span class="sd">    Parameters</span>
 </span><span id="L-163"><a href="#L-163"><span class="linenos">163</span></a><span class="sd">    ----------</span>
-</span><span id="L-164"><a href="#L-164"><span class="linenos">164</span></a><span class="sd">    rgb_averages : dict</span>
+</span><span id="L-164"><a href="#L-164"><span class="linenos">164</span></a><span class="sd">    medias_rgb : dict</span>
 </span><span id="L-165"><a href="#L-165"><span class="linenos">165</span></a><span class="sd">        Dictionary with categories as keys and average [R, G, B] values.</span>
 </span><span id="L-166"><a href="#L-166"><span class="linenos">166</span></a>
 </span><span id="L-167"><a href="#L-167"><span class="linenos">167</span></a><span class="sd">    Returns</span>
@@ -517,13 +517,13 @@ path : Path
 </span><span id="plot_clustermap-121"><a href="#plot_clustermap-121"><span class="linenos">121</span></a>
 </span><span id="plot_clustermap-122"><a href="#plot_clustermap-122"><span class="linenos">122</span></a><span class="sd">    Parameters</span>
 </span><span id="plot_clustermap-123"><a href="#plot_clustermap-123"><span class="linenos">123</span></a><span class="sd">    ----------</span>
-</span><span id="plot_clustermap-124"><a href="#plot_clustermap-124"><span class="linenos">124</span></a><span class="sd">    df_norm : pandas.DataFrame</span>
+</span><span id="plot_clustermap-124"><a href="#plot_clustermap-124"><span class="linenos">124</span></a><span class="sd">    df : pandas.DataFrame</span>
 </span><span id="plot_clustermap-125"><a href="#plot_clustermap-125"><span class="linenos">125</span></a><span class="sd">        DataFrame with normalized [&#39;R&#39;, &#39;G&#39;, &#39;B&#39;] columns.</span>
 </span><span id="plot_clustermap-126"><a href="#plot_clustermap-126"><span class="linenos">126</span></a><span class="sd">    path : Path</span>
 </span><span id="plot_clustermap-127"><a href="#plot_clustermap-127"><span class="linenos">127</span></a><span class="sd">        Path where the figure will be saved.</span>
 </span><span id="plot_clustermap-128"><a href="#plot_clustermap-128"><span class="linenos">128</span></a><span class="sd">    &quot;&quot;&quot;</span>
 </span><span id="plot_clustermap-129"><a href="#plot_clustermap-129"><span class="linenos">129</span></a>    <span class="n">sns</span><span class="o">.</span><span class="n">clustermap</span><span class="p">(</span>
-</span><span id="plot_clustermap-130"><a href="#plot_clustermap-130"><span class="linenos">130</span></a>        <span class="n">df_norm</span><span class="p">[[</span><span class="s1">&#39;R&#39;</span><span class="p">,</span><span class="s1">&#39;G&#39;</span><span class="p">,</span><span class="s1">&#39;B&#39;</span><span class="p">]],</span> 
+</span><span id="plot_clustermap-130"><a href="#plot_clustermap-130"><span class="linenos">130</span></a>        <span class="n">df</span><span class="p">[[</span><span class="s1">&#39;R&#39;</span><span class="p">,</span><span class="s1">&#39;G&#39;</span><span class="p">,</span><span class="s1">&#39;B&#39;</span><span class="p">]],</span> 
 </span><span id="plot_clustermap-131"><a href="#plot_clustermap-131"><span class="linenos">131</span></a>        <span class="n">method</span><span class="o">=</span><span class="s1">&#39;ward&#39;</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="s1">&#39;euclidean&#39;</span><span class="p">,</span> 
 </span><span id="plot_clustermap-132"><a href="#plot_clustermap-132"><span class="linenos">132</span></a>        <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;viridis&#39;</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">12</span><span class="p">)</span>
 </span><span id="plot_clustermap-133"><a href="#plot_clustermap-133"><span class="linenos">133</span></a>    <span class="p">)</span>
@@ -537,7 +537,7 @@ path : Path
 
 <h2 id="parameters">Parameters</h2>
 
-<p>df_norm : pandas.DataFrame
+<p>df : pandas.DataFrame
     DataFrame with normalized ['R', 'G', 'B'] columns.
 path : Path
     Path where the figure will be saved.</p>
@@ -608,7 +608,7 @@ path : Path
 </span><span id="get_df_with_rgb_avg-162"><a href="#get_df_with_rgb_avg-162"><span class="linenos">162</span></a>
 </span><span id="get_df_with_rgb_avg-163"><a href="#get_df_with_rgb_avg-163"><span class="linenos">163</span></a><span class="sd">    Parameters</span>
 </span><span id="get_df_with_rgb_avg-164"><a href="#get_df_with_rgb_avg-164"><span class="linenos">164</span></a><span class="sd">    ----------</span>
-</span><span id="get_df_with_rgb_avg-165"><a href="#get_df_with_rgb_avg-165"><span class="linenos">165</span></a><span class="sd">    rgb_averages : dict</span>
+</span><span id="get_df_with_rgb_avg-165"><a href="#get_df_with_rgb_avg-165"><span class="linenos">165</span></a><span class="sd">    medias_rgb : dict</span>
 </span><span id="get_df_with_rgb_avg-166"><a href="#get_df_with_rgb_avg-166"><span class="linenos">166</span></a><span class="sd">        Dictionary with categories as keys and average [R, G, B] values.</span>
 </span><span id="get_df_with_rgb_avg-167"><a href="#get_df_with_rgb_avg-167"><span class="linenos">167</span></a>
 </span><span id="get_df_with_rgb_avg-168"><a href="#get_df_with_rgb_avg-168"><span class="linenos">168</span></a><span class="sd">    Returns</span>
@@ -647,7 +647,7 @@ path : Path
 
 <h2 id="parameters">Parameters</h2>
 
-<p>rgb_averages : dict
+<p>medias_rgb : dict
     Dictionary with categories as keys and average [R, G, B] values.</p>
 
 <h2 id="returns">Returns</h2>

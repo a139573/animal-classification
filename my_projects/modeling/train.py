@@ -16,6 +16,12 @@ torch.set_float32_matmul_precision("medium")
 
 
 class VGGNet(pl.LightningModule):
+    """
+    A VGG-based classifier implemented using PyTorch Lightning.
+
+    This model uses a pre-trained VGG backbone (frozen features) and a custom
+    classifier head for the specific number of animal classes in the dataset.
+    """
     def __init__(self, architecture="vgg16", num_classes=90, pretrained=True, lr=1e-3):
         super().__init__()
         if architecture.lower() == "vgg16":
@@ -148,6 +154,40 @@ def main(
     is_demo: bool = False,
     progress: gr.Progress = None,
 ):
+    """
+    Main training pipeline for the Animal Classification project.
+
+    This function handles the setup of the DataModule, the initialization of the
+    model (VGGNet), and the training loop using PyTorch Lightning. It creates
+    necessary directories for models, logs, and reports.
+
+    Parameters
+    ----------
+    architecture : str
+        The model architecture to use ('vgg16' or 'vgg11').
+    dataset_choice : str
+        Which dataset to use ('full' or 'mini').
+    seed : int
+        Random seed for reproducibility.
+    test_frac : float
+        Fraction of data to use for testing.
+    max_epochs : int
+        Maximum number of training epochs.
+    batch_size : int
+        Batch size for data loaders.
+    num_workers : int
+        Number of CPU workers for data loading.
+    is_demo : bool
+        If True, runs in 'demo mode' (no saving to disk, returns objects).
+    progress : gradio.Progress, optional
+        Gradio progress tracker object for the dashboard.
+
+    Returns
+    -------
+    dict
+        A dictionary containing the trained model, metrics, and paths/objects
+        for visualization.
+    """
     data_dir = Path("data")
     subsample_dir = data_dir / (
         "animals/animals" if dataset_choice == "full" else "mini_animals/animals"
