@@ -224,4 +224,5 @@ if __name__ == "__main__":
         test_frac=args.test_frac,
         max_epochs=args.max_epochs,
         batch_size=args.batch_size,
+        is_demo=False
     )

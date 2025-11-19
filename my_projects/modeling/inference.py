@@ -32,20 +32,25 @@ def fig_to_image():
 
 def run_inference(model_path: Path = None, data_dir: Path = None, architecture: str = None, trained_model: pl.LightningModule = None, output_path: Path = None, batch_size: int = 16, is_demo: bool = False):
     """
-    Runs model inference, calculates metrics, and saves plots.
+    Run model inference on the validation dataset.  
+    Uses an in-memory model if provided, otherwise loads from checkpoint.
 
     Parameters
     ----------
-    model_path : pathlib.Path
-        Path to the saved model state dictionary (.pth file).
-    data_dir : pathlib.Path
-        Path to the root data directory (e.g., '.../mini_animals/animals').
-    architecture : str
-        The model architecture name (e.g., "vgg16") to instantiate.
-    output_path : pathlib.Path
-        Directory where predictions (.npy) and plots (.png) will be saved.
+    trained_model : torch.nn.Module, optional
+        A trained model instance already loaded in memory.
+    model_path : Path, optional
+        Path to a saved model state dictionary (.pth).
+    data_dir : Path, optional
+        Path to the dataset directory.
+    architecture : str, optional
+        Model architecture name ("vgg16" or "vgg11").
+    output_path : Path, optional
+        Where to save predictions and plots.
     batch_size : int, optional
-        Batch size for the validation DataLoader (default is 16).
+        Validation batch size.
+    is_demo : bool, optional
+        Whether to use a temporary folder for outputs (auto-cleaned).
 
     Returns
     -------
@@ -68,7 +73,7 @@ def run_inference(model_path: Path = None, data_dir: Path = None, architecture: 
         output_path.mkdir(parents=True, exist_ok=True)
         print(f"✅ Plots and predictions will be saved to: {output_path}")
 
-    # --- Setup data module ---
+    # --- Setup DataModule ---
     data_module = AnimalsDataModule(data_dir=data_dir, batch_size=batch_size)
     data_module.setup()
     val_loader = data_module.val_dataloader()
@@ -112,7 +117,7 @@ def run_inference(model_path: Path = None, data_dir: Path = None, architecture: 
         val_labels = all_labels
 
     # --- Confusion matrix ---
-    plt.figure(figsize=(6,6))
+    plt.figure(figsize=(6, 6))
     plt.imshow(cm, cmap="Blues")
     plt.title("Confusion Matrix")
     plt.colorbar()
@@ -133,17 +138,17 @@ def run_inference(model_path: Path = None, data_dir: Path = None, architecture: 
         print("⚠️ ROC plot failed:", e)
         roc_img = None
 
-    # --- Calibration plot (top-class correctness) ---
+    # --- Calibration plot ---
     try:
-        plt.figure(figsize=(6,6))
-        y_true = (preds == all_labels).astype(int)  # 1 if top prediction correct
-        y_prob = all_probs.max(axis=1)              # probability of top prediction
-        prob_true, prob_pred = calibration_curve(y_true, y_prob, n_bins=10, strategy='uniform')
-        plt.plot(prob_pred, prob_true, marker='o')
-        plt.plot([0,1],[0,1],'--', color='gray')
+        plt.figure(figsize=(6, 6))
+        y_true = (preds == all_labels).astype(int)
+        y_prob = all_probs.max(axis=1)
+        prob_true, prob_pred = calibration_curve(y_true, y_prob, n_bins=10, strategy="uniform")
+        plt.plot(prob_pred, prob_true, marker="o")
+        plt.plot([0, 1], [0, 1], "--", color="gray")
         plt.xlabel("Predicted probability")
         plt.ylabel("True probability")
-        plt.title("Calibration Plot (Top-Class Correctness)")
+        plt.title("Calibration Plot")
         plt.tight_layout()
         cal_img = fig_to_image() if is_demo else plt.savefig(output_path / f"{architecture}_calibration.png")
     except Exception as e:

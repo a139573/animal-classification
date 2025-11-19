@@ -124,28 +124,10 @@ def run_inference_gr(trained_model, batch_size):
     """
     Runs inference on the validation set and generates visualizations.
 
-    Gradio wrapper for the `run_inference` function. Loads the
-    generated metric images (confusion matrix, ROC, calibration).
+    If a trained_model is provided (from demo memory), it is used directly.
+    Otherwise, the function loads a model checkpoint from disk.
 
-    Parameters
-    ----------
-    dataset_choice : str
-        Dataset selection ("Full dataset" or "Reduced dataset").
-    model_choice : str
-        Model architecture to use (e.g., "VGG16").
-    batch_size : int or float
-        Batch size for inference. Will be cast to int.
-
-    Returns
-    -------
-    metrics_text : str
-        Formatted string with metrics (Accuracy, F1-Score).
-    cm_img : np.ndarray or None
-        Confusion matrix image loaded via mpimg.
-    roc_img : np.ndarray or None
-        ROC curve image loaded via mpimg.
-    cal_img : np.ndarray or None
-        Calibration plot image loaded via mpimg.
+    Metrics are displayed in the dashboard but not stored on disk.
     """
 
     val_probs, val_labels, acc, f1, cm_img, roc_img, cal_img = run_inference(
