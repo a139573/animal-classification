@@ -7,9 +7,10 @@ from ..modeling.train import VGGNet
 from sklearn.metrics import accuracy_score, confusion_matrix, f1_score, RocCurveDisplay
 from sklearn.calibration import calibration_curve
 import matplotlib.pyplot as plt
-import tempfile
-import argparse
+import pytorch_lightning as pl
 
+from PIL import Image
+import io
 
 """
 Model Inference and Evaluation Script.
@@ -20,29 +21,16 @@ and generates diagnostic plots such as the confusion matrix, ROC curve,
 and calibration plot.
 """
 
+# Helper to convert matplotlib figure to PIL Image
+def fig_to_image():
+    buf = io.BytesIO()
+    plt.savefig(buf, format="png")
+    buf.seek(0)
+    img = Image.open(buf)
+    plt.close()
+    return img
 
-import torch
-from torch.nn import functional as F
-import numpy as np
-from pathlib import Path
-from sklearn.metrics import accuracy_score, confusion_matrix, f1_score, RocCurveDisplay
-from sklearn.calibration import calibration_curve
-import matplotlib.pyplot as plt
-import tempfile
-
-from ..dataset import AnimalsDataModule
-from ..modeling.train import VGGNet
-
-
-def run_inference(
-    trained_model=None,
-    model_path: Path = None,
-    data_dir: Path = None,
-    architecture: str = None,
-    output_path: Path = None,
-    batch_size: int = 16,
-    is_demo: bool = False,
-):
+def run_inference(model_path: Path = None, data_dir: Path = None, architecture: str = None, trained_model: pl.LightningModule = None, output_path: Path = None, batch_size: int = 16, is_demo: bool = False):
     """
     Run model inference on the validation dataset.  
     Uses an in-memory model if provided, otherwise loads from checkpoint.
@@ -69,30 +57,18 @@ def run_inference(
     dict
         { "val_acc": float, "f1_score": float, "confusion_matrix": np.ndarray }
     """
-
-    # --- Handle defaults / validation ---
-    if trained_model is None and (model_path is None or architecture is None):
-        raise ValueError(
-            "You must provide either a `trained_model` instance or both `model_path` and `architecture`."
-        )
-
-    if data_dir is None:
-        data_dir = Path("data/mini_animals/animals")
-        print(f"⚙️ Defaulting data_dir to: {data_dir}")
-
-    print("\n🔍 Starting inference")
-    print(f"📁 Dataset: {data_dir}")
-    print(f"🧠 Architecture: {architecture or 'provided model'}")
-
-    # --- Handle output directory ---
-    if is_demo:
-        temp_dir = tempfile.TemporaryDirectory()
-        output_path = Path(temp_dir.name)
-        print(f"⚙️ Running in demo mode — temporary dir: {output_path}")
+    if model_path is not None:
+        print(f"\n🔍 Loading model: {model_path}")
     else:
-        output_path = Path(output_path or "inference_outputs").absolute()
+        print("Model loaded from training")
+    print(f"📁 Using dataset: {data_dir}")
+    print(f"🧠 Architecture: {architecture}")
+
+    # --- Ensure absolute path exists ---
+    if output_path is not None: # if it is None, we don't want to store (demo)
+        output_path = Path(output_path).absolute()
         output_path.mkdir(parents=True, exist_ok=True)
-        print(f"✅ Output directory: {output_path}")
+        print(f"✅ Plots and predictions will be saved to: {output_path}")
 
     # --- Setup DataModule ---
     data_module = AnimalsDataModule(data_dir=data_dir, batch_size=batch_size)
@@ -100,28 +76,21 @@ def run_inference(
     val_loader = data_module.val_dataloader()
     num_classes = len(data_module.class_names)
 
-    # --- Load or use provided model ---
-    if trained_model is not None:
-        print("🧩 Using provided trained model instance.")
-        model = trained_model
-        model.eval()
-    else:
-        print(f"📦 Loading model from checkpoint: {model_path}")
-        model = VGGNet(architecture=architecture, num_classes=num_classes, pretrained=False)
+    # --- Load model ---
+    if trained_model is None:
+        trained_model = VGGNet(architecture=architecture, num_classes=num_classes, pretrained=False)
         state_dict = torch.load(model_path, map_location="cpu")
-        model.load_state_dict(state_dict)
-        model.eval()
-
-    # --- Move to device ---
+        trained_model.load_state_dict(state_dict)
+    trained_model.eval()
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    model.to(device)
+    trained_model.to(device)
 
     # --- Collect predictions ---
     all_probs, all_labels = [], []
     with torch.no_grad():
         for xb, yb in val_loader:
             xb = xb.to(device)
-            out = model(xb)
+            out = trained_model(xb)
             probs = F.softmax(out, dim=1)
             all_probs.append(probs.cpu().numpy())
             all_labels.append(yb.numpy())
@@ -136,8 +105,13 @@ def run_inference(
     cm = confusion_matrix(all_labels, preds)
 
     # --- Save predictions ---
-    np.save(output_path / "val_probs.npy", all_probs)
-    np.save(output_path / "val_labels.npy", all_labels)
+    if not is_demo:
+        np.save(output_path / f"{architecture}_val_probs.npy", all_probs)
+        np.save(output_path / f"{architecture}_val_labels.npy", all_labels)
+    else:
+        # Keep in memory for demo
+        val_probs = all_probs
+        val_labels = all_labels
 
     # --- Confusion matrix ---
     plt.figure(figsize=(6, 6))
@@ -147,20 +121,19 @@ def run_inference(
     plt.xlabel("Predicted")
     plt.ylabel("True")
     plt.tight_layout()
-    plt.savefig(output_path / "confusion_matrix.png")
-    plt.close()
+    cm_img = fig_to_image() if is_demo else plt.savefig(output_path / f"{architecture}_confusion_matrix.png")
 
     # --- ROC curve ---
     try:
         plt.figure()
         y_true_onehot = np.eye(num_classes)[all_labels]
-        RocCurveDisplay.from_predictions(y_true_onehot.ravel(), all_probs.ravel())
+        RocCurveDisplay.from_predictions(y_true_onehot, all_probs, multi_class='ovr')
         plt.title("ROC Curve")
         plt.tight_layout()
-        plt.savefig(output_path / "roc_curve.png")
-        plt.close()
+        roc_img = fig_to_image() if is_demo else plt.savefig(output_path / f"{architecture}_roc_curve.png")
     except Exception as e:
         print("⚠️ ROC plot failed:", e)
+        roc_img = None
 
     # --- Calibration plot ---
     try:
@@ -174,48 +147,13 @@ def run_inference(
         plt.ylabel("True probability")
         plt.title("Calibration Plot")
         plt.tight_layout()
-        plt.savefig(output_path / "calibration_plot.png")
-        plt.close()
+        cal_img = fig_to_image() if is_demo else plt.savefig(output_path / f"{architecture}_calibration.png")
     except Exception as e:
         print("⚠️ Calibration plot failed:", e)
+        cal_img = None
 
-    print(f"\n✅ Saved predictions and plots to: {output_path}")
-    print(f"Validation Accuracy: {acc:.3f}, F1-score: {f1:.3f}")
-
-    results = {
-        "val_acc": acc,
-        "f1_score": f1,
-        "confusion_matrix": cm,
-        "output_path": str(output_path),
-    }
-
+    # --- Now you can return these images directly to Gradio ---
     if is_demo:
-        temp_dir.cleanup()
-        print("🧹 Cleaned up temporary demo files.")
-
-    return results
-
-
-
-# -------------------------------------------------------------------
-# CLI USAGE
-# -------------------------------------------------------------------
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Run model inference and evaluation.")
-    parser.add_argument("--model-path", type=str, required=True, help="Path to trained model (.pth).")
-    parser.add_argument("--data-dir", type=str, required=True, help="Path to dataset (e.g. data/mini_animals/animals).")
-    parser.add_argument("--architecture", default="vgg16", choices=["vgg16", "vgg11"])
-    parser.add_argument("--output-path", default="inference_outputs", help="Output directory (ignored if --demo).")
-    parser.add_argument("--batch-size", type=int, default=16)
-    parser.add_argument("--demo", action="store_true", help="Run in demo mode (temporary files only).")
-
-    args = parser.parse_args()
-
-    run_inference(
-        model_path=Path(args.model_path),
-        data_dir=Path(args.data_dir),
-        architecture=args.architecture,
-        output_path=Path(args.output_path),
-        batch_size=args.batch_size,
-        is_demo=args.demo,
-    )
+        return val_probs, val_labels, acc, f1, cm_img, roc_img, cal_img
+    else:
+        return {"output_path": output_path, "val_acc": acc, "f1_score": f1, "confusion_matrix": cm}

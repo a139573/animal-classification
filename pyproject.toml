@@ -5,19 +5,13 @@ build-backend = "setuptools.build_meta"
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["my_projects*"]
-exclude = [
-    "notebooks*",
-    "reports*",
-    "data*",
-    "models*",
-    "logs*",
-    "predictions*",
-    "lightning_logs*"
-]
+exclude = ["notebooks*", "reports*", "data*", "models*", "logs*", "predictions*", "lightning_logs*"]
+[tool.setuptools.package-data]
+"animal_classification" = ["data/mini_animals/**/*"]
 
 [project]
 name = "animal-classification"
-version = "0.2.2"
+version = "0.2.3"
 description = "A deep learning project to classify 90 different animals using VGG architectures."
 readme = "README.md"
 requires-python = ">=3.9"
@@ -77,5 +71,7 @@ animal-dashboard = "my_projects.scripts.dashboard:main"
 
 # ✅ UV single-command demo
 [tool.uv]
-entry-point = "animal-dashboard"
 package = true
+
+[tool.pdoc]
+docformat = "numpy"
