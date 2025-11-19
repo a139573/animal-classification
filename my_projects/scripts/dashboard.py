@@ -67,14 +67,14 @@ def run_training(model_choice, seed, epochs, num_workers, progress=gr.Progress()
 
     Parameters
     ----------
-    dataset_choice : str
-        Dataset selection ("Full dataset" or "Reduced dataset").
     model_choice : str
         Model architecture to train (e.g., "VGG16").
     seed : int or float
         Random seed for reproducibility. Will be cast to int.
     epochs : int or float
         Maximum number of epochs. Will be cast to int.
+    num_workers : int
+        Number of subprocesses to use for data loading.
     progress : gradio.Progress, optional
         Gradio object to track training progress.
 

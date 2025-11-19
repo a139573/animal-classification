@@ -120,13 +120,13 @@ def plot_clustermap(df, path):
 
     Parameters
     ----------
-    df_norm : pandas.DataFrame
+    df : pandas.DataFrame
         DataFrame with normalized ['R', 'G', 'B'] columns.
     path : Path
         Path where the figure will be saved.
     """
     sns.clustermap(
-        df_norm[['R','G','B']], 
+        df[['R','G','B']], 
         method='ward', metric='euclidean', 
         cmap='viridis', figsize=(8,12)
     )
@@ -161,7 +161,7 @@ def get_df_with_rgb_avg(medias_rgb):
 
     Parameters
     ----------
-    rgb_averages : dict
+    medias_rgb : dict
         Dictionary with categories as keys and average [R, G, B] values.
 
     Returns
