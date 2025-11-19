@@ -102,6 +102,7 @@ def main(
     test_frac: float = 0.2,
     max_epochs: int = 5,
     batch_size: int = 16,
+    num_workers: int = 2,
     is_demo: bool = False,
     progress: gr.Progress = None,
 ):

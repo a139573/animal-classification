@@ -55,7 +55,7 @@ VGG16 = None
 #     return f"✅ Reduced dataset created with {images_per_class} images per class, size {image_size}×{image_size}."
 
 # === TRAINING ===
-def run_training(model_choice, seed, epochs, progress=gr.Progress()):
+def run_training(model_choice, seed, epochs, num_workers, progress=gr.Progress()):
     """
     Runs the model training script and returns metrics.
 
@@ -89,6 +89,7 @@ def run_training(model_choice, seed, epochs, progress=gr.Progress()):
         dataset_choice="mini",
         seed=int(seed),
         max_epochs=int(epochs),
+        num_workers=num_workers,
         progress=progress,
         is_demo=True
     )
@@ -208,6 +209,13 @@ with gr.Blocks(title="Animal Classification Dashboard", theme=dark_theme) as dem
         seed = gr.Number(value=123, label="Random Seed")
         model_choice = gr.Dropdown(["VGG16","VGG11"], value="VGG16", label="Model")
         epochs = gr.Number(value=2, label="Epochs")
+        num_workers = gr.Slider(
+            minimum=1,
+            maximum=16,
+            step=1,
+            value=2,
+            label="Num workers"
+        )
         run_train_button = gr.Button("Run Training")
         metrics_output = gr.Markdown()
         train_losses = gr.Plot(label="Loss convergence")
@@ -215,7 +223,7 @@ with gr.Blocks(title="Animal Classification Dashboard", theme=dark_theme) as dem
         trained_model = gr.State()
         run_train_button.click(
             fn=run_training,
-            inputs=[model_choice, seed, epochs],
+            inputs=[model_choice, seed, epochs, num_workers],
             outputs=[trained_model, metrics_output, train_losses, train_accs]
         )
 
