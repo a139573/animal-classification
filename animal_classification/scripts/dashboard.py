@@ -16,13 +16,15 @@ from ..modeling.train import main as train_main
 from ..modeling.inference import run_inference
 from ..reduce_data import reduce_dataset
 import pandas as pd
+import glob
 
 # === PATHS ===
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
-"""Dynamically calculated project root path."""
-DATA_DIR = PROJECT_ROOT / "data" / "mini_animals" / "animals"
-"""Directory where the reduced dataset is stored."""
+# Fallback defaults relative to where user runs dashboard
+DEFAULT_DATA_DIR = Path("data/mini_animals/animals")
+DEFAULT_MODELS_DIR = Path("models/*.ckpt")
 # REPORTS_DIR = (PROJECT_ROOT / "reports" / "figures").absolute()
+
+architecture = None
 
 VGG11 = None
 """Placeholder for the VGG11 model."""
@@ -161,7 +163,7 @@ def run_training(model_choice, seed, epochs, num_workers, progress=gr.Progress()
     return results.get("model", None), metrics_text, fig_loss, fig_acc
 
 # === INFERENCE ===
-def run_inference_gr(trained_model, batch_size, num_workers):
+def run_inference_gr(architecture, trained_model, batch_size, num_workers):
     """
     Runs inference on the validation set and generates visualizations.
 
@@ -170,12 +172,22 @@ def run_inference_gr(trained_model, batch_size, num_workers):
 
     Metrics are displayed in the dashboard but not stored on disk.
     """
+    if trained_model is None:
+        print("NO TRAINED MODEL!")
+        model_files = glob.glob(str(DEFAULT_MODELS_DIR))
+        if len(model_files) == 0:
+            raise FileNotFoundError(f"No model files found with pattern: {model_files}")
+        model_path = Path(model_files[0])
+        print(f"Using saved checkpoint from {model_path}")
+    else:
+        model_path = None
+
 
     val_probs, val_labels, acc, f1, cm_img, roc_img, cal_img = run_inference(
-        model_path=None,
+        model_path=model_path,
         trained_model=trained_model,
-        data_dir=DATA_DIR,
-        architecture=None,
+        data_dir=DEFAULT_DATA_DIR,
+        architecture=architecture,
         output_path=None,
         batch_size=int(batch_size),
         num_workers=num_workers,
@@ -233,6 +245,7 @@ with gr.Blocks(title="Animal Classification Dashboard", theme=dark_theme) as dem
 
     # --- Inference Tab ---
     with gr.Tab("Inference"):
+        infer_model_choice = model_choice
         infer_num_workers = gr.Slider(
             minimum=1,
             maximum=16,
@@ -249,7 +262,7 @@ with gr.Blocks(title="Animal Classification Dashboard", theme=dark_theme) as dem
         infer_table = gr.Dataframe(headers=["True Label", "Predicted Prob for True Label"], interactive=False, label="Predictions Table")
         run_inference_btn.click(
             fn=run_inference_gr,
-            inputs=[trained_model, infer_batch_size, infer_num_workers],
+            inputs=[infer_model_choice, trained_model, infer_batch_size, infer_num_workers],
             outputs=[infer_metrics, infer_cm, infer_roc, infer_cal, infer_table]
         )
 

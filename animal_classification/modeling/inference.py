@@ -8,9 +8,21 @@ from sklearn.metrics import accuracy_score, confusion_matrix, f1_score, RocCurve
 from sklearn.calibration import calibration_curve
 import matplotlib.pyplot as plt
 import pytorch_lightning as pl
+import argparse
 
 from PIL import Image
 import io
+import glob
+
+import importlib.resources as pkg_resources
+
+# Get the directory of the current script
+SCRIPT_DIR = Path(__file__).parent.resolve()
+
+# Default paths relative to where the user runs the command
+default_model_pattern = Path("models/*.ckpt")
+default_data_dir = Path("data/mini_animals/animals")
+
 
 """
 Model Inference and Evaluation Script.
@@ -37,7 +49,7 @@ def fig_to_image():
     buf = io.BytesIO()
     plt.savefig(buf, format="png")
     buf.seek(0)
-    img = Image.open(buf)
+    img = Image.open(buf).copy()
     plt.close()
     return img
 
@@ -51,7 +63,7 @@ def run_inference(model_path: Path = None, data_dir: Path = None, architecture: 
     trained_model : torch.nn.Module, optional
         A trained model instance already loaded in memory.
     model_path : Path, optional
-        Path to a saved model state dictionary (.pth).
+        Path to a saved model state dictionary (.ckpt).
     data_dir : Path, optional
         Path to the dataset directory.
     architecture : str, optional
@@ -68,6 +80,7 @@ def run_inference(model_path: Path = None, data_dir: Path = None, architecture: 
     dict
         { "val_acc": float, "f1_score": float, "confusion_matrix": np.ndarray }
     """
+    print(f"Model path is {model_path} ")
     if model_path is not None:
         print(f"\n🔍 Loading model: {model_path}")
     else:
@@ -81,6 +94,26 @@ def run_inference(model_path: Path = None, data_dir: Path = None, architecture: 
         output_path.mkdir(parents=True, exist_ok=True)
         print(f"✅ Plots and predictions will be saved to: {output_path}")
 
+    if is_demo:
+        # Resolve path inside the installed package for the demo data
+        # This fixes the FileNotFoundError
+        try:
+            data_dir = pkg_resources.files('animal_classification').joinpath('data/mini_animals/animals')
+            print(f"📦 Using packaged demo data from: {data_dir}")
+        except Exception as e:
+            # Fallback for unexpected issues (e.g. running outside of a packaged environment)
+             print(f"⚠️ Packaged data path lookup failed ({e}). Falling back to CWD path.")
+             data_dir = Path("data/mini_animals/animals")
+    """
+    else:
+        # Use standard relative path for CLI/local development
+        data_dir = Path("data")
+        subsample_dir = data_dir / (
+            "animals/animals" if dataset_choice == "full" else "mini_animals/animals"
+        )
+        print(f"📁 Using local data path: {subsample_dir}")
+    """
+
     # --- Setup DataModule ---
     data_module = AnimalsDataModule(data_dir=data_dir, batch_size=batch_size, num_workers=num_workers)
     data_module.setup()
@@ -89,9 +122,22 @@ def run_inference(model_path: Path = None, data_dir: Path = None, architecture: 
 
     # --- Load model ---
     if trained_model is None:
-        trained_model = VGGNet(architecture=architecture, num_classes=num_classes, pretrained=False)
-        state_dict = torch.load(model_path, map_location="cpu")
-        trained_model.load_state_dict(state_dict)
+        trained_model = VGGNet(
+            architecture=architecture,
+            num_classes=num_classes,
+            pretrained=False
+        )
+
+        ckpt = torch.load(model_path, map_location="cpu")
+
+        # Lightning checkpoints wrap the real weights under "state_dict"
+        raw_state = ckpt["state_dict"]
+
+        # Remove "model." prefix Lightning adds
+        clean_state = {k.replace("model.", ""): v for k, v in raw_state.items()}
+
+        trained_model.load_state_dict(clean_state, strict=True)
+
     trained_model.eval()
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     trained_model.to(device)
@@ -133,6 +179,7 @@ def run_inference(model_path: Path = None, data_dir: Path = None, architecture: 
     plt.ylabel("True")
     plt.tight_layout()
     cm_img = fig_to_image() if is_demo else plt.savefig(output_path / f"{architecture}_confusion_matrix.png")
+    plt.close()
 
     # --- Macro-average ROC curve ---
     try:
@@ -189,6 +236,7 @@ def run_inference(model_path: Path = None, data_dir: Path = None, architecture: 
         plt.legend()
         plt.tight_layout()
         roc_img = fig_to_image() if is_demo else plt.savefig(output_path / f"{architecture}_roc_curve.png")
+        plt.close()
     except Exception as e:
         print("⚠️ ROC plot failed:", e)
         roc_img = None
@@ -223,6 +271,7 @@ def run_inference(model_path: Path = None, data_dir: Path = None, architecture: 
         plt.legend()
         plt.tight_layout()
         cal_img = fig_to_image() if is_demo else plt.savefig(output_path / f"{architecture}_calibration.png")
+        plt.close()
     except Exception as e:
         print("⚠️ Calibration plot failed:", e)
         cal_img = None
@@ -235,3 +284,46 @@ def run_inference(model_path: Path = None, data_dir: Path = None, architecture: 
         return val_probs, val_labels, acc, f1, cm_img, roc_img, cal_img
     else:
         return {"output_path": output_path, "val_acc": acc, "f1_score": f1, "confusion_matrix": cm}
+
+
+def main():
+    parser = argparse.ArgumentParser(description="Run inference on trained VGG model")
+    parser.add_argument("--model-path", type=str, default=str(default_model_pattern), help="Path to .ckpt checkpoint")
+    parser.add_argument("--data-dir", type=str, default=str(default_data_dir), help="Path to validation dataset")
+    parser.add_argument("--architecture", type=str, default="vgg16", choices=["vgg16", "vgg11"])
+    parser.add_argument("--batch-size", type=int, default=16)
+    parser.add_argument("--num-workers", type=int, default=2)
+    parser.add_argument("--output-path", type=str, default="inference_outputs")
+    args = parser.parse_args()
+
+    # Convert paths
+    data_dir = Path(args.data_dir)
+    if not data_dir.exists():
+        raise FileNotFoundError(f"Data directory does not exist: {data_dir}")
+
+    model_files = glob.glob(args.model_path)
+    if len(model_files) == 0:
+        raise FileNotFoundError(f"No model files found with pattern: {args.model_path}")
+    model_path = Path(model_files[0])
+
+    output_path = Path(args.output_path).absolute()
+
+    results = run_inference(
+        model_path=model_path,
+        data_dir=data_dir,
+        architecture=args.architecture,
+        batch_size=args.batch_size,
+        num_workers=args.num_workers,
+        output_path=output_path,
+        is_demo=False
+    )
+
+    print("\n✅ Inference finished")
+    print(f"Validation Accuracy: {results['val_acc']:.4f}")
+    print(f"F1 Score (macro): {results['f1_score']:.4f}")
+    print(f"Confusion matrix saved to: {output_path}")
+
+
+
+if __name__ == "__main__":
+    main()
