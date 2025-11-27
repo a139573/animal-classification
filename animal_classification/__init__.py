@@ -14,6 +14,8 @@ required for the Machine Learning pipeline.
 * **scripts**: Other helper scripts.
 """
 
+__docformat__ = "numpy"
+
 # This tells pdoc which modules to include in the documentation
 # Make sure these match your .py files
 __all__ = [
