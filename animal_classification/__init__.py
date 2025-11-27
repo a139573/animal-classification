@@ -1,5 +1,5 @@
 """
-Animal Classification Project (my_projects)
+Animal Classification Project (animal_classification)
 
 This is the main package for the project. It contains all modules
 required for the Machine Learning pipeline.
