@@ -7,7 +7,7 @@ from ..modeling.train import VGGNet
 from sklearn.metrics import accuracy_score, confusion_matrix, f1_score, RocCurveDisplay, roc_auc_score
 from sklearn.calibration import calibration_curve
 import matplotlib.pyplot as plt
-import pytorch_lightning as pl
+import lightning.pytorch as pl
 import argparse
 
 from PIL import Image

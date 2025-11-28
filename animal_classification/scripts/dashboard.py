@@ -211,7 +211,7 @@ def run_inference_gr(architecture, trained_model, batch_size, num_workers):
 # ------ DASHBOARD ------ #
 dark_theme = gr.themes.Monochrome()
 
-with gr.Blocks(title="Animal Classification Dashboard", theme=dark_theme) as demo:
+with gr.Blocks(title="Animal Classification Dashboard") as demo:
     # --- Reduce Dataset Tab ---
     # with gr.Tab("Reduce Dataset"):
     #     images_per_class = gr.Dropdown([15,30,60], value=30, label="Images per Class")
@@ -270,7 +270,7 @@ def main():
     """
     Launches the Gradio web application.
     """
-    demo.launch()
+    demo.launch(theme=dark_theme)
 
 if __name__ == "__main__":
     main()

@@ -14,48 +14,48 @@ It uses **PyTorch** and **PyTorch Lightning** for modeling and provides command-
 
 The project follows a modular cookiecutter-style structure, with code organized inside `animal_classification/my_projects/`.
 
----
-
-## 📈 Key Results & Demo
-
-A VGG16 model trained for 10 epochs achieved the following performance:
-
-| Metric | Score |
-| :--- | :--- |
-| **Top-1 Accuracy** | 92.5% |
-| **Loss (Validation)** | 0.21 |
-
-### Interactive Dashboard Preview
-Launch the demo with `animal-dashboard` to interact with the trained model and view metrics.
-
-
----
 
 ## 📂 Dataset
 Dataset: **[Animal Image Dataset (90 Different Animals)](https://www.kaggle.com/datasets/iamsouravbanerjee/animal-image-dataset-90-different-animals)** Contains **5,400 images** across **90 classes**.
 
 ---
+### Exploratory Data Analysis
+In GitHub, you can take a look inside notebooks/plots_metrics.ipynb to see a brief exploratory analysis of this dataset. Some of the most relevant findings are...
+
+---
+
 
 ## ⚙️ Installation Options
 
 ### 1. 🚀 Run the Demo (No installation needed)
-Use `uvx` (assuming `uv` is installed) to download and run the Gradio demo instantly. This includes a mini dataset for quick experiments.
+Use `uvx` (assuming `uv` is installed) to download and run the Gradio demo instantly in an isolated, temporary environment. This includes a mini dataset for quick experiments.
 
 ```bash
-uvx animal-dashboard --index [https://test.pypi.org/simple/animal-classification](https://test.pypi.org/simple/animal-classification)
+uvx --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ --from "animal-classification-aldanondo-malon==0.1.3" animal-dashboard
+```
+
+Or, if you have CUDA available:
+
+```bash
+uvx --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ --from "animal-classification-aldanondo-malon[gpu]==0.1.3" animal-dashboard
 ```
 
 ### 2. 📦 Install as a Dependency
 To use this project as a library within your own code:
 
 ```bash
-uv add --index [https://test.pypi.org/simple/animal-classification](https://test.pypi.org/simple/animal-classification)
+uv add --default-index https://test.pypi.org/simple/ --index https://pypi.org/simple/ "animal-classification-aldanondo-malon==0.1.3"
+```
+
+Or, if you have CUDA available:
+```bash
+uv add --default-index https://test.pypi.org/simple/ --index https://pypi.org/simple/ "animal-classification-aldanondo-malon[gpu]==0.1.3"
 ```
 
 ### 3. 🔧 Local Development (Your own repo / experiments)
 For running training/inference scripts locally, clone the repository and set up the development environment:
 ```bash
-git clone [https://github.com/a139573/animal-classification](https://github.com/a139573/animal-classification)
+git clone https://github.com/a139573/animal-classification
 cd animal-classification
 ```
 Create and activate a virtual environment:
@@ -68,6 +68,10 @@ Install the project and its dependencies in editable mode
 ```bash
 uv pip install -e .
 ```
+Or, if you have CUDA available:
+```bash
+uv pip install -e ".[gpu]"
+```
 
 ### 4. 🧪 Install Built Wheel (QA/Internal Testing)
 
@@ -76,13 +80,13 @@ If you have a pre-built wheel file (.whl) from the uv build command and want to 
 To install the CPU-only version:
 
 ```bash
-uv pip install animal_classification-1.0.0.whl
+uv pip install animal-classification-aldanondo-malon-0.1.3.whl
 ```
 
 To install the GPU version (Requires NVIDIA/CUDA environment):
 
 ```bash
-uv pip install 'animal_classification-1.0.0.whl[gpu]'
+uv pip install 'animal-classification-aldanondo-malon-0.1.3.whl[gpu]'
 ```
 
 ## 🧩 Project Structure

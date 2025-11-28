@@ -1,14 +1,15 @@
 import os
 import sys
 
-os.environ["CUDA_VISIBLE_DEVICES"] = ""
-os.environ["PYTORCH_NO_CUDA"] = "1"
+# REMOVED LINES that were forcing CPU mode:
+# os.environ["CUDA_VISIBLE_DEVICES"] = ""
+# os.environ["PYTORCH_NO_CUDA"] = "1"
 
 import torch
 # Now safe to import PyTorch Lightning
-import pytorch_lightning as pl
-from pytorch_lightning.callbacks import ModelCheckpoint
-from pytorch_lightning.loggers import CSVLogger
+import lightning.pytorch as pl # MARK: 1. Changed import to lightning.pytorch
+from lightning.pytorch.callbacks import ModelCheckpoint
+from lightning.pytorch.loggers import CSVLogger
 
 # The rest of your imports
 from torch import nn, optim
@@ -25,8 +26,8 @@ import importlib.resources as pkg_resources
 
 
 #os.environ.setdefault("TORCH_LOGS", "OFF")
-#os.environ.setdefault("CUDA_VISIBLE_DEVICES", "")
-#os.environ.setdefault("PYTORCH_NO_CUDA", "1")
+#os.environ.setdefault("CUDA_VISIBLE_DEVICES", "") # MARK: 2. Removed redundant commented env var
+#os.environ.setdefault("PYTORCH_NO_CUDA", "1") # MARK: 3. Removed redundant commented env var
 
 
 torch.set_float32_matmul_precision("medium")
@@ -44,6 +45,19 @@ def get_accelerator():
             return "cpu"
     # no CUDA at all
     return "cpu"
+
+
+
+
+def get_packaged_mini_data_path():
+    """Locates the 'mini_animals' dataset inside the installed package."""
+    # Use files() to correctly reference the path inside site-packages
+    try:
+        return pkg_resources.files('animal_classification').joinpath('data/mini_animals/animals')
+    except Exception:
+        # Fallback for local dev setup where package is not installed as a wheel
+        return Path("data/mini_animals/animals")
+
 
 
 
@@ -226,23 +240,35 @@ def main(
 
     print("🟢 Using GPU" if use_gpu else "🟡 Falling back to CPU")
 
+
+    # If is demo, always use packaged data
     if is_demo:
-        # Resolve path inside the installed package for the demo data
-        # This fixes the FileNotFoundError
-        try:
-            subsample_dir = pkg_resources.files('animal_classification').joinpath('data/mini_animals/animals')
-            print(f"📦 Using packaged demo data from: {subsample_dir}")
-        except Exception as e:
-            # Fallback for unexpected issues (e.g. running outside of a packaged environment)
-             print(f"⚠️ Packaged data path lookup failed ({e}). Falling back to CWD path.")
-             subsample_dir = Path("data/mini_animals/animals")
+        subsample_dir = get_packaged_mini_data_path()
+        print(f"📦 DEMO MODE: Using packaged mini dataset from: {subsample_dir}")
+
+    # If not demo (CLI execution), check for local availability
     else:
-        # Use standard relative path for CLI/local development
-        data_dir = Path("data")
-        subsample_dir = data_dir / (
-            "animals/animals" if dataset_choice == "full" else "mini_animals/animals"
-        )
-        print(f"📁 Using local data path: {subsample_dir}")
+        # 1. Determine local paths based on user choice
+        base_data_dir = Path("data")
+        
+        if dataset_choice == "full":
+            local_target_path = base_data_dir / "animals/animals"
+            dataset_name = "FULL"
+        else: # "mini"
+            local_target_path = base_data_dir / "mini_animals/animals"
+            dataset_name = "MINI"
+
+        # 2. Check if the local data exists
+        if local_target_path.exists():
+            subsample_dir = local_target_path
+            print(f"📁 CLI MODE: Using local {dataset_name} dataset from: {subsample_dir}")
+        else:
+            # 3. Fallback: Local data not found, use the packaged mini dataset instead
+            subsample_dir = get_packaged_mini_data_path()
+            print(f"⚠️ Local {dataset_name} dataset not found at {local_target_path}. Falling back to packaged MINI dataset from: {subsample_dir}")
+
+    # IMPORTANT: Assumes AnimalsDataModule is defined elsewhere
+    from ..dataset import AnimalsDataModule 
 
     data_module = AnimalsDataModule(
         data_dir=subsample_dir,

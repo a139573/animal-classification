@@ -9,35 +9,40 @@ include = ["animal_classification*"]
 "animal_classification" = ["data/mini_animals/**/*"]
 
 [project]
-name = "animal-classification"
-version = "1.0.0"
+name = "animal-classification-aldanondo-malon"
+version = "0.1.3"
 description = "A deep learning project to classify 90 animals using VGG architectures."
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.10,<=3.13"
 license = "MIT"
 
 authors = [
-  { name = "Andrés Malón", email = "andresmalon@gmail.com" },
-  { name = "Roberto Aldanondo", email = "robertoaj02@gmail.com" }
+{ name = "Andrés Malón", email = "andresmalon@gmail.com" },
+{ name = "Roberto Aldanondo", email = "robertoaj02@gmail.com" }
 ]
 
 dependencies = [
-  "torch",            # BASE install is CPU-only for max stability.
-  "torchvision",
-  "pytorch-lightning",
-  "pillow",
-  "kagglehub",
-  "gradio>=4.44.1",
-  "numpy>=2.0.2",
-  "pandas>=2.3.0",
-  "seaborn>=0.13.2",
-  "matplotlib>=3.9.4",
-  "scikit-learn>=1.6.1"
+"torch",            # BASE install is CPU-only for max stability.
+"torchvision",
+"pytorch-lightning",
+"pillow",
+"kagglehub",
+"gradio>=4.44.1",
+"numpy>=2.0.2",
+"pandas>=2.3.0",
+"seaborn>=0.13.2",
+"matplotlib>=3.9.4",
+"scikit-learn>=1.6.1"
 ]
 
 [project.optional-dependencies]
 dev = ["pdoc>=15.0.4"]
 cli = ["kagglehub"]
+gpu = [
+"torch>=2.2.0",
+"torchvision>=0.16.0",
+"torchaudio>=2.2.0"
+]
 
 [project.urls]
 Homepage = "https://github.com/yourusername/animal-classification"
@@ -53,20 +58,17 @@ animal-reduce-data = "animal_classification.reduce_data:main"
 [tool.uv]
 package = true
 
-# Define the CUDA index.
 [[tool.uv.index]]
 name = "pytorch-cuda-cu121"
 url = "https://download.pytorch.org/whl/cu121" # 🎯 Target CUDA 12.1
 explicit = true
 
 [tool.uv.sources]
-# ⬅️ FIXED: The conditional marker is now inside the source definition.
-# This tells uv to use the 'pytorch-cuda-cu121' index ONLY when `[gpu]` is specified.
 torch = [
-    { index = "pytorch-cuda-cu121", marker = "extra == 'gpu'" },
+{ index = "pytorch-cuda-cu121", marker = "extra == 'gpu'" },
 ]
 torchvision = [
-    { index = "pytorch-cuda-cu121", marker = "extra == 'gpu'" },
+{ index = "pytorch-cuda-cu121", marker = "extra == 'gpu'" },
 ]
 
 [tool.pdoc]

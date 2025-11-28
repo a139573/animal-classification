@@ -1,11 +1,4 @@
-import os
-from pathlib import Path
-import pytorch_lightning as pl
-import torch
-from torch.utils.data import DataLoader, random_split
-from torchvision import datasets, transforms
-
-import pytorch_lightning as pl
+import lightning.pytorch as pl
 import torch
 from torch.utils.data import DataLoader, random_split
 from torchvision import datasets, transforms
