@@ -320,16 +320,19 @@
 
             <div class="docstring"><p>Retrieves the list of images for a specific category.</p>
 
-<h2 id="parameters">Parameters</h2>
+<h6 id="parameters">Parameters</h6>
 
-<p>category_path : str or Path
-        The path to the category folder.</p>
+<ul>
+<li><strong>category_path</strong> (str or Path):
+The path to the category folder.</li>
+</ul>
 
-<h2 id="returns">Returns</h2>
+<h6 id="returns">Returns</h6>
 
-<p>list of str
-        A list containing the filenames of valid images 
-        (.jpg, .jpeg, .png, .bmp, .gif) within the folder.</p>
+<ul>
+<li><strong>list of str</strong>: A list containing the filenames of valid images 
+(.jpg, .jpeg, .png, .bmp, .gif) within the folder.</li>
+</ul>
 </div>
 
 
@@ -368,15 +371,18 @@
 
             <div class="docstring"><p>Reads the category names from a text file.</p>
 
-<h2 id="parameters">Parameters</h2>
+<h6 id="parameters">Parameters</h6>
 
-<p>data_dir : Path
-        Path to the directory containing the 'name of the animals.txt' file.</p>
+<ul>
+<li><strong>data_dir</strong> (Path):
+Path to the directory containing the 'name of the animals.txt' file.</li>
+</ul>
 
-<h2 id="returns">Returns</h2>
+<h6 id="returns">Returns</h6>
 
-<p>list of str
-        A list of category names (one per line in the file).</p>
+<ul>
+<li><strong>list of str</strong>: A list of category names (one per line in the file).</li>
+</ul>
 </div>
 
 
@@ -438,15 +444,18 @@
 
             <div class="docstring"><p>Calculates the average R, G, and B values per image category.</p>
 
-<h2 id="parameters">Parameters</h2>
+<h6 id="parameters">Parameters</h6>
 
-<p>data_dir : Path
-        Path to the data directory containing the images within 'mini_animals'.</p>
+<ul>
+<li><strong>data_dir</strong> (Path):
+Path to the data directory containing the images within 'mini_animals'.</li>
+</ul>
 
-<h2 id="returns">Returns</h2>
+<h6 id="returns">Returns</h6>
 
-<p>dict
-        A dictionary with categories as keys and the [R, G, B] averages as values.</p>
+<ul>
+<li><strong>dict</strong>: A dictionary with categories as keys and the [R, G, B] averages as values.</li>
+</ul>
 </div>
 
 
@@ -490,12 +499,14 @@
 
             <div class="docstring"><p>Generates a heatmap of average R, G, B values per class.</p>
 
-<h2 id="parameters">Parameters</h2>
+<h6 id="parameters">Parameters</h6>
 
-<p>df : pandas.DataFrame
-    DataFrame with columns ['R', 'G', 'B', 'luminance'].
-path : Path
-    Path where the figure will be saved.</p>
+<ul>
+<li><strong>df</strong> (pandas.DataFrame):
+DataFrame with columns ['R', 'G', 'B', 'luminance'].</li>
+<li><strong>path</strong> (Path):
+Path where the figure will be saved.</li>
+</ul>
 </div>
 
 
@@ -535,12 +546,14 @@ path : Path
 
             <div class="docstring"><p>Generates a hierarchical clustermap of R, G, and B values.</p>
 
-<h2 id="parameters">Parameters</h2>
+<h6 id="parameters">Parameters</h6>
 
-<p>df : pandas.DataFrame
-    DataFrame with normalized ['R', 'G', 'B'] columns.
-path : Path
-    Path where the figure will be saved.</p>
+<ul>
+<li><strong>df</strong> (pandas.DataFrame):
+DataFrame with normalized ['R', 'G', 'B'] columns.</li>
+<li><strong>path</strong> (Path):
+Path where the figure will be saved.</li>
+</ul>
 </div>
 
 
@@ -581,12 +594,14 @@ path : Path
 
             <div class="docstring"><p>Generates a visualization of the average colors per class.</p>
 
-<h2 id="parameters">Parameters</h2>
+<h6 id="parameters">Parameters</h6>
 
-<p>df : pandas.DataFrame
-    DataFrame with columns ['class', 'R', 'G', 'B'].
-path : Path
-    Path where the figure will be saved.</p>
+<ul>
+<li><strong>df</strong> (pandas.DataFrame):
+DataFrame with columns ['class', 'R', 'G', 'B'].</li>
+<li><strong>path</strong> (Path):
+Path where the figure will be saved.</li>
+</ul>
 </div>
 
 
@@ -645,19 +660,24 @@ path : Path
 
             <div class="docstring"><p>Converts a dictionary of RGB averages into a DataFrame and adds metrics.</p>
 
-<h2 id="parameters">Parameters</h2>
+<h6 id="parameters">Parameters</h6>
 
-<p>medias_rgb : dict
-    Dictionary with categories as keys and average [R, G, B] values.</p>
+<ul>
+<li><strong>medias_rgb</strong> (dict):
+Dictionary with categories as keys and average [R, G, B] values.</li>
+</ul>
 
-<h2 id="returns">Returns</h2>
+<h6 id="returns">Returns</h6>
 
-<p>pandas.DataFrame
-    DataFrame with columns:
-    - 'class': The class name.
-    - 'R', 'G', 'B': Normalized values (0.0-1.0).
-    - 'luminance': Perceptual luminance.
-    - 'colorfulness': An approximate colorfulness metric.</p>
+<ul>
+<li><strong>pandas.DataFrame</strong>: DataFrame with columns:
+<ul>
+<li>'class': The class name.</li>
+<li>'R', 'G', 'B': Normalized values (0.0-1.0).</li>
+<li>'luminance': Perceptual luminance.</li>
+<li>'colorfulness': An approximate colorfulness metric.</li>
+</ul></li>
+</ul>
 </div>
 
 
