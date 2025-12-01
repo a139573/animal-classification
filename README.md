@@ -27,14 +27,16 @@ In GitHub, you can take a look inside notebooks/plots_metrics.ipynb to see a bri
 
 ## ⚙️ Installation Options
 
+The following installation instructions are meant for a Linux-based operating system.
+
 ### 1. 🚀 Run the Demo (No installation needed)
-Use `uvx` (assuming `uv` is installed) to download and run the Gradio demo instantly in an isolated, temporary environment. This includes a mini dataset for quick experiments.
+Use *uvx* (assuming *uv* is installed) to download and run the Gradio demo instantly in an isolated, temporary environment. This includes a mini dataset for quick experiments.
 
 ```bash
 uvx --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ --from "animal-classification-aldanondo-malon==0.1.3" animal-dashboard
 ```
 
-Or, if you have CUDA available:
+**(Recommended)** Or, if you have CUDA available:
 
 ```bash
 uvx --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ --from "animal-classification-aldanondo-malon[gpu]==0.1.3" animal-dashboard
@@ -47,7 +49,7 @@ To use this project as a library within your own code:
 uv add --default-index https://test.pypi.org/simple/ --index https://pypi.org/simple/ "animal-classification-aldanondo-malon==0.1.3"
 ```
 
-Or, if you have CUDA available:
+**(Recommended)** Or, if you have CUDA available:
 ```bash
 uv add --default-index https://test.pypi.org/simple/ --index https://pypi.org/simple/ "animal-classification-aldanondo-malon[gpu]==0.1.3"
 ```
@@ -68,14 +70,14 @@ Install the project and its dependencies in editable mode
 ```bash
 uv pip install -e .
 ```
-Or, if you have CUDA available:
+**(Recommended)** Or, if you have CUDA available:
 ```bash
 uv pip install -e ".[gpu]"
 ```
 
 ### 4. 🧪 Install Built Wheel (QA/Internal Testing)
 
-If you have a pre-built wheel file (.whl) from the uv build command and want to test the non-editable final artifact (e.g., for QA or distributing a specific version), use the file path.
+If you downloaded the pre-built wheel file (.whl) from testpypi, use the following command.
 
 To install the CPU-only version:
 
@@ -83,26 +85,37 @@ To install the CPU-only version:
 uv pip install animal-classification-aldanondo-malon-0.1.3.whl
 ```
 
-To install the GPU version (Requires NVIDIA/CUDA environment):
+**(Recommended)** To install the GPU version (Requires NVIDIA/CUDA environment):
 
 ```bash
 uv pip install 'animal-classification-aldanondo-malon-0.1.3.whl[gpu]'
 ```
 
 ## 🧩 Project Structure
+
 animal_classification/
-│
+
 ├── animal_classification/
-│   ├── dataset.py
-│   ├── download_data.py
-│   ├── reduce_data.py
-│   ├── plots.py
-│   ├── modeling/
-│   └── scripts/
-│
-├── notebooks/           # Exploratory data analysis and model prototyping
-├── reports/             # Generated charts, metrics, and figures
+
+│ ├── dataset.py
+
+│ ├── download_data.py
+
+│ ├── reduce_data.py
+
+│ ├── plots.py
+
+│ ├── modeling/
+
+│ └── scripts/
+
+
+├── notebooks/ # Exploratory data analysis and model prototyping
+
+├── reports/ # Generated charts, metrics, and figures
+
 ├── pyproject.toml
+
 └── README.md
 
 ## 🚀 Usage
@@ -114,10 +127,12 @@ Downloads the full 90-class dataset into data/animals/.
 animal-download-data
 ```
 Required arguments: None
+
 Optional arguments: None
 
-### 2️⃣ Reduce Dataset (Optional)
-Creates a smaller, preprocessed dataset for faster testing or development. There is already one included. If you run this command, the given reduced dataset will be overwritten with the one you create.
+### 2️⃣ Reduce Dataset
+Creates a smaller dataset for faster testing or development with the provided characteristics.
+
 ```bash
 animal-reduce-data
 ```
@@ -137,12 +152,19 @@ Trains a classification model on either the full or reduced dataset. Use argumen
 animal-train
 ```
 Required arguments: None
+
 Optional arguments:
+
 --architecture: The architecture of the model to train. Default: VGG16
+
 --dataset-choice: Whether to train on the whole dataset ("full") or on the reduced version ("mini"), either the one included in the wheel or a different one generated (overwritten) by running the reduce-dataset script.
+
 --seed: The seed used for the whole training process. Default: 42
+
 --test-frac: The proportion of data to be held out for test. Default: 0.2
+
 --max-epochs: The max number of epochs for the model to train for. Default: 5
+
 --batch-size: The batch size used by the dataloaders for training. Default: 8
 
 ### 4️⃣ Run Inference
@@ -153,11 +175,17 @@ animal-infer
 ```
 
 Required arguments: None
+
 Optional arguments:
+
 --model-path: The path to the VGG11 or VGG16 model to use in case it's stored somewhere else and not where the training script saves them by default
+
 --architecture: The architecture of the trained model (VGG11 or VGG16) you want to use for inference. Default: VGG16
+
 --batch-size: The batch size to use in the test dataloader. Default: 16
+
 --num-workers: The number of processes to load data simulatenously. Default: 2
+
 --output-path: The path in which to store the results and metrics from the inference. Default: "inference_outputs/"
 
 ### 5️⃣ Launch Dashboard

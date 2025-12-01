@@ -10,7 +10,7 @@ include = ["animal_classification*"]
 
 [project]
 name = "animal-classification-aldanondo-malon"
-version = "0.1.3"
+version = "0.1.4"
 description = "A deep learning project to classify 90 animals using VGG architectures."
 readme = "README.md"
 requires-python = ">=3.10,<=3.13"
@@ -22,17 +22,17 @@ authors = [
 ]
 
 dependencies = [
-"torch",            # BASE install is CPU-only for max stability.
-"torchvision",
-"pytorch-lightning",
-"pillow",
-"kagglehub",
-"gradio>=4.44.1",
-"numpy>=2.0.2",
-"pandas>=2.3.0",
-"seaborn>=0.13.2",
-"matplotlib>=3.9.4",
-"scikit-learn>=1.6.1"
+  "torch>=2.2.0",
+  "torchvision>=0.16.0",
+  "lightning>=2.2.0",
+  "pillow>=10.0.0",
+  "kagglehub>=0.2.0",
+  "gradio>=4.44.1",
+  "numpy>=2.0.2",
+  "pandas>=2.3.0",
+  "seaborn>=0.13.2",
+  "matplotlib>=3.9.4",
+  "scikit-learn>=1.6.1"
 ]
 
 [project.optional-dependencies]
