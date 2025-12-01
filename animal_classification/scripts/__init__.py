@@ -1,13 +1,14 @@
 """
-Scripts Package (my_projects.scripts)
-=====================================
+Helper scripts and entry points for the Animal Classification project.
 
-This package contains auxiliary scripts and utilities for the project,
-such as launching web applications or batch processes.
+This package serves as a container for executable scripts and dashboard interfaces
+used to interact with the trained models and datasets. It is designed to be
+used primarily via command-line entry points or the interactive web UI.
 
 Available Submodules:
 
-* **dashboard**: Contains the code for the interactive dashboard.
+* **dashboard**: Implements the interactive Gradio dashboard for data reduction, training,
+    and inference visualization.
 """
 
 # --- Recommended: Define __all__ ---

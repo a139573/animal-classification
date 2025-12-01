@@ -1,3 +1,9 @@
+"""
+Model Training Script.
+
+This module handles the training pipeline using PyTorch Lightning.
+It defines the main training loop, argument parsing, and model checkpointing.
+"""
 import os
 import sys
 
@@ -34,6 +40,20 @@ torch.set_float32_matmul_precision("medium")
 
 # --- Safe device selection, avoid CUDA issues ---
 def get_accelerator():
+    """
+    Determines the hardware accelerator to use (GPU or CPU).
+
+    This function checks if CUDA is available and performs a sanity check
+    by attempting to access device properties. If CUDA is reported as
+    available but fails the check (e.g., due to driver issues), it gracefully
+    falls back to CPU and prints a warning.
+
+    Returns
+    -------
+    str
+        Returns "gpu" if a CUDA device is available and functioning,
+        otherwise returns "cpu".
+    """
     # CUDA available?
     if torch.cuda.is_available():
         try:
@@ -50,7 +70,19 @@ def get_accelerator():
 
 
 def get_packaged_mini_data_path():
-    """Locates the 'mini_animals' dataset inside the installed package."""
+    """
+    Locates the 'mini_animals' dataset directory.
+
+    This function attempts to find the dataset inside the installed package
+    (site-packages) using `importlib.resources`. If the package is not
+    installed (e.g., during local development), it falls back to the
+    relative local path.
+
+    Returns
+    -------
+    pathlib.Path
+        The path object pointing to the 'mini_animals/animals' directory.
+    """
     # Use files() to correctly reference the path inside site-packages
     try:
         return pkg_resources.files('animal_classification').joinpath('data/mini_animals/animals')
@@ -94,6 +126,21 @@ class VGGNet(pl.LightningModule):
         """Learning rate used by the optimizer."""
 
     def forward(self, x):
+        """
+        Performs the forward pass of the network.
+
+        Parameters
+        ----------
+        x : torch.Tensor
+            Input tensor containing a batch of images. 
+            Shape: (batch_size, channels, height, width).
+
+        Returns
+        -------
+        torch.Tensor
+            The raw output logits from the classifier head.
+            Shape: (batch_size, num_classes).
+        """
         return self.vgg(x)
 
     def training_step(self, batch, batch_idx):

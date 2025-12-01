@@ -1,3 +1,9 @@
+"""
+Dataset Reduction Utility.
+
+Reduces an image dataset by sampling a fixed number of images per class
+and resizing them to a uniform size. Saves reduced dataset to ../data/mini_animals/animals
+"""
 import argparse
 import random
 import shutil
@@ -5,18 +11,25 @@ from pathlib import Path
 from PIL import Image
 from tqdm import tqdm
 
-"""
-Dataset Reduction Utility.
-
-Reduces an image dataset by sampling a fixed number of images per class
-and resizing them to a uniform size. Saves reduced dataset to ../data/mini_animals/animals
-"""
 
 def reduce_dataset(images_per_class, image_size, progress=None, seed=123):
     """
-    Reduces the animal dataset.
+    Reduces the animal dataset by sampling and resizing images.
 
-    Saves reduced dataset to ./data/mini_animals/animals
+    It clears the output directory if it exists and repopulates it with
+    the sampled images.
+
+    Parameters
+    ----------
+    images_per_class : int
+        Number of images to randomly select and save for each class.
+    image_size : int
+        The target width and height (in pixels) to resize images to.
+    progress : callable, optional
+        A callback function to update progress bars (e.g., for Gradio).
+        Should accept a float (0.0 to 1.0) and a description string.
+    seed : int, optional
+        Random seed for reproducibility (default is 123).
     """
     random.seed(seed)
 

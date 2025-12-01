@@ -14,7 +14,19 @@ def flatten_folder(path: Path) -> Path:
     Recursively flattens a directory structure.
 
     If a folder contains exactly one subfolder and no files,
-    this function descends into that subfolder repeatedly.
+    this function descends into that subfolder repeatedly until it finds
+    a directory with actual content (files or multiple folders).
+
+    Parameters
+    ----------
+    path : Path
+        The initial directory path to inspect.
+
+    Returns
+    -------
+    Path
+        The path to the deepest single-child subdirectory found,
+        or the original path if no flattening was needed.
     """
     while True:
         items = list(path.iterdir())

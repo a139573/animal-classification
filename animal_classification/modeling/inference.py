@@ -1,3 +1,11 @@
+"""
+Model Inference and Evaluation Script.
+
+This script runs inference using a trained model checkpoint on a specified
+dataset. It calculates key performance metrics, saves raw predictions,
+and generates diagnostic plots such as the confusion matrix, ROC curve,
+and calibration plot.
+"""
 import torch
 from torch.nn import functional as F
 import numpy as np
@@ -23,15 +31,6 @@ SCRIPT_DIR = Path(__file__).parent.resolve()
 default_model_pattern = Path("models/*.ckpt")
 default_data_dir = Path("data/mini_animals/animals")
 
-
-"""
-Model Inference and Evaluation Script.
-
-This script runs inference using a trained model checkpoint on a specified
-dataset. It calculates key performance metrics, saves raw predictions,
-and generates diagnostic plots such as the confusion matrix, ROC curve,
-and calibration plot.
-"""
 
 # Helper to convert matplotlib figure to PIL Image
 def fig_to_image():
@@ -287,6 +286,16 @@ def run_inference(model_path: Path = None, data_dir: Path = None, architecture: 
 
 
 def main():
+    """
+    Command-line entry point for running inference.
+
+    This function parses command-line arguments to configure the inference
+    process. It resolves paths, validates the existence of the model and
+    dataset, and invokes `run_inference` in script mode (is_demo=False).
+
+    It prints the final metrics (Accuracy, F1) to the standard output and
+    saves visualizations to the specified output path.
+    """
     parser = argparse.ArgumentParser(description="Run inference on trained VGG model")
     parser.add_argument("--model-path", type=str, default=str(default_model_pattern), help="Path to .ckpt checkpoint")
     parser.add_argument("--data-dir", type=str, default=str(default_data_dir), help="Path to validation dataset")

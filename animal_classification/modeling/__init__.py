@@ -1,7 +1,4 @@
 """
-Modeling Package (my_projects.modeling)
-=======================================
-
 This package contains all modules related to Machine Learning
 for the project.
 

@@ -8,6 +8,7 @@ required for the Machine Learning pipeline.
 
 * **dataset**: Functions for loading and processing the dataset.
 * **download_data**: Script to download the initial data.
+* **delete_data**: Script to clean the dataset.
 * **modeling**: Model definition, training, and evaluation.
 * **plots**: Functions for generating visualizations.
 * **reduce_data**: Scripts for dimensionality reduction.
@@ -18,11 +19,11 @@ __docformat__ = "numpy"
 
 # This tells pdoc which modules to include in the documentation
 # Make sure these match your .py files
-__all__ = [
-    "dataset", 
-    "download_data", 
-    "modeling", 
-    "plots", 
-    "reduce_data", 
-    "scripts"
-]
+# __all__ = [
+#     "dataset", 
+#     "download_data", 
+#     "modeling", 
+#     "plots", 
+#     "reduce_data", 
+#     "scripts"
+# ]
