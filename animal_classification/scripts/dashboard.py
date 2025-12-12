@@ -17,11 +17,12 @@ from ..modeling.inference import run_inference
 from ..reduce_data import reduce_dataset
 import pandas as pd
 import glob
+import os
 
 # === PATHS ===
 # Fallback defaults relative to where user runs dashboard
 DEFAULT_DATA_DIR = Path("data/mini_animals/animals")
-DEFAULT_MODELS_DIR = Path("models/*.ckpt")
+DEFAULT_MODELS_DIR = Path("models")
 # REPORTS_DIR = (PROJECT_ROOT / "reports" / "figures").absolute()
 
 architecture = None
@@ -173,12 +174,28 @@ def run_inference_gr(architecture, trained_model, batch_size, num_workers):
     Metrics are displayed in the dashboard but not stored on disk.
     """
     if trained_model is None:
-        print("NO TRAINED MODEL!")
-        model_files = glob.glob(str(DEFAULT_MODELS_DIR))
+        print("NO TRAINED MODEL! Attempting to find the latest saved checkpoint...")
+        
+        # Strictly search for the standard PyTorch Lightning checkpoint extension (.ckpt).
+        model_pattern = str(DEFAULT_MODELS_DIR / '*.ckpt')
+        print(f"Searching for standard checkpoint files: {model_pattern}")
+        
+        # Use glob.glob to find all matching files
+        model_files = glob.glob(model_pattern)
+        
         if len(model_files) == 0:
-            raise FileNotFoundError(f"No model files found with pattern: {model_files}")
+            # If no CKPT files are found, raise an error immediately. No fallback to .pth.
+            raise FileNotFoundError(
+                f"No standard model checkpoint files (.ckpt) found in the directory: {DEFAULT_MODELS_DIR}. "
+                f"Checked pattern: '{model_pattern}'. "
+                f"The dashboard requires a PyTorch Lightning checkpoint (.ckpt) to ensure all necessary metadata is loaded."
+            )
+            
+        # Sort files by modification time, newest first (reverse=True)
+        model_files.sort(key=os.path.getmtime, reverse=True)
+        
         model_path = Path(model_files[0])
-        print(f"Using saved checkpoint from {model_path}")
+        print(f"Using latest saved checkpoint from {model_path}")
     else:
         model_path = None
 
@@ -199,13 +216,7 @@ def run_inference_gr(architecture, trained_model, batch_size, num_workers):
     metrics_text = f"✅ **Validation Accuracy:** {acc:.3f} | **F1-Score:** {f1:.3f}"
 
 
-    n_display = 100  # show first 100 rows
-    table_df = pd.DataFrame({
-        "True Label": val_labels[:n_display],
-        "Predicted Prob": val_probs[:n_display].max(axis=1)  # top-class probability
-    })
-
-    return metrics_text, cm_img, roc_img, cal_img, table_df
+    return metrics_text, cm_img, roc_img, cal_img
 
 
 # ------ DASHBOARD ------ #
@@ -259,18 +270,18 @@ with gr.Blocks(title="Animal Classification Dashboard") as demo:
         infer_cm = gr.Image(label="Confusion Matrix")
         infer_roc = gr.Image(label="ROC Curve")
         infer_cal = gr.Image(label="Calibration Plot")
-        infer_table = gr.Dataframe(headers=["True Label", "Predicted Prob for True Label"], interactive=False, label="Predictions Table")
+       # infer_table = gr.Dataframe(headers=["True Label", "Predicted Prob for True Label"], interactive=False, label="Predictions Table")
         run_inference_btn.click(
             fn=run_inference_gr,
             inputs=[infer_model_choice, trained_model, infer_batch_size, infer_num_workers],
-            outputs=[infer_metrics, infer_cm, infer_roc, infer_cal, infer_table]
+            outputs=[infer_metrics, infer_cm, infer_roc, infer_cal]
         )
 
 def main():
     """
     Launches the Gradio web application.
     """
-    demo.launch(theme=dark_theme)
+    demo.launch()
 
 if __name__ == "__main__":
     main()

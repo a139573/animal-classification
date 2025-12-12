@@ -12,11 +12,12 @@ import numpy as np
 from pathlib import Path
 from ..dataset import AnimalsDataModule
 from ..modeling.train import VGGNet
-from sklearn.metrics import accuracy_score, confusion_matrix, f1_score, RocCurveDisplay, roc_auc_score
+from sklearn.metrics import accuracy_score, confusion_matrix, f1_score, RocCurveDisplay, roc_auc_score, roc_curve
 from sklearn.calibration import calibration_curve
 import matplotlib.pyplot as plt
 import lightning.pytorch as pl
 import argparse
+import re
 
 from PIL import Image
 import io
@@ -79,7 +80,8 @@ def run_inference(model_path: Path = None, data_dir: Path = None, architecture: 
     dict
         { "val_acc": float, "f1_score": float, "confusion_matrix": np.ndarray }
     """
-    print(f"Model path is {model_path} ")
+    architecture = architecture.lower()
+
     if model_path is not None:
         print(f"\n🔍 Loading model: {model_path}")
     else:
@@ -121,21 +123,29 @@ def run_inference(model_path: Path = None, data_dir: Path = None, architecture: 
 
     # --- Load model ---
     if trained_model is None:
-        trained_model = VGGNet(
-            architecture=architecture,
-            num_classes=num_classes,
-            pretrained=False
-        )
+        try:
+            trained_model = VGGNet(
+                architecture=architecture,
+                num_classes=num_classes,
+                pretrained=False
+            )
 
-        ckpt = torch.load(model_path, map_location="cpu")
+            ckpt = torch.load(model_path, map_location="cpu")
 
-        # Lightning checkpoints wrap the real weights under "state_dict"
-        raw_state = ckpt["state_dict"]
+            # Lightning checkpoints wrap the real weights under "state_dict"
+            raw_state = ckpt["state_dict"]
 
-        # Remove "model." prefix Lightning adds
-        clean_state = {k.replace("model.", ""): v for k, v in raw_state.items()}
+            # Remove "model." prefix Lightning adds
+            clean_state = {k.replace("model.", ""): v for k, v in raw_state.items()}
 
-        trained_model.load_state_dict(clean_state, strict=True)
+            trained_model.load_state_dict(clean_state, strict=True)
+        except Exception as e:
+            raise RuntimeError(
+                f"\n❌ Failed to load weights for '{architecture}' from checkpoint: {model_path}. "
+                f"This likely means the checkpoint file is corrupted or its contents "
+                f"do not match the expected model architecture ({architecture}).\n"
+                f"Original error: {e}"
+            ) from e
 
     trained_model.eval()
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -182,7 +192,8 @@ def run_inference(model_path: Path = None, data_dir: Path = None, architecture: 
 
     # --- Macro-average ROC curve ---
     try:
-        plt.figure(figsize=(8, 6))
+        # Use subplots to get the Axes object for plotting ---
+        fig, ax = plt.subplots(figsize=(8, 6))
 
         unique_labels = np.unique(all_labels)
         y_true_onehot = np.eye(num_classes)[all_labels]
@@ -203,6 +214,8 @@ def run_inference(model_path: Path = None, data_dir: Path = None, architecture: 
         # Compute per-class ROC points and aggregate via interpolation
         fpr_interp = np.linspace(0, 1, 100)
         tpr_all = []
+        curve_style = {'color': 'blue', 'alpha': 0.1}
+
 
         for i in range(num_classes):
             y_true_i = y_true_onehot[:, i]
@@ -211,31 +224,31 @@ def run_inference(model_path: Path = None, data_dir: Path = None, architecture: 
             # Skip class if it has only one label present
             if np.sum(y_true_i) == 0 or np.sum(y_true_i) == len(y_true_i):
                 continue
+            
+            # Use raw roc_curve to avoid internal figure creation/memory leak ---
+            fpr_i, tpr_i, _ = roc_curve(y_true_i, y_prob_i)
+            
+            # Plot the individual curve (no label, just for shading)
+            ax.plot(fpr_i, tpr_i, **curve_style) 
 
-            display = RocCurveDisplay.from_predictions(
-                y_true_i,
-                y_prob_i,
-                name=None,
-                color='blue',
-                alpha=0.1
-            )
             # Interpolate TPR at fixed FPR points
-            tpr_interp = np.interp(fpr_interp, display.fpr, display.tpr)
+            tpr_interp = np.interp(fpr_interp, fpr_i, tpr_i)
             tpr_all.append(tpr_interp)
 
         # Average TPR across classes
         if tpr_all:
             tpr_mean = np.mean(tpr_all, axis=0)
-            plt.plot(fpr_interp, tpr_mean, color='red', label=f'Macro-average ROC (AUC={auc_score:.3f})')
-
-        plt.plot([0, 1], [0, 1], "--", color="gray")
-        plt.xlabel("False Positive Rate")
-        plt.ylabel("True Positive Rate")
-        plt.title("ROC Curve (macro-average)")
-        plt.legend()
-        plt.tight_layout()
-        roc_img = fig_to_image() if is_demo else plt.savefig(output_path / f"{architecture}_roc_curve.png")
-        plt.close()
+            # Use the shared 'ax' object for final plotting
+            ax.plot(fpr_interp, tpr_mean, color='red', label=f'Macro-average ROC (AUC={auc_score:.3f})')
+        
+        ax.plot([0, 1], [0, 1], "--", color="gray")
+        ax.set_xlabel("False Positive Rate")
+        ax.set_ylabel("True Positive Rate")
+        ax.set_title("ROC Curve (macro-average)")
+        ax.legend()
+        fig.tight_layout()
+        roc_img = fig_to_image() if is_demo else fig.savefig(output_path / f"{architecture}_roc_curve.png")
+        plt.close(fig) # <-- Close the explicit figure object
     except Exception as e:
         print("⚠️ ROC plot failed:", e)
         roc_img = None
@@ -285,6 +298,20 @@ def run_inference(model_path: Path = None, data_dir: Path = None, architecture: 
         return {"output_path": output_path, "val_acc": acc, "f1_score": f1, "confusion_matrix": cm}
 
 
+def extract_version(filepath):
+    """
+    Extracts the version number from a checkpoint filename.
+    e.g., 'vgg16-best-v10.ckpt' -> 10
+          'vgg16-best.ckpt' -> 0
+    """
+    # Search for -vN.ckpt where N is one or more digits
+    match = re.search(r'-v(\d+)\.ckpt$', filepath)
+    if match:
+        return int(match.group(1))
+    # If no version suffix is found, assume it is the initial version (0)
+    return 0
+
+
 def main():
     """
     Command-line entry point for running inference.
@@ -310,10 +337,16 @@ def main():
     if not data_dir.exists():
         raise FileNotFoundError(f"Data directory does not exist: {data_dir}")
 
+    # Find and select the latest versioned checkpoint
     model_files = glob.glob(args.model_path)
+    
     if len(model_files) == 0:
         raise FileNotFoundError(f"No model files found with pattern: {args.model_path}")
-    model_path = Path(model_files[0])
+    
+    # Select the model path that yields the maximum version number
+    latest_model_path = max(model_files, key=extract_version)
+    model_path = Path(latest_model_path)
+
 
     output_path = Path(args.output_path).absolute()
 
@@ -328,10 +361,10 @@ def main():
     )
 
     print("\n✅ Inference finished")
+    print(f"Using latest model checkpoint: {model_path.name}") # <-- ADDED: Feedback to user
     print(f"Validation Accuracy: {results['val_acc']:.4f}")
     print(f"F1 Score (macro): {results['f1_score']:.4f}")
-    print(f"Confusion matrix saved to: {output_path}")
-
+    print(f"Confusion matrix and ROC curve saved to: {output_path}")
 
 
 if __name__ == "__main__":

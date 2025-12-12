@@ -18,11 +18,8 @@ The project follows a modular cookiecutter-style structure, with code organized 
 ## 📂 Dataset
 Dataset: **[Animal Image Dataset (90 Different Animals)](https://www.kaggle.com/datasets/iamsouravbanerjee/animal-image-dataset-90-different-animals)** Contains **5,400 images** across **90 classes**.
 
----
 ### Exploratory Data Analysis
 In GitHub, you can take a look inside notebooks/plots_metrics.ipynb to see a brief exploratory analysis of this dataset. Some of the most relevant findings are...
-
----
 
 
 ## ⚙️ Installation Options
@@ -122,7 +119,8 @@ animal_classification/
 After installation, the following CLI commands are available:
 
 ### 1️⃣ Download Full Dataset
-Downloads the full 90-class dataset into data/animals/.
+Downloads the full dataset with 60 full-sized images for each of the 90 classes into data/animals/.
+
 ```bash
 animal-download-data
 ```
@@ -131,7 +129,7 @@ Required arguments: None
 Optional arguments: None
 
 ### 2️⃣ Reduce Dataset
-Creates a smaller dataset for faster testing or development with the provided characteristics.
+Creates a smaller dataset for faster testing or development with the provided characteristics. You need to download the full dataset first, using the previous command. If you execute it again, the previous reduced dataset will be completely overwritten.
 
 ```bash
 animal-reduce-data
@@ -143,7 +141,7 @@ Optional arguments:
 
 --num-images: The number of images to keep from each class. Default: 30
 
---img-size: The width and height to which the images will be reshaped. Default: 224
+--img-size: The width and height to which the images will be reshaped. Default (recommended): 224
 
 ### 3️⃣ Train Model
 
