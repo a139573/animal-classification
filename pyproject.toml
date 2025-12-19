@@ -22,31 +22,32 @@ authors = [
 ]
 
 dependencies = [
-"torch>=2.8.0",         # ⬅️ FIX 1: Aligning to newer version that supports sm_120 (Blackwell)
-"torchvision>=0.23.0",  # ⬅️ FIX 2: Aligning to newer compatible version
-"lightning>=2.5.5",     # ⬅️ FIX 3: Aligning to newer compatible version
-"pillow>=10.0.0",
-"kagglehub>=0.2.0",
-"gradio>=4.44.1",
-"numpy>=2.0.2",
-"pandas>=2.3.0",
-"seaborn>=0.13.2",
-"matplotlib>=3.9.4",
-"scikit-learn>=1.6.1"
+    "torch>=2.8.0",
+    "torchvision>=0.23.0",
+    "torchaudio>=2.8.0",
+    "lightning>=2.5.5",
+    "pillow>=10.0.0",
+    "kagglehub>=0.2.0",
+    "gradio>=4.44.1",
+    "numpy>=2.0.2",
+    "pandas>=2.3.0",
+    "seaborn>=0.13.2",
+    "matplotlib>=3.9.4",
+    "scikit-learn>=1.6.1",
+    "twine"
 ]
 
 [project.optional-dependencies]
 dev = ["pdoc>=15.0.4"]
 cli = ["kagglehub"]
-gpu = [
-"torch>=2.8.0",         # ⬅️ FIX 4: Aligning GPU version
-"torchvision>=0.23.0",  # ⬅️ FIX 5: Aligning GPU version
-"torchaudio>=2.8.0"     # ⬅️ FIX 6: Aligning GPU version
-]
+# This extra acts as a switch to the CPU index in the sources block.
+gpu = ["torch>=2.8.0",
+    "torchvision>=0.23.0",
+    "torchaudio>=2.8.0",]
 
 [project.urls]
-Homepage = "https://github.com/yourusername/animal-classification"
-Repository = "https://github.com/yourusername/animal-classification"
+Homepage = "https://a139573.github.io/animal-classification/"
+Repository = "https://github.com/a139573/animal-classification"
 
 [project.scripts]
 animal-train = "animal_classification.modeling.train:main"
@@ -58,17 +59,37 @@ animal-reduce-data = "animal_classification.reduce_data:main"
 [tool.uv]
 package = true
 
-#[[tool.uv.index]]
-#name = "pytorch-cuda-cu121"
-#url = "https://download.pytorch.org/whl/cu121" # 🎯 Target CUDA 12.1
-#explicit = true
+# --- UV Configuration to handle CUDA 12.6 (Default) and CPU indices ---
 
-#[tool.uv.sources]
-#torch = [
-#{ index = "pytorch-cuda-cu121", marker = "extra == 'gpu'" },
-#]
-#torchvision = [
-#{ index = "pytorch-cuda-cu121", marker = "extra == 'gpu'" },
-#]
+[[tool.uv.index]]
+name = "pytorch-cuda-128"
+url = "https://download.pytorch.org/whl/cu128" 
+explicit = true
+
+[[tool.uv.index]]
+name = "pytorch-cuda-126"
+url = "https://download.pytorch.org/whl/cu126" 
+explicit = true
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[tool.uv.sources]
+# Default (no extra) resolves to CUDA 12.6. [cpu] extra resolves to CPU index.
+torch = [
+    { index = "pytorch-cuda-128", marker = "extra == 'gpu'" }, 
+    #{ index = "pytorch-cpu", marker = "extra == 'cpu'" }
+]
+torchvision = [
+    { index = "pytorch-cuda-126", marker = "extra == 'gpu'" },
+    #{ index = "pytorch-cpu", marker = "extra == 'cpu'" }
+]
+torchaudio = [
+    { index = "pytorch-cuda-126", marker = "extra == 'gpu'" },
+   # { index = "pytorch-cpu", marker = "extra == 'cpu'" }
+]
+
 [tool.pdoc]
 docformat = "numpy"
