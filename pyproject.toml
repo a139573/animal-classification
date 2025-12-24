@@ -2,15 +2,19 @@
 requires = ["setuptools>=64", "wheel"]
 build-backend = "setuptools.build_meta"
 
+[tool.setuptools]
+include-package-data = true
+
 [tool.setuptools.packages.find]
 include = ["animal_classification*"]
+namespaces = false
 
 [tool.setuptools.package-data]
 "animal_classification" = ["data/mini_animals/**/*"]
 
 [project]
 name = "animal-classification-aldanondo-malon"
-version = "0.2.0"
+version = "1.1.0"
 description = "A deep learning project to classify 90 animals using VGG architectures."
 readme = "README.md"
 requires-python = ">=3.10,<=3.13"
@@ -40,10 +44,6 @@ dependencies = [
 [project.optional-dependencies]
 dev = ["pdoc>=15.0.4"]
 cli = ["kagglehub"]
-# This extra acts as a switch to the CPU index in the sources block.
-gpu = ["torch>=2.8.0",
-    "torchvision>=0.23.0",
-    "torchaudio>=2.8.0",]
 
 [project.urls]
 Homepage = "https://a139573.github.io/animal-classification/"
@@ -52,14 +52,12 @@ Repository = "https://github.com/a139573/animal-classification"
 [project.scripts]
 animal-train = "animal_classification.modeling.train:main"
 animal-infer = "animal_classification.modeling.inference:main"
-animal-dashboard = "animal_classification.scripts.dashboard:main"
-animal-download-data = "animal_classification.download_data:main"
-animal-reduce-data = "animal_classification.reduce_data:main"
+animal-dashboard = "animal_classification.app.dashboard:main"
+animal-download-data = "animal_classification.preprocessing.download_data:main"
+animal-reduce-data = "animal_classification.preprocessing.reduce_data:main"
 
 [tool.uv]
 package = true
-
-# --- UV Configuration to handle CUDA 12.6 (Default) and CPU indices ---
 
 [[tool.uv.index]]
 name = "pytorch-cuda-128"
@@ -77,18 +75,14 @@ url = "https://download.pytorch.org/whl/cpu"
 explicit = true
 
 [tool.uv.sources]
-# Default (no extra) resolves to CUDA 12.6. [cpu] extra resolves to CPU index.
 torch = [
-    { index = "pytorch-cuda-128", marker = "extra == 'gpu'" }, 
-    #{ index = "pytorch-cpu", marker = "extra == 'cpu'" }
+    { index = "pytorch-cuda-128" },
 ]
 torchvision = [
-    { index = "pytorch-cuda-126", marker = "extra == 'gpu'" },
-    #{ index = "pytorch-cpu", marker = "extra == 'cpu'" }
+    { index = "pytorch-cuda-126"},
 ]
 torchaudio = [
-    { index = "pytorch-cuda-126", marker = "extra == 'gpu'" },
-   # { index = "pytorch-cpu", marker = "extra == 'cpu'" }
+    { index = "pytorch-cuda-126" },
 ]
 
 [tool.pdoc]
