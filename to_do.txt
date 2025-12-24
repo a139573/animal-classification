@@ -1,8 +1,0 @@
-Adjust inference.py
-
-Add interactive data visualization
-Add interactive training
-
-Publish on pypi/huggingface
-
-...

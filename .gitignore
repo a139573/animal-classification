@@ -29,17 +29,18 @@ models/
 # --- Lightning / Training logs ---
 lightning_logs/
 logs/
-runs/               # e.g., TensorBoard
+runs/
 
 # --- Reports & Generated Figures ---
-# Ignore contents but keep the folder structure
-reports/*
-!reports/.gitkeep
-!reports/inference/.gitkeep
-!reports/figures/.gitkeep
+# Ignore all figures by default
+reports/figures/*
+
+# Exceptions
+!reports/figures/*heatmap*
+!reports/figures/*color_averages*
+!reports/figures/*clustermap*
 
 # --- Inference Outputs ---
-# Prevent accidental commit if output_path defaults to local source
 inference_outputs/
 animal_classification/inference_outputs/
 
@@ -66,3 +67,20 @@ Thumbs.db
 *.pkl
 *.npy
 *.npz
+
+# Artifacts and outputs
+predictions/
+to_do.txt
+plots/figures/*
+!plots/figures/.gitkeep
+
+# Redundant dependencies
+requirements.txt
+
+# Scratch/Experimental Notebooks
+notebooks/Proyect 1 Animals Image Dataset.ipynb
+notebooks/trying_gradio.ipynb
+
+# Notebook artifacts
+notebooks/*.csv
+notebooks/*.png
