@@ -12,7 +12,13 @@ It uses **PyTorch** and **PyTorch Lightning** for modeling and provides command-
 * Model training and inference
 * Visualization and interactive dashboards via Gradio
 
-The project follows a modular cookiecutter-style structure, with code organized inside `animal_classification/my_projects/`.
+## ⚡ Hardware & CUDA Compatibility
+
+This project is optimized for NVIDIA Blackwell GPUs (e.g., RTX 5000/6000 Ada/Blackwell series).
+
+Default Index: Uses PyTorch cu128 (CUDA 12.8) for core tensors and cu126 for vision/audio utilities to ensure maximum performance on latest-gen kernels.
+
+Requirements: An NVIDIA GPU with drivers supporting CUDA 12.6+ is recommended for the default installation.
 
 
 ## 📂 Dataset
@@ -30,25 +36,14 @@ The following installation instructions are meant for a Linux-based operating sy
 Use *uvx* (assuming *uv* is installed) to download and run the Gradio demo instantly in an isolated, temporary environment. This includes a mini dataset for quick experiments.
 
 ```bash
-uvx --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ --from "animal-classification-aldanondo-malon==0.1.3" animal-dashboard
-```
-
-**(Recommended)** Or, if you have CUDA available:
-
-```bash
-uvx --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ --from "animal-classification-aldanondo-malon[gpu]==0.1.3" animal-dashboard
+uvx --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ --from "animal-classification-aldanondo-malon==1.1.0" animal-dashboard
 ```
 
 ### 2. 📦 Install as a Dependency
 To use this project as a library within your own code:
 
 ```bash
-uv add --default-index https://test.pypi.org/simple/ --index https://pypi.org/simple/ "animal-classification-aldanondo-malon==0.1.3"
-```
-
-**(Recommended)** Or, if you have CUDA available:
-```bash
-uv add --default-index https://test.pypi.org/simple/ --index https://pypi.org/simple/ "animal-classification-aldanondo-malon[gpu]==0.1.3"
+uv add --default-index https://test.pypi.org/simple/ --index https://pypi.org/simple/ "animal-classification-aldanondo-malon==1.1.0"
 ```
 
 ### 3. 🔧 Local Development (Your own repo / experiments)
@@ -67,10 +62,6 @@ Install the project and its dependencies in editable mode
 ```bash
 uv pip install -e .
 ```
-**(Recommended)** Or, if you have CUDA available:
-```bash
-uv pip install -e ".[gpu]"
-```
 
 ### 4. 🧪 Install Built Wheel (QA/Internal Testing)
 
@@ -79,40 +70,33 @@ If you downloaded the pre-built wheel file (.whl) from testpypi, use the followi
 To install the CPU-only version:
 
 ```bash
-uv pip install animal-classification-aldanondo-malon-0.1.3.whl
-```
-
-**(Recommended)** To install the GPU version (Requires NVIDIA/CUDA environment):
-
-```bash
-uv pip install 'animal-classification-aldanondo-malon-0.1.3.whl[gpu]'
+uv pip install animal-classification-aldanondo-malon-1.1.0.whl
 ```
 
 ## 🧩 Project Structure
 
 animal_classification/
-
-├── animal_classification/
-
-│ ├── dataset.py
-
-│ ├── download_data.py
-
-│ ├── reduce_data.py
-
-│ ├── plots.py
-
-│ ├── modeling/
-
-│ └── scripts/
-
-
-├── notebooks/ # Exploratory data analysis and model prototyping
-
-├── reports/ # Generated charts, metrics, and figures
-
+├── animal_classification/       # Main Source Code
+│   ├── modeling/                # Model Logic & Evaluation
+│   │   ├── __init__.py
+│   │   ├── architecture.py      # VGGNet Definition
+│   │   ├── inference.py         # Evaluation Script
+│   │   └── metrics.py           # Plotting & Scoring Utils
+│   │
+│   ├── preprocessing/           # Data Pipeline
+│   │   ├── __init__.py
+│   │   ├── dataset.py           # Lightning DataModule
+│   │   ├── delete_data.py       # Cleanup Script
+│   │   ├── download_data.py     # Downloader
+│   │   └── reduce_data.py       # Resizer
+│   │
+│   ├── __init__.py
+│   └── utils.py                 # Hardware & Path Utilities
+│
+├── notebooks/                   # Exploratory Data Analysis
+├── reports/                     # Generated Figures (Structure only)
+├── .gitignore
 ├── pyproject.toml
-
 └── README.md
 
 ## 🚀 Usage

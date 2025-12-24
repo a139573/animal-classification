@@ -17,15 +17,19 @@ class AnimalsDataModule(pl.LightningDataModule):
 
         Parameters
         ----------
-        data_dir : str, optional
+        data_dir : str, optional.
             Directory containing the dataset (default is ".").
-        batch_size : int, optional
+
+        batch_size : int, optional.
             Batch size for the DataLoaders (default is 32).
-        num_workers : int, optional
+
+        num_workers : int, optional.
             Number of workers for the DataLoaders (default is 4).
-        test_frac : float, optional
+
+        test_frac : float, optional.
             Fraction of the dataset to reserve for testing (default is 0.2).
-        seed : int, optional
+
+        seed : int, optional.
             Random seed for data splitting (default is 123).
         """
         super().__init__()
@@ -56,7 +60,7 @@ class AnimalsDataModule(pl.LightningDataModule):
 
         Parameters
         ----------
-        stage : str, optional
+        stage : str, optional.
             Lightning stage (e.g., "fit", "test"). Not used in this
             implementation, as the data is split only once.
         """
@@ -106,10 +110,3 @@ class AnimalsDataModule(pl.LightningDataModule):
             The test DataLoader (shuffle=False).
         """
         return DataLoader(self.test_data, batch_size=self.batch_size, num_workers=self.num_workers)
-
-
-
-# # --- Instantiate DataModule ---
-# data_module = AnimalsDataModule(
-#     data_dir=subsample_dir, test_frac=test_frac, seed=seed
-# )

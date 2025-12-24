@@ -31,6 +31,18 @@ lightning_logs/
 logs/
 runs/               # e.g., TensorBoard
 
+# --- Reports & Generated Figures ---
+# Ignore contents but keep the folder structure
+reports/*
+!reports/.gitkeep
+!reports/inference/.gitkeep
+!reports/figures/.gitkeep
+
+# --- Inference Outputs ---
+# Prevent accidental commit if output_path defaults to local source
+inference_outputs/
+animal_classification/inference_outputs/
+
 # --- System / Editor specific ---
 .DS_Store
 Thumbs.db

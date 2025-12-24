@@ -17,6 +17,8 @@ Submodules:
 # This tells pdoc which modules to document
 
 __all__ = [
+    "architecture",
+    "train",
     "inference",
-    "train"
+    "metrics"
 ]
