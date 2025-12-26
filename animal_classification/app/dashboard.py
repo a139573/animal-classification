@@ -182,7 +182,7 @@ def create_demo():
     It also initializes the `gr.State` component used to share the trained model
     between the Training and Inference tabs.
     """
-    with gr.Blocks(title="Animal Classification Dashboard", theme=gr.themes.Soft()) as demo:
+    with gr.Blocks(title="Animal Classification Dashboard") as demo: 
         gr.Markdown("# 🦁 Animal Classification Dashboard")
         
         # --- Tab 1: Reduce Data (Disabled) ---

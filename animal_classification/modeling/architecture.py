@@ -11,7 +11,7 @@ class VGGNet(pl.LightningModule):
     This model uses a pre-trained VGG backbone (frozen features) and a custom
     classifier head for the specific number of animal classes in the dataset.
     """
-    def __init__(self, architecture="vgg16", num_classes=90, pretrained=True, lr=1e-3):
+    def __init__(self, architecture="vgg16", num_classes=90, pretrained=True, lr=1e-4):
         """
         Args:
             architecture (str): Backbone name ('vgg16' or 'vgg11').

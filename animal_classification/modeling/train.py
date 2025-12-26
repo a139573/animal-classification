@@ -23,6 +23,7 @@ python -m animal_classification.modeling.train --architecture vgg11 --batch-size
 
 import argparse 
 import tempfile 
+import os
 from pathlib import Path
 
 import pandas as pd 
@@ -34,11 +35,12 @@ from lightning.pytorch.callbacks import ModelCheckpoint
 from lightning.pytorch.loggers import CSVLogger
 
 # --- Local Project Imports ---
-from animal_classification.modeling.architecture import VGGNet 
+from animal_classification.modeling.architecture import VGGNet
+from animal_classification.modeling.metrics import plot_training_curves 
 from animal_classification.preprocessing import AnimalsDataModule 
 from animal_classification.utils import get_accelerator, get_packaged_mini_data_path
 
-# Set precision for Tensor Cores (Performance Optimization)
+# Set precision for Tensor Cores (Performance Optimization for Blackwell/Ada GPUs)
 torch.set_float32_matmul_precision("medium")
 
 class GradioProgressCallback(pl.Callback): 
@@ -74,54 +76,27 @@ def main( architecture: str = "vgg16", dataset_choice: str = "mini", seed: int =
     ----------
     architecture : str.
         The model backbone to use. Options: `'vgg16'`, `'vgg11'`.
-
     dataset_choice : str.
         Which dataset folder to use. Options: `'mini'` (default), `'full'`.
-
     seed : int.
-        Random seed for reproducibility (data splitting and weight init).
-
+        Random seed for reproducibility.
     test_frac : float.
-        Fraction of data (0.0 - 1.0) to hold out for testing.
-
+        Fraction of data to hold out for testing.
     max_epochs : int.
         Total number of training epochs.
-
     batch_size : int.
         Number of images per training batch.
-
     num_workers : int.
         Number of CPU subprocesses for data loading.
-
     is_demo : bool.
-
-        If `True`, runs in "Dashboard Mode":
-
-        - Saves logs to a temp folder.
-
-        - Does NOT save checkpoints to disk.
-
-        - Returns the model object directly.
-
-        If `False` (CLI default), saves everything to `models/` and `reports/`.
-
+        If `True`, runs in Dashboard mode (in-memory).
     progress : gradio.Progress, optional.
-        Gradio progress tracker (only needed if `is_demo=True`).
+        Gradio progress tracker.
 
     Returns
     -------
     dict
-        A dictionary containing results:
-
-        - `model`: The trained PyTorch Lightning module (CPU/GPU).
-
-        - `val_acc`: Final validation accuracy (float).
-
-        - `log_path`: Path to the CSV metrics file.
-
-        - `train_loss_list`: List of training losses per epoch.
-
-        - `val_acc_list`: List of validation accuracies per epoch.
+        A dictionary containing training metrics and the model object.
     """
 
     # 1. Setup Hardware
@@ -134,7 +109,6 @@ def main( architecture: str = "vgg16", dataset_choice: str = "mini", seed: int =
         subsample_dir = get_packaged_mini_data_path()
         print(f"📦 DEMO MODE: Using packaged mini dataset from: {subsample_dir}")
     else:
-        # CLI Mode: Check local folder first, fallback to package
         base_data_dir = Path("data")
         local_target = base_data_dir / ("animals/animals" if dataset_choice == "full" else "mini_animals/animals")
         
@@ -165,12 +139,10 @@ def main( architecture: str = "vgg16", dataset_choice: str = "mini", seed: int =
     callbacks = []
 
     if is_demo:
-        # Use a temp dir for logs in demo mode to avoid clutter
         tmp_dir = tempfile.TemporaryDirectory()
         logs_dir = Path(tmp_dir.name)
         callbacks.append(GradioProgressCallback(progress, max_epochs))
     else:
-        # Permanent storage for CLI runs
         models_dir = Path("models")
         models_dir.mkdir(parents=True, exist_ok=True)
         logs_dir = Path("logs")
@@ -215,27 +187,17 @@ def main( architecture: str = "vgg16", dataset_choice: str = "mini", seed: int =
     csv_path = Path(logger.log_dir) / "metrics.csv"
     if csv_path.exists():
         df = pd.read_csv(csv_path)
-        # Group by epoch to get one clean value per epoch
         metrics = df.groupby('epoch').mean()
-        train_loss = metrics['train_loss'].tolist()
-        val_loss = metrics['val_loss'].tolist()
-        val_acc = metrics['val_acc'].tolist()
+        
+        train_loss = metrics['train_loss'].dropna().tolist()
+        val_loss = metrics['val_loss'].dropna().tolist()
+        val_acc = metrics['val_acc'].dropna().tolist()
         final_acc = val_acc[-1] if val_acc else 0.0
 
-        if not is_demo:
-            plt.figure(figsize=(6, 4))
-            plt.plot(train_loss, marker="o", label="Training Loss")
-            plt.plot(val_loss, marker="x", label="Validation Loss")
-            plt.plot(val_acc, marker="s", label="Validation Accuracy")
-            plt.xlabel("Epoch")
-            plt.ylabel("Value")
-            plt.title(f"{architecture.upper()} Convergence")
-            plt.legend()
-            plt.grid(True)
-            plt.savefig(reports_dir / f"{architecture}_convergence.png")
-            plt.close()
+        # if not is_demo:
+        # --- IMPROVED THEME: DUAL-AXIS CONVERGENCE PLOT ---
+        plot_training_curves(train_loss, val_loss, val_acc, architecture_name=architecture, output_path=None, is_demo=is_demo)
     else:
-        # Fallback if logging failed
         final_acc = 0.0
         train_loss, val_loss, val_acc = [], [], []
 
@@ -248,7 +210,7 @@ def main( architecture: str = "vgg16", dataset_choice: str = "mini", seed: int =
         "train_loss_list": train_loss if is_demo else None,
     }
 
-if __name__ == "main":
+if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Train Animal Classification Model") 
     parser.add_argument("--architecture", default="vgg16", choices=["vgg16", "vgg11"]) 
     parser.add_argument("--dataset-choice", default="mini", choices=["full", "mini"]) 

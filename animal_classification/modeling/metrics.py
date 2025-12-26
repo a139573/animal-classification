@@ -45,6 +45,41 @@ def fig_to_image(fig=None):
     plt.close(fig if fig else "all")
     return img
 
+def plot_training_curves(train_loss, val_loss, val_acc, architecture_name="Model", output_path=None, is_demo=False):
+    """
+    Generates dual-axis convergence plots for training/validation loss and accuracy.
+    """
+    plt.style.use('seaborn-v0_8-muted')
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
+    epochs = range(len(train_loss))
+    
+    # Subplot 1: Loss Convergence
+    ax1.plot(epochs, train_loss, 'o-', color='#1f77b4', linewidth=2, label='Train Loss')
+    ax1.plot(epochs, val_loss, 's--', color='#ff7f0e', linewidth=2, label='Val Loss')
+    ax1.set_title(f'Loss Convergence ({architecture_name.upper()})', fontsize=12, fontweight='bold')
+    ax1.set_xlabel('Epoch')
+    ax1.set_ylabel('Loss Value')
+    ax1.grid(True, linestyle='--', alpha=0.6)
+    ax1.legend()
+    
+    # Subplot 2: Accuracy Development
+    ax2.plot(epochs, val_acc, 'D-', color='#2ca02c', linewidth=2, label='Val Accuracy')
+    ax2.set_title(f'Accuracy Development ({architecture_name.upper()})', fontsize=12, fontweight='bold')
+    ax2.set_xlabel('Epoch')
+    ax2.set_ylabel('Accuracy (%)')
+    ax2.set_ylim(0, 1.05)
+    ax2.grid(True, linestyle='--', alpha=0.6)
+    ax2.legend(loc='lower right')
+    
+    plt.tight_layout()
+    
+    if is_demo:
+        return fig_to_image(fig)
+    if output_path:
+        fig.savefig(output_path / f"{architecture_name.lower()}_convergence.png", dpi=300)
+    plt.close(fig)
+    return None
+
 def plot_confusion_matrix(y_true, y_pred, architecture_name="Model", output_path=None, is_demo=False):
     """
     Generates a Confusion Matrix to visualize misclassifications.

@@ -14,7 +14,7 @@ namespaces = false
 
 [project]
 name = "animal-classification-aldanondo-malon"
-version = "1.1.0"
+version = "1.2.0"
 description = "A deep learning project to classify 90 animals using VGG architectures."
 readme = "README.md"
 requires-python = ">=3.10,<=3.13"

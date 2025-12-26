@@ -12,18 +12,19 @@ It handles:
 ## 💻 CLI Usage
 Run evaluation on the latest checkpoint:
 ```bash
-python -m animal_classification.modeling.inference --architecture vgg16
+python -m animal_classification.modeling.inference --architecture vgg16 --dataset-choice mini
 ```
-Run on a specific model file:
+Run on a specific model file using the full dataset:
 
 ```bash
-python -m animal_classification.modeling.inference --model-path models/vgg16-best.ckpt
+python -m animal_classification.modeling.inference --model-path models/vgg16-best.ckpt --dataset-choice full
 ```
 """
 
 import argparse
 import glob
 import re
+import os
 from pathlib import Path
 
 import lightning.pytorch as pl
@@ -40,7 +41,6 @@ from animal_classification.utils import get_packaged_mini_data_path
 
 # Configuration Defaults
 DEFAULT_MODEL_PATTERN = "models/*.ckpt"
-DEFAULT_DATA_DIR = "animal_classification/data/mini_animals/animals"
 DEFAULT_OUTPUT_PATH = "reports/inference"
 
 def run_inference( model_path: Path = None, data_dir: Path = None, architecture: str = "vgg16", trained_model: pl.LightningModule = None, output_path: Path = None, batch_size: int = 16, num_workers: int = 2, is_demo: bool = False):
@@ -91,6 +91,9 @@ def run_inference( model_path: Path = None, data_dir: Path = None, architecture:
         # Use the robust utility to find data in the package or locally
         data_dir = get_packaged_mini_data_path()
 
+    if data_dir is None:
+        raise ValueError("Data directory must be provided if not in demo mode.")
+
     data_module = AnimalsDataModule(
         data_dir=data_dir, 
         batch_size=batch_size, 
@@ -103,12 +106,26 @@ def run_inference( model_path: Path = None, data_dir: Path = None, architecture:
     # 2. Model Initialization
     if trained_model is None:
         print(f"🔄 Loading model from checkpoint: {model_path}")
+        
+        # Check for class count mismatch between checkpoint and current data_dir
+        try:
+            checkpoint = torch.load(model_path, map_location="cpu")
+            ckpt_hparams = checkpoint.get("hyper_parameters", {})
+            ckpt_num_classes = ckpt_hparams.get("num_classes")
+            
+            if ckpt_num_classes and ckpt_num_classes != num_classes:
+                print(f"⚠️ Warning: Checkpoint has {ckpt_num_classes} classes, but current data has {num_classes}.")
+                print(f"🔄 Adjusting model to {ckpt_num_classes} classes to prevent size mismatch.")
+                num_classes = ckpt_num_classes
+        except Exception as e:
+            print(f"⚠️ Could not inspect checkpoint metadata: {e}")
+
         # Use Lightning's native loader which handles strict matching automatically
         trained_model = VGGNet.load_from_checkpoint(
             checkpoint_path=model_path,
             architecture=architecture,
             num_classes=num_classes,
-            strict=False # Allow minor mismatches (e.g., if logging keys changed)
+            strict=False # Allow minor mismatches
         )
 
     trained_model.eval()
@@ -119,7 +136,6 @@ def run_inference( model_path: Path = None, data_dir: Path = None, architecture:
     all_probs, all_labels = [], []
     val_dataset = val_loader.dataset
 
-    # Attempt to extract file paths for error analysis (Best Effort)
     try:
         if hasattr(val_dataset, 'samples'): # Standard ImageFolder
             all_paths = [str(Path(s[0]).resolve()) for s in val_dataset.samples]
@@ -142,7 +158,7 @@ def run_inference( model_path: Path = None, data_dir: Path = None, architecture:
     all_labels = np.concatenate(all_labels)
     predictions = all_probs.argmax(axis=1)
 
-    # 4. Persistence (CLI Mode Only)
+    # 4. Persistence
     if not is_demo and output_path:
         np.save(output_path / "val_probs.npy", all_probs)
         np.save(output_path / "val_labels.npy", all_labels)
@@ -155,7 +171,6 @@ def run_inference( model_path: Path = None, data_dir: Path = None, architecture:
         "f1_macro": f1_score(all_labels, predictions, average="macro")
     }
 
-    # Visualization calls
     cm_img = plot_confusion_matrix(all_labels, predictions, architecture, output_path, is_demo)
     roc_img, auc_score = plot_roc_curves(all_labels, all_probs, num_classes, architecture, output_path, is_demo)
     cal_img = plot_calibration_curve(all_labels, all_probs, num_classes, architecture, output_path, is_demo)
@@ -174,42 +189,56 @@ def extract_version(filepath):
 
 def main(): 
     parser = argparse.ArgumentParser(description="Run inference on trained animal classification models.")
-    parser.add_argument("--model-path", type=str, default=DEFAULT_MODEL_PATTERN) 
-    parser.add_argument("--data-dir", type=str, default=DEFAULT_DATA_DIR) 
-    parser.add_argument("--architecture", type=str, default="vgg16", choices=["vgg16", "vgg11"]) 
-    parser.add_argument("--output-path", type=str, default=DEFAULT_OUTPUT_PATH) 
-    parser.add_argument("--batch-size", type=int, default=16) 
+    parser.add_argument("--model-path", type=str, default=DEFAULT_MODEL_PATTERN, help="Path to checkpoint or glob pattern.") 
+    parser.add_argument("--dataset-choice", type=str, default="mini", choices=["mini", "full"], help="Choice of dataset (mini or full).")
+    parser.add_argument("--data-dir", type=str, default=None, help="Manual override for the data directory.") 
+    parser.add_argument("--architecture", type=str.lower, default="vgg16", choices=["vgg16", "vgg11"], help="Model architecture.") 
+    parser.add_argument("--output-path", type=str, default=DEFAULT_OUTPUT_PATH, help="Output directory for reports.") 
+    parser.add_argument("--batch-size", type=int, default=16, help="Batch size for inference.") 
+    parser.add_argument("--num-workers", type=int, default=2, help="Number of data loading workers.") 
     args = parser.parse_args()
 
-    # Locate the latest checkpoint if a pattern is given
+    # 1. Resolve Data Path
+    if args.data_dir:
+        data_path = Path(args.data_dir)
+    elif args.dataset_choice == "mini":
+        data_path = get_packaged_mini_data_path()
+    else: # full
+        # Assumes standard structure created by the download script
+        data_path = Path("data/animals/animals")
+
+    if not data_path.exists():
+        raise FileNotFoundError(f"Selected data directory not found: {data_path}")
+
+    # 2. Locate Checkpoint
     if "*" in args.model_path:
         model_files = glob.glob(args.model_path)
         if not model_files:
             raise FileNotFoundError(f"No checkpoints found matching: {args.model_path}")
-        # Sort by version or modification time
         try:
             target_checkpoint = max(model_files, key=extract_version)
         except Exception:
-            # Fallback to file modification time if versions aren't clear
             model_files.sort(key=os.path.getmtime, reverse=True)
             target_checkpoint = model_files[0]
     else:
         target_checkpoint = args.model_path
 
+    # 3. Execute
     results = run_inference(
         model_path=Path(target_checkpoint),
-        data_dir=Path(args.data_dir),
+        data_dir=data_path,
         architecture=args.architecture,
         output_path=Path(args.output_path),
-        batch_size=args.batch_size
+        batch_size=args.batch_size,
+        num_workers=args.num_workers
     )
 
     print(f"\n✅ Evaluation complete for: {Path(target_checkpoint).name}")
+    print(f"📊 Dataset: {args.dataset_choice} ({data_path})")
     print(f"Accuracy: {results['accuracy']:.4f}")
     print(f"F1 Score: {results['f1_macro']:.4f}")
     print(f"AUC Score: {results['auc_macro']:.4f}")
     print(f"Results saved to: {results['output_path']}")
 
-if __name__ == "main":
-    import os # Needed for fallback sorting in main
+if __name__ == "__main__":
     main()
