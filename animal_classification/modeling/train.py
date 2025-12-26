@@ -217,7 +217,7 @@ if __name__ == "__main__":
     parser.add_argument("--seed", type=int, default=42) 
     parser.add_argument("--test-frac", type=float, default=0.2) 
     parser.add_argument("--max-epochs", type=int, default=5) 
-    parser.add_argument("--batch-size", type=int, default=8)
+    parser.add_argument("--batch-size", type=int, default=16)
 
     args = parser.parse_args()
 
