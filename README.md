@@ -208,7 +208,7 @@ If you want to build and publish your own version (requires uv and PyPI credenti
 uv build
 ```
 
-# 2. Publish to TestPyPI
+2. Publish to TestPyPI
 ```bash
 uv publish --repository testpypi
 ```
