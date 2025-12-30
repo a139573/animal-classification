@@ -12,6 +12,14 @@ It uses **PyTorch** and **PyTorch Lightning** for modeling and provides command-
 * Model training and inference
 * Visualization and interactive dashboards via Gradio
 
+## 🔗 Project Links
+
+Interactive Demo (TestPyPI): [animal-classification-aldanondo-malon](https://test.pypi.org/project/animal-classification-aldanondo-malon/)
+
+API Documentation: https://a139573.github.io/animal-classification/animal_classification.html
+
+Source Code: [GitHub Repository](https://github.com/a139573/animal-classification)
+
 ## ⚡ Hardware & CUDA Compatibility
 
 This project is optimized for NVIDIA Blackwell GPUs (e.g., RTX 5000/6000 Ada/Blackwell series).
@@ -158,6 +166,8 @@ Optional arguments:
 --max-epochs: The max number of epochs for the model to train for. Default: 5
 
 --batch-size: The batch size used by the dataloaders for training. Default: 16
+
+--lr: The learning rate used by the Adam optimizer. Default: 1e-4
 
 ### 4️⃣ Run Inference
 Predicts classes for test images using a trained model.

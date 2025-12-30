@@ -14,9 +14,76 @@ and returning PIL images (Dashboard mode).
 import io
 import numpy as np
 import matplotlib.pyplot as plt
+import random
+import pandas as pd
+from pathlib import Path
 from PIL import Image
 from sklearn.metrics import confusion_matrix, roc_auc_score, roc_curve
 from sklearn.calibration import calibration_curve
+
+# DATA EXPLORATION PLOTS
+
+def get_dataset_stats(data_dir: Path):
+    """Calculates basic statistics for the dataset exploration tab."""
+    class_folders = sorted([d for d in data_dir.iterdir() if d.is_dir()])
+    counts = {d.name: len([f for f in d.glob('*') if f.suffix.lower() in {'.jpg', '.jpeg', '.png', '.bmp', '.webp'}]) for d in class_folders}
+    df = pd.DataFrame(list(counts.items()), columns=['Species', 'Image Count'])
+    return df, len(class_folders), sum(counts.values()), [d.name for d in class_folders]
+
+def get_species_samples(data_dir: Path, species_name: str, num_samples=8):
+    """
+    Returns a list of PIL images for a specific species. 
+    Filters for common image extensions to prevent loading metadata or hidden files.
+    """
+    species_path = data_dir / species_name
+    if not species_path.exists():
+        return []
+    
+    # Filter for valid image formats only
+    valid_extensions = {'.jpg', '.jpeg', '.png', '.bmp', '.webp'}
+    img_paths = [p for p in species_path.glob('*') if p.suffix.lower() in valid_extensions]
+    
+    selected = random.sample(img_paths, min(num_samples, len(img_paths)))
+    return [Image.open(p).convert("RGB") for p in selected]
+
+def plot_color_analysis(data_dir: Path):
+    """
+    Performs RGB profile analysis on a subset of classes for visualization.
+    We take a sample of 25 species alphabetically to keep the plot readable.
+    """
+    class_folders = sorted([d for d in data_dir.iterdir() if d.is_dir()])
+    rgb_means = []
+    names = []
+    
+    # We take a representative sample of 25 species for UI legibility
+    for folder in class_folders[:25]: 
+        imgs = [f for f in folder.glob('*') if f.suffix.lower() in {'.jpg', '.jpeg', '.png'}]
+        imgs = imgs[:10] # Sample 10 images for average
+        
+        if not imgs: continue
+        
+        class_rgb = []
+        for p in imgs:
+            with Image.open(p) as img:
+                arr = np.array(img.convert("RGB"))
+                class_rgb.append(arr.mean(axis=(0,1)))
+        
+        rgb_means.append(np.mean(class_rgb, axis=0))
+        names.append(folder.name)
+    
+    df = pd.DataFrame(rgb_means, columns=['R', 'G', 'B'], index=names) / 255.0
+    
+    fig, ax = plt.subplots(figsize=(10, 6))
+    df.plot(kind='bar', stacked=True, color=['#e74c3c', '#2ecc71', '#3498db'], ax=ax, alpha=0.8)
+    ax.set_title("Average Color Profiles (Subset of 25 Species)")
+    ax.set_ylabel("Mean Intensity")
+    plt.xticks(rotation=45, ha='right', fontsize=9)
+    plt.tight_layout()
+    
+    return fig_to_image(fig)
+
+
+# MODEL EVALUATION PLOTS
 
 def fig_to_image(fig=None):
     """
@@ -266,3 +333,4 @@ def plot_calibration_curve(y_true, y_probs, num_classes, architecture_name="Mode
     except Exception as e:
         print(f"⚠️ Calibration plot failed: {e}")
         return None
+ 

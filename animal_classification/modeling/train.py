@@ -12,12 +12,7 @@ You can train a model directly from your terminal:
 
 ```bash
 # Train VGG16 for 10 epochs on the mini dataset
-python -m animal_classification.modeling.train --architecture vgg16 --max-epochs 10
-```
-
-```bash
-# Train VGG11 with a custom batch size
-python -m animal_classification.modeling.train --architecture vgg11 --batch-size 32
+python -m animal_classification.modeling.train --architecture vgg16 --max-epochs 10 --lr 1e-4
 ```
 """
 
@@ -44,10 +39,7 @@ from animal_classification.utils import get_accelerator, get_packaged_mini_data_
 torch.set_float32_matmul_precision("medium")
 
 class GradioProgressCallback(pl.Callback): 
-    """ Hooks into the training loop to update the Gradio web UI progress bar.
-
-    This is only used when `is_demo=True`.
-    """
+    """ Hooks into the training loop to update the Gradio web UI progress bar. """
     def __init__(self, progress_fn, max_epochs):
         super().__init__()
         self.progress_fn = progress_fn
@@ -59,7 +51,6 @@ class GradioProgressCallback(pl.Callback):
             self.total_batches = len(trainer.train_dataloader)
 
         current_epoch = trainer.current_epoch
-        # Calculate global progress
         total_steps = self.max_epochs * self.total_batches
         global_step = current_epoch * self.total_batches + batch_idx + 1
         pct = global_step / total_steps
@@ -69,35 +60,8 @@ class GradioProgressCallback(pl.Callback):
             desc=f"Epoch {current_epoch+1}/{self.max_epochs} — batch {batch_idx+1}/{self.total_batches}"
         )
 
-def main( architecture: str = "vgg16", dataset_choice: str = "mini", seed: int = 42, test_frac: float = 0.2, max_epochs: int = 5, batch_size: int = 16, num_workers: int = 2, is_demo: bool = False, progress: gr.Progress = None, ): 
-    """ Executes the training pipeline.
-
-    Parameters
-    ----------
-    architecture : str.
-        The model backbone to use. Options: `'vgg16'`, `'vgg11'`.
-    dataset_choice : str.
-        Which dataset folder to use. Options: `'mini'` (default), `'full'`.
-    seed : int.
-        Random seed for reproducibility.
-    test_frac : float.
-        Fraction of data to hold out for testing.
-    max_epochs : int.
-        Total number of training epochs.
-    batch_size : int.
-        Number of images per training batch.
-    num_workers : int.
-        Number of CPU subprocesses for data loading.
-    is_demo : bool.
-        If `True`, runs in Dashboard mode (in-memory).
-    progress : gradio.Progress, optional.
-        Gradio progress tracker.
-
-    Returns
-    -------
-    dict
-        A dictionary containing training metrics and the model object.
-    """
+def main( architecture: str = "vgg16", dataset_choice: str = "mini", seed: int = 42, test_frac: float = 0.2, max_epochs: int = 5, batch_size: int = 16, lr: float = 1e-3, num_workers: int = 2, is_demo: bool = False, progress: gr.Progress = None, ): 
+    """ Executes the training pipeline. """
 
     # 1. Setup Hardware
     accelerator = get_accelerator()
@@ -129,15 +93,15 @@ def main( architecture: str = "vgg16", dataset_choice: str = "mini", seed: int =
     )
     data_module.setup()
 
-    # 4. Initialize Model
+    # 4. Initialize Model with custom Learning Rate
     net = VGGNet(
         architecture=architecture, 
-        num_classes=len(data_module.class_names)
+        num_classes=len(data_module.class_names),
+        lr=lr
     )
 
     # 5. Setup Callbacks & Loggers
     callbacks = []
-
     if is_demo:
         tmp_dir = tempfile.TemporaryDirectory()
         logs_dir = Path(tmp_dir.name)
@@ -194,8 +158,6 @@ def main( architecture: str = "vgg16", dataset_choice: str = "mini", seed: int =
         val_acc = metrics['val_acc'].dropna().tolist()
         final_acc = val_acc[-1] if val_acc else 0.0
 
-        # if not is_demo:
-        # --- IMPROVED THEME: DUAL-AXIS CONVERGENCE PLOT ---
         plot_training_curves(train_loss, val_loss, val_acc, architecture_name=architecture, output_path=None, is_demo=is_demo)
     else:
         final_acc = 0.0
@@ -218,6 +180,7 @@ if __name__ == "__main__":
     parser.add_argument("--test-frac", type=float, default=0.2) 
     parser.add_argument("--max-epochs", type=int, default=5) 
     parser.add_argument("--batch-size", type=int, default=16)
+    parser.add_argument("--lr", type=float, default=1e-3, help="Learning rate for Adam optimizer")
 
     args = parser.parse_args()
 
@@ -228,4 +191,5 @@ if __name__ == "__main__":
         test_frac=args.test_frac,
         max_epochs=args.max_epochs,
         batch_size=args.batch_size,
+        lr=args.lr
     )
