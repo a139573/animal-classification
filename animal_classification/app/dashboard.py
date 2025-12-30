@@ -37,16 +37,17 @@ from matplotlib import pyplot as plt
 
 # --- Project Imports ---# 
 # These imports link the GUI to the core logic libraries
-from ..modeling.train import main as train_main
-from ..modeling.inference import run_inference
-from ..modeling.metrics import (
+from animal_classification.modeling.train import main as train_main
+from animal_classification.modeling.inference import run_inference
+from animal_classification.modeling.metrics import (
     get_dataset_stats, 
     get_species_samples, 
-    plot_color_analysis
+    plot_color_analysis,
 )
+from animal_classification.utils import get_packaged_mini_data_path
 
 # === CONSTANTS & PATHS ===
-DEFAULT_DATA_DIR = Path("animal_classification/data/mini_animals/animals")
+DEFAULT_DATA_DIR = get_packaged_mini_data_path
 DEFAULT_MODELS_DIR = Path("models")
 
 # === WORKFLOW 1: DATA EXPLORATION ===

@@ -31,9 +31,6 @@ def get_accelerator():
     # no CUDA at all
     return "cpu"
 
-
-
-
 def get_packaged_mini_data_path():
     """
     Locates the 'mini_animals' dataset directory.
