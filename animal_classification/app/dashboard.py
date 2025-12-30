@@ -47,7 +47,7 @@ from animal_classification.modeling.metrics import (
 from animal_classification.utils import get_packaged_mini_data_path
 
 # === CONSTANTS & PATHS ===
-DEFAULT_DATA_DIR = get_packaged_mini_data_path
+DEFAULT_DATA_DIR = get_packaged_mini_data_path()
 DEFAULT_MODELS_DIR = Path("models")
 
 # === WORKFLOW 1: DATA EXPLORATION ===

@@ -47,14 +47,14 @@ The following installation instructions are meant for a Linux-based operating sy
 Use *uvx* (assuming *uv* is installed) to download and run the Gradio demo instantly in an isolated, temporary environment. This includes a mini dataset for quick experiments.
 
 ```bash
-uvx --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ --from "animal-classification-aldanondo-malon==1.2.1" animal-dashboard
+uvx --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ --from "animal-classification-aldanondo-malon==1.3.1" animal-dashboard
 ```
 
 ### 2. 📦 Install as a Dependency
 To use this project as a library within your own code:
 
 ```bash
-uv add --default-index https://test.pypi.org/simple/ --index https://pypi.org/simple/ "animal-classification-aldanondo-malon==1.2.1"
+uv add --default-index https://test.pypi.org/simple/ --index https://pypi.org/simple/ "animal-classification-aldanondo-malon==1.3.1"
 ```
 
 ### 3. 🔧 Local Development (Your own repo / experiments)
@@ -79,7 +79,7 @@ uv pip install -e .
 If you downloaded the pre-built wheel file (.whl) from testpypi, use the following command:
 
 ```bash
-uv pip install animal-classification-aldanondo-malon-1.2.1.whl
+uv pip install animal-classification-aldanondo-malon-1.3.1.whl
 ```
 
 ## 🧩 Project Structure
