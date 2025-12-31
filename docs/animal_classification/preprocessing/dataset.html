@@ -22,10 +22,14 @@
   <path fill-rule="evenodd" d="M4.146 8.354a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5H14.5a.5.5 0 0 1 0 1H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3z"/>
 </svg>                &nbsp;animal_classification.preprocessing</a>
 
-            <img src="https://em-content.zobj.net/source/microsoft-teams/337/lion_1f981.png" class="logo" alt="project logo"/>
 
             <input type="search" placeholder="Search..." role="searchbox" aria-label="search"
                    pattern=".+" required>
+
+            <h2>Contents</h2>
+            <ul>
+  <li><a href="#animals-data-module">🖼️ Animals Data Module</a></li>
+</ul>
 
 
 
@@ -44,16 +48,19 @@
                                 <a class="variable" href="#AnimalsDataModule.batch_size">batch_size</a>
                         </li>
                         <li>
-                                <a class="variable" href="#AnimalsDataModule.num_workers">num_workers</a>
+                                <a class="variable" href="#AnimalsDataModule.seed">seed</a>
                         </li>
                         <li>
                                 <a class="variable" href="#AnimalsDataModule.test_frac">test_frac</a>
                         </li>
                         <li>
-                                <a class="variable" href="#AnimalsDataModule.seed">seed</a>
+                                <a class="variable" href="#AnimalsDataModule.num_workers">num_workers</a>
                         </li>
                         <li>
-                                <a class="variable" href="#AnimalsDataModule.transform">transform</a>
+                                <a class="variable" href="#AnimalsDataModule.train_transform">train_transform</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#AnimalsDataModule.val_transform">val_transform</a>
                         </li>
                         <li>
                                 <a class="function" href="#AnimalsDataModule.setup">setup</a>
@@ -73,7 +80,6 @@
     </ul>
 
 
-            <footer>Animal Classification v1.0 • Built with PyTorch &amp; Lightning</footer>
 
         <a class="attribution" title="pdoc: Python API documentation generator" href="https://pdoc.dev" target="_blank">
             built with <span class="visually-hidden">pdoc</span><img
@@ -87,123 +93,127 @@
                     <h1 class="modulename">
 <a href="./../../animal_classification.html">animal_classification</a><wbr>.<a href="./../preprocessing.html">preprocessing</a><wbr>.dataset    </h1>
 
-                
+                        <div class="docstring"><h1 id="animals-data-module">🖼️ Animals Data Module</h1>
+
+<p>This module handles the loading and preprocessing of the animal images.
+It uses PyTorch Lightning's <code>DataModule</code> to organize:</p>
+
+<ol>
+<li><strong>Transformations:</strong> Mandatory normalization and Data Augmentation for training.</li>
+<li><strong>Splitting:</strong> Dividing the dataset into training and validation sets.</li>
+<li><strong>Dataloaders:</strong> Batching and shuffling for CPU/GPU processing.</li>
+</ol>
+</div>
+
                         <input id="mod-dataset-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 
                         <label class="view-source-button" for="mod-dataset-view-source"><span>View Source</span></label>
 
-                        <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos">  1</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">lightning.pytorch</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pl</span>
-</span><span id="L-2"><a href="#L-2"><span class="linenos">  2</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
-</span><span id="L-3"><a href="#L-3"><span class="linenos">  3</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">torch.utils.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataLoader</span><span class="p">,</span> <span class="n">random_split</span>
-</span><span id="L-4"><a href="#L-4"><span class="linenos">  4</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">torchvision</span><span class="w"> </span><span class="kn">import</span> <span class="n">datasets</span><span class="p">,</span> <span class="n">transforms</span>
-</span><span id="L-5"><a href="#L-5"><span class="linenos">  5</span></a>
-</span><span id="L-6"><a href="#L-6"><span class="linenos">  6</span></a><span class="k">class</span><span class="w"> </span><span class="nc">AnimalsDataModule</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">LightningDataModule</span><span class="p">):</span>
-</span><span id="L-7"><a href="#L-7"><span class="linenos">  7</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-8"><a href="#L-8"><span class="linenos">  8</span></a><span class="sd">    PyTorch Lightning DataModule for an animal classification dataset.</span>
-</span><span id="L-9"><a href="#L-9"><span class="linenos">  9</span></a>
-</span><span id="L-10"><a href="#L-10"><span class="linenos"> 10</span></a><span class="sd">    This class handles the loading, transformation, and splitting (training,</span>
-</span><span id="L-11"><a href="#L-11"><span class="linenos"> 11</span></a><span class="sd">    validation, test) of the image dataset.</span>
-</span><span id="L-12"><a href="#L-12"><span class="linenos"> 12</span></a>
-</span><span id="L-13"><a href="#L-13"><span class="linenos"> 13</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="L-14"><a href="#L-14"><span class="linenos"> 14</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_dir</span><span class="o">=</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> <span class="n">num_workers</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">test_frac</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">123</span><span class="p">):</span>
-</span><span id="L-15"><a href="#L-15"><span class="linenos"> 15</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-16"><a href="#L-16"><span class="linenos"> 16</span></a><span class="sd">        Initializes the DataModule.</span>
-</span><span id="L-17"><a href="#L-17"><span class="linenos"> 17</span></a>
-</span><span id="L-18"><a href="#L-18"><span class="linenos"> 18</span></a><span class="sd">        Parameters</span>
-</span><span id="L-19"><a href="#L-19"><span class="linenos"> 19</span></a><span class="sd">        ----------</span>
-</span><span id="L-20"><a href="#L-20"><span class="linenos"> 20</span></a><span class="sd">        data_dir : str, optional.</span>
-</span><span id="L-21"><a href="#L-21"><span class="linenos"> 21</span></a><span class="sd">            Directory containing the dataset (default is &quot;.&quot;).</span>
+                        <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos">  1</span></a><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-2"><a href="#L-2"><span class="linenos">  2</span></a><span class="sd"># 🖼️ Animals Data Module</span>
+</span><span id="L-3"><a href="#L-3"><span class="linenos">  3</span></a>
+</span><span id="L-4"><a href="#L-4"><span class="linenos">  4</span></a><span class="sd">This module handles the loading and preprocessing of the animal images.</span>
+</span><span id="L-5"><a href="#L-5"><span class="linenos">  5</span></a><span class="sd">It uses PyTorch Lightning&#39;s `DataModule` to organize:</span>
+</span><span id="L-6"><a href="#L-6"><span class="linenos">  6</span></a><span class="sd">1.  **Transformations:** Mandatory normalization and Data Augmentation for training.</span>
+</span><span id="L-7"><a href="#L-7"><span class="linenos">  7</span></a><span class="sd">2.  **Splitting:** Dividing the dataset into training and validation sets.</span>
+</span><span id="L-8"><a href="#L-8"><span class="linenos">  8</span></a><span class="sd">3.  **Dataloaders:** Batching and shuffling for CPU/GPU processing.</span>
+</span><span id="L-9"><a href="#L-9"><span class="linenos">  9</span></a><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-10"><a href="#L-10"><span class="linenos"> 10</span></a>
+</span><span id="L-11"><a href="#L-11"><span class="linenos"> 11</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+</span><span id="L-12"><a href="#L-12"><span class="linenos"> 12</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span>
+</span><span id="L-13"><a href="#L-13"><span class="linenos"> 13</span></a>
+</span><span id="L-14"><a href="#L-14"><span class="linenos"> 14</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+</span><span id="L-15"><a href="#L-15"><span class="linenos"> 15</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">lightning.pytorch</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pl</span>
+</span><span id="L-16"><a href="#L-16"><span class="linenos"> 16</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">torch.utils.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataLoader</span><span class="p">,</span> <span class="n">Subset</span>
+</span><span id="L-17"><a href="#L-17"><span class="linenos"> 17</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">torchvision</span><span class="w"> </span><span class="kn">import</span> <span class="n">transforms</span><span class="p">,</span> <span class="n">datasets</span>
+</span><span id="L-18"><a href="#L-18"><span class="linenos"> 18</span></a>
+</span><span id="L-19"><a href="#L-19"><span class="linenos"> 19</span></a><span class="k">class</span><span class="w"> </span><span class="nc">AnimalsDataModule</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">LightningDataModule</span><span class="p">):</span>
+</span><span id="L-20"><a href="#L-20"><span class="linenos"> 20</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-21"><a href="#L-21"><span class="linenos"> 21</span></a><span class="sd">    LightningDataModule for the Animal Image Dataset.</span>
 </span><span id="L-22"><a href="#L-22"><span class="linenos"> 22</span></a>
-</span><span id="L-23"><a href="#L-23"><span class="linenos"> 23</span></a><span class="sd">        batch_size : int, optional.</span>
-</span><span id="L-24"><a href="#L-24"><span class="linenos"> 24</span></a><span class="sd">            Batch size for the DataLoaders (default is 32).</span>
-</span><span id="L-25"><a href="#L-25"><span class="linenos"> 25</span></a>
-</span><span id="L-26"><a href="#L-26"><span class="linenos"> 26</span></a><span class="sd">        num_workers : int, optional.</span>
-</span><span id="L-27"><a href="#L-27"><span class="linenos"> 27</span></a><span class="sd">            Number of workers for the DataLoaders (default is 4).</span>
-</span><span id="L-28"><a href="#L-28"><span class="linenos"> 28</span></a>
-</span><span id="L-29"><a href="#L-29"><span class="linenos"> 29</span></a><span class="sd">        test_frac : float, optional.</span>
-</span><span id="L-30"><a href="#L-30"><span class="linenos"> 30</span></a><span class="sd">            Fraction of the dataset to reserve for testing (default is 0.2).</span>
-</span><span id="L-31"><a href="#L-31"><span class="linenos"> 31</span></a>
-</span><span id="L-32"><a href="#L-32"><span class="linenos"> 32</span></a><span class="sd">        seed : int, optional.</span>
-</span><span id="L-33"><a href="#L-33"><span class="linenos"> 33</span></a><span class="sd">            Random seed for data splitting (default is 123).</span>
-</span><span id="L-34"><a href="#L-34"><span class="linenos"> 34</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="L-35"><a href="#L-35"><span class="linenos"> 35</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-</span><span id="L-36"><a href="#L-36"><span class="linenos"> 36</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span> <span class="o">=</span> <span class="n">data_dir</span>
-</span><span id="L-37"><a href="#L-37"><span class="linenos"> 37</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Path to the data directory.&quot;&quot;&quot;</span>
-</span><span id="L-38"><a href="#L-38"><span class="linenos"> 38</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">=</span> <span class="n">batch_size</span>
-</span><span id="L-39"><a href="#L-39"><span class="linenos"> 39</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Number of samples per batch.&quot;&quot;&quot;</span>
-</span><span id="L-40"><a href="#L-40"><span class="linenos"> 40</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">num_workers</span> <span class="o">=</span> <span class="n">num_workers</span>
-</span><span id="L-41"><a href="#L-41"><span class="linenos"> 41</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Number of subprocesses for data loading.&quot;&quot;&quot;</span>
-</span><span id="L-42"><a href="#L-42"><span class="linenos"> 42</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">test_frac</span> <span class="o">=</span> <span class="n">test_frac</span>
-</span><span id="L-43"><a href="#L-43"><span class="linenos"> 43</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fraction of the dataset to reserve for testing.&quot;&quot;&quot;</span>
-</span><span id="L-44"><a href="#L-44"><span class="linenos"> 44</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">seed</span> <span class="o">=</span> <span class="n">seed</span>
-</span><span id="L-45"><a href="#L-45"><span class="linenos"> 45</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Random seed for data splitting.&quot;&quot;&quot;</span>
-</span><span id="L-46"><a href="#L-46"><span class="linenos"> 46</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">transform</span> <span class="o">=</span> <span class="n">transforms</span><span class="o">.</span><span class="n">Compose</span><span class="p">([</span>
-</span><span id="L-47"><a href="#L-47"><span class="linenos"> 47</span></a>            <span class="n">transforms</span><span class="o">.</span><span class="n">Resize</span><span class="p">((</span><span class="mi">224</span><span class="p">,</span> <span class="mi">224</span><span class="p">)),</span>
-</span><span id="L-48"><a href="#L-48"><span class="linenos"> 48</span></a>            <span class="n">transforms</span><span class="o">.</span><span class="n">ToTensor</span><span class="p">(),</span>
-</span><span id="L-49"><a href="#L-49"><span class="linenos"> 49</span></a>            <span class="n">transforms</span><span class="o">.</span><span class="n">Normalize</span><span class="p">(</span><span class="n">mean</span><span class="o">=</span><span class="p">[</span><span class="mf">0.485</span><span class="p">,</span> <span class="mf">0.456</span><span class="p">,</span> <span class="mf">0.406</span><span class="p">],</span> <span class="n">std</span><span class="o">=</span><span class="p">[</span><span class="mf">0.229</span><span class="p">,</span> <span class="mf">0.224</span><span class="p">,</span> <span class="mf">0.225</span><span class="p">]),</span>
-</span><span id="L-50"><a href="#L-50"><span class="linenos"> 50</span></a>        <span class="p">])</span>
-</span><span id="L-51"><a href="#L-51"><span class="linenos"> 51</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Transformations applied to each image.&quot;&quot;&quot;</span>
-</span><span id="L-52"><a href="#L-52"><span class="linenos"> 52</span></a>        
-</span><span id="L-53"><a href="#L-53"><span class="linenos"> 53</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stage</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-</span><span id="L-54"><a href="#L-54"><span class="linenos"> 54</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-55"><a href="#L-55"><span class="linenos"> 55</span></a><span class="sd">        Prepares the data and performs the train/val/test split.</span>
-</span><span id="L-56"><a href="#L-56"><span class="linenos"> 56</span></a>
-</span><span id="L-57"><a href="#L-57"><span class="linenos"> 57</span></a><span class="sd">        This method is called automatically by PyTorch Lightning. It loads the</span>
-</span><span id="L-58"><a href="#L-58"><span class="linenos"> 58</span></a><span class="sd">        full dataset, calculates the splits, and assigns the</span>
-</span><span id="L-59"><a href="#L-59"><span class="linenos"> 59</span></a><span class="sd">        `train_data`, `val_data`, and `test_data` subsets.</span>
-</span><span id="L-60"><a href="#L-60"><span class="linenos"> 60</span></a>
-</span><span id="L-61"><a href="#L-61"><span class="linenos"> 61</span></a><span class="sd">        Parameters</span>
-</span><span id="L-62"><a href="#L-62"><span class="linenos"> 62</span></a><span class="sd">        ----------</span>
-</span><span id="L-63"><a href="#L-63"><span class="linenos"> 63</span></a><span class="sd">        stage : str, optional.</span>
-</span><span id="L-64"><a href="#L-64"><span class="linenos"> 64</span></a><span class="sd">            Lightning stage (e.g., &quot;fit&quot;, &quot;test&quot;). Not used in this</span>
-</span><span id="L-65"><a href="#L-65"><span class="linenos"> 65</span></a><span class="sd">            implementation, as the data is split only once.</span>
-</span><span id="L-66"><a href="#L-66"><span class="linenos"> 66</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="L-67"><a href="#L-67"><span class="linenos"> 67</span></a>        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;train_data&quot;</span><span class="p">):</span>
-</span><span id="L-68"><a href="#L-68"><span class="linenos"> 68</span></a>            <span class="n">full_dataset</span> <span class="o">=</span> <span class="n">datasets</span><span class="o">.</span><span class="n">ImageFolder</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">)</span>
-</span><span id="L-69"><a href="#L-69"><span class="linenos"> 69</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">class_names</span> <span class="o">=</span> <span class="n">full_dataset</span><span class="o">.</span><span class="n">classes</span>
-</span><span id="L-70"><a href="#L-70"><span class="linenos"> 70</span></a>
-</span><span id="L-71"><a href="#L-71"><span class="linenos"> 71</span></a>            <span class="n">n_total</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">full_dataset</span><span class="p">)</span>
-</span><span id="L-72"><a href="#L-72"><span class="linenos"> 72</span></a>            <span class="n">n_test</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">n_total</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_frac</span><span class="p">)</span>
-</span><span id="L-73"><a href="#L-73"><span class="linenos"> 73</span></a>            <span class="n">n_val</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">n_total</span> <span class="o">-</span> <span class="n">n_test</span><span class="p">)</span> <span class="o">*</span> <span class="mf">0.25</span><span class="p">)</span>
-</span><span id="L-74"><a href="#L-74"><span class="linenos"> 74</span></a>            <span class="n">n_train</span> <span class="o">=</span> <span class="n">n_total</span> <span class="o">-</span> <span class="n">n_val</span> <span class="o">-</span> <span class="n">n_test</span>
-</span><span id="L-75"><a href="#L-75"><span class="linenos"> 75</span></a>
-</span><span id="L-76"><a href="#L-76"><span class="linenos"> 76</span></a>            <span class="n">generator</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">Generator</span><span class="p">()</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">seed</span><span class="p">)</span>
-</span><span id="L-77"><a href="#L-77"><span class="linenos"> 77</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">train_data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">val_data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_data</span> <span class="o">=</span> <span class="n">random_split</span><span class="p">(</span>
-</span><span id="L-78"><a href="#L-78"><span class="linenos"> 78</span></a>                <span class="n">full_dataset</span><span class="p">,</span> <span class="p">[</span><span class="n">n_train</span><span class="p">,</span> <span class="n">n_val</span><span class="p">,</span> <span class="n">n_test</span><span class="p">],</span> <span class="n">generator</span><span class="o">=</span><span class="n">generator</span>
-</span><span id="L-79"><a href="#L-79"><span class="linenos"> 79</span></a>            <span class="p">)</span>
+</span><span id="L-23"><a href="#L-23"><span class="linenos"> 23</span></a><span class="sd">    Ensures that images are augmented during training and normalized </span>
+</span><span id="L-24"><a href="#L-24"><span class="linenos"> 24</span></a><span class="sd">    correctly for pre-trained VGG architectures.</span>
+</span><span id="L-25"><a href="#L-25"><span class="linenos"> 25</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="L-26"><a href="#L-26"><span class="linenos"> 26</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_dir</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">16</span><span class="p">,</span> <span class="n">seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">42</span><span class="p">,</span> <span class="n">test_frac</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.2</span><span class="p">,</span> <span class="n">num_workers</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">):</span>
+</span><span id="L-27"><a href="#L-27"><span class="linenos"> 27</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+</span><span id="L-28"><a href="#L-28"><span class="linenos"> 28</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">data_dir</span><span class="p">)</span>
+</span><span id="L-29"><a href="#L-29"><span class="linenos"> 29</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">=</span> <span class="n">batch_size</span>
+</span><span id="L-30"><a href="#L-30"><span class="linenos"> 30</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">seed</span> <span class="o">=</span> <span class="n">seed</span>
+</span><span id="L-31"><a href="#L-31"><span class="linenos"> 31</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">test_frac</span> <span class="o">=</span> <span class="n">test_frac</span>
+</span><span id="L-32"><a href="#L-32"><span class="linenos"> 32</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">num_workers</span> <span class="o">=</span> <span class="n">num_workers</span>
+</span><span id="L-33"><a href="#L-33"><span class="linenos"> 33</span></a>        
+</span><span id="L-34"><a href="#L-34"><span class="linenos"> 34</span></a>        <span class="c1"># 1. Training Transformations (Data Augmentation)</span>
+</span><span id="L-35"><a href="#L-35"><span class="linenos"> 35</span></a>        <span class="c1"># Random cropping and flipping are essential to prevent overfitting on small datasets</span>
+</span><span id="L-36"><a href="#L-36"><span class="linenos"> 36</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">train_transform</span> <span class="o">=</span> <span class="n">transforms</span><span class="o">.</span><span class="n">Compose</span><span class="p">([</span>
+</span><span id="L-37"><a href="#L-37"><span class="linenos"> 37</span></a>            <span class="n">transforms</span><span class="o">.</span><span class="n">RandomResizedCrop</span><span class="p">(</span><span class="mi">224</span><span class="p">),</span>
+</span><span id="L-38"><a href="#L-38"><span class="linenos"> 38</span></a>            <span class="n">transforms</span><span class="o">.</span><span class="n">RandomHorizontalFlip</span><span class="p">(),</span>
+</span><span id="L-39"><a href="#L-39"><span class="linenos"> 39</span></a>            <span class="n">transforms</span><span class="o">.</span><span class="n">ColorJitter</span><span class="p">(</span><span class="n">brightness</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">contrast</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">saturation</span><span class="o">=</span><span class="mf">0.2</span><span class="p">),</span>
+</span><span id="L-40"><a href="#L-40"><span class="linenos"> 40</span></a>            <span class="n">transforms</span><span class="o">.</span><span class="n">ToTensor</span><span class="p">(),</span>
+</span><span id="L-41"><a href="#L-41"><span class="linenos"> 41</span></a>            <span class="n">transforms</span><span class="o">.</span><span class="n">Normalize</span><span class="p">(</span>
+</span><span id="L-42"><a href="#L-42"><span class="linenos"> 42</span></a>                <span class="n">mean</span><span class="o">=</span><span class="p">[</span><span class="mf">0.485</span><span class="p">,</span> <span class="mf">0.456</span><span class="p">,</span> <span class="mf">0.406</span><span class="p">],</span> 
+</span><span id="L-43"><a href="#L-43"><span class="linenos"> 43</span></a>                <span class="n">std</span><span class="o">=</span><span class="p">[</span><span class="mf">0.229</span><span class="p">,</span> <span class="mf">0.224</span><span class="p">,</span> <span class="mf">0.225</span><span class="p">]</span>
+</span><span id="L-44"><a href="#L-44"><span class="linenos"> 44</span></a>            <span class="p">)</span>
+</span><span id="L-45"><a href="#L-45"><span class="linenos"> 45</span></a>        <span class="p">])</span>
+</span><span id="L-46"><a href="#L-46"><span class="linenos"> 46</span></a>
+</span><span id="L-47"><a href="#L-47"><span class="linenos"> 47</span></a>        <span class="c1"># 2. Validation/Test Transformations (Deterministic)</span>
+</span><span id="L-48"><a href="#L-48"><span class="linenos"> 48</span></a>        <span class="c1"># Consistent with ImageNet validation protocols</span>
+</span><span id="L-49"><a href="#L-49"><span class="linenos"> 49</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">val_transform</span> <span class="o">=</span> <span class="n">transforms</span><span class="o">.</span><span class="n">Compose</span><span class="p">([</span>
+</span><span id="L-50"><a href="#L-50"><span class="linenos"> 50</span></a>            <span class="n">transforms</span><span class="o">.</span><span class="n">Resize</span><span class="p">(</span><span class="mi">256</span><span class="p">),</span>
+</span><span id="L-51"><a href="#L-51"><span class="linenos"> 51</span></a>            <span class="n">transforms</span><span class="o">.</span><span class="n">CenterCrop</span><span class="p">(</span><span class="mi">224</span><span class="p">),</span>
+</span><span id="L-52"><a href="#L-52"><span class="linenos"> 52</span></a>            <span class="n">transforms</span><span class="o">.</span><span class="n">ToTensor</span><span class="p">(),</span>
+</span><span id="L-53"><a href="#L-53"><span class="linenos"> 53</span></a>            <span class="n">transforms</span><span class="o">.</span><span class="n">Normalize</span><span class="p">(</span>
+</span><span id="L-54"><a href="#L-54"><span class="linenos"> 54</span></a>                <span class="n">mean</span><span class="o">=</span><span class="p">[</span><span class="mf">0.485</span><span class="p">,</span> <span class="mf">0.456</span><span class="p">,</span> <span class="mf">0.406</span><span class="p">],</span> 
+</span><span id="L-55"><a href="#L-55"><span class="linenos"> 55</span></a>                <span class="n">std</span><span class="o">=</span><span class="p">[</span><span class="mf">0.229</span><span class="p">,</span> <span class="mf">0.224</span><span class="p">,</span> <span class="mf">0.225</span><span class="p">]</span>
+</span><span id="L-56"><a href="#L-56"><span class="linenos"> 56</span></a>            <span class="p">)</span>
+</span><span id="L-57"><a href="#L-57"><span class="linenos"> 57</span></a>        <span class="p">])</span>
+</span><span id="L-58"><a href="#L-58"><span class="linenos"> 58</span></a>
+</span><span id="L-59"><a href="#L-59"><span class="linenos"> 59</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stage</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+</span><span id="L-60"><a href="#L-60"><span class="linenos"> 60</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-61"><a href="#L-61"><span class="linenos"> 61</span></a><span class="sd">        Loads the dataset and performs the train/validation split using </span>
+</span><span id="L-62"><a href="#L-62"><span class="linenos"> 62</span></a><span class="sd">        distinct transformation pipelines for each subset.</span>
+</span><span id="L-63"><a href="#L-63"><span class="linenos"> 63</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="L-64"><a href="#L-64"><span class="linenos"> 64</span></a>        <span class="c1"># We create two instances of the dataset pointing to the same root</span>
+</span><span id="L-65"><a href="#L-65"><span class="linenos"> 65</span></a>        <span class="c1"># but with different transformations.</span>
+</span><span id="L-66"><a href="#L-66"><span class="linenos"> 66</span></a>        <span class="n">train_full</span> <span class="o">=</span> <span class="n">datasets</span><span class="o">.</span><span class="n">ImageFolder</span><span class="p">(</span><span class="n">root</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">train_transform</span><span class="p">)</span>
+</span><span id="L-67"><a href="#L-67"><span class="linenos"> 67</span></a>        <span class="n">val_full</span> <span class="o">=</span> <span class="n">datasets</span><span class="o">.</span><span class="n">ImageFolder</span><span class="p">(</span><span class="n">root</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">val_transform</span><span class="p">)</span>
+</span><span id="L-68"><a href="#L-68"><span class="linenos"> 68</span></a>        
+</span><span id="L-69"><a href="#L-69"><span class="linenos"> 69</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">class_names</span> <span class="o">=</span> <span class="n">train_full</span><span class="o">.</span><span class="n">classes</span>
+</span><span id="L-70"><a href="#L-70"><span class="linenos"> 70</span></a>        
+</span><span id="L-71"><a href="#L-71"><span class="linenos"> 71</span></a>        <span class="c1"># Logic to ensure the same indices are used for splitting despite having two objects</span>
+</span><span id="L-72"><a href="#L-72"><span class="linenos"> 72</span></a>        <span class="n">num_samples</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">train_full</span><span class="p">)</span>
+</span><span id="L-73"><a href="#L-73"><span class="linenos"> 73</span></a>        <span class="n">indices</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randperm</span><span class="p">(</span><span class="n">num_samples</span><span class="p">,</span> <span class="n">generator</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">Generator</span><span class="p">()</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">seed</span><span class="p">))</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+</span><span id="L-74"><a href="#L-74"><span class="linenos"> 74</span></a>        
+</span><span id="L-75"><a href="#L-75"><span class="linenos"> 75</span></a>        <span class="n">n_val</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">num_samples</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_frac</span><span class="p">)</span>
+</span><span id="L-76"><a href="#L-76"><span class="linenos"> 76</span></a>        
+</span><span id="L-77"><a href="#L-77"><span class="linenos"> 77</span></a>        <span class="c1"># Create subsets that share the underlying data but apply the correct transform</span>
+</span><span id="L-78"><a href="#L-78"><span class="linenos"> 78</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">train_ds</span> <span class="o">=</span> <span class="n">Subset</span><span class="p">(</span><span class="n">train_full</span><span class="p">,</span> <span class="n">indices</span><span class="p">[</span><span class="n">n_val</span><span class="p">:])</span>
+</span><span id="L-79"><a href="#L-79"><span class="linenos"> 79</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">val_ds</span> <span class="o">=</span> <span class="n">Subset</span><span class="p">(</span><span class="n">val_full</span><span class="p">,</span> <span class="n">indices</span><span class="p">[:</span><span class="n">n_val</span><span class="p">])</span>
 </span><span id="L-80"><a href="#L-80"><span class="linenos"> 80</span></a>
 </span><span id="L-81"><a href="#L-81"><span class="linenos"> 81</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">train_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="L-82"><a href="#L-82"><span class="linenos"> 82</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-83"><a href="#L-83"><span class="linenos"> 83</span></a><span class="sd">        Creates the DataLoader for the training set.</span>
-</span><span id="L-84"><a href="#L-84"><span class="linenos"> 84</span></a>
-</span><span id="L-85"><a href="#L-85"><span class="linenos"> 85</span></a><span class="sd">        Returns</span>
-</span><span id="L-86"><a href="#L-86"><span class="linenos"> 86</span></a><span class="sd">        -------</span>
-</span><span id="L-87"><a href="#L-87"><span class="linenos"> 87</span></a><span class="sd">        torch.utils.data.DataLoader</span>
-</span><span id="L-88"><a href="#L-88"><span class="linenos"> 88</span></a><span class="sd">            The training DataLoader, with shuffling (shuffle=True).</span>
-</span><span id="L-89"><a href="#L-89"><span class="linenos"> 89</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="L-90"><a href="#L-90"><span class="linenos"> 90</span></a>        <span class="k">return</span> <span class="n">DataLoader</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">train_data</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">num_workers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_workers</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-</span><span id="L-91"><a href="#L-91"><span class="linenos"> 91</span></a>
-</span><span id="L-92"><a href="#L-92"><span class="linenos"> 92</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">val_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="L-93"><a href="#L-93"><span class="linenos"> 93</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-94"><a href="#L-94"><span class="linenos"> 94</span></a><span class="sd">        Creates the DataLoader for the validation set.</span>
-</span><span id="L-95"><a href="#L-95"><span class="linenos"> 95</span></a>
-</span><span id="L-96"><a href="#L-96"><span class="linenos"> 96</span></a><span class="sd">        Returns</span>
-</span><span id="L-97"><a href="#L-97"><span class="linenos"> 97</span></a><span class="sd">        -------</span>
-</span><span id="L-98"><a href="#L-98"><span class="linenos"> 98</span></a><span class="sd">        torch.utils.data.DataLoader</span>
-</span><span id="L-99"><a href="#L-99"><span class="linenos"> 99</span></a><span class="sd">            The validation DataLoader (shuffle=False).</span>
-</span><span id="L-100"><a href="#L-100"><span class="linenos">100</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="L-101"><a href="#L-101"><span class="linenos">101</span></a>        <span class="k">return</span> <span class="n">DataLoader</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">val_data</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">num_workers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_workers</span><span class="p">)</span>
-</span><span id="L-102"><a href="#L-102"><span class="linenos">102</span></a>
-</span><span id="L-103"><a href="#L-103"><span class="linenos">103</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">test_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="L-104"><a href="#L-104"><span class="linenos">104</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-105"><a href="#L-105"><span class="linenos">105</span></a><span class="sd">        Creates the DataLoader for the test set.</span>
-</span><span id="L-106"><a href="#L-106"><span class="linenos">106</span></a>
-</span><span id="L-107"><a href="#L-107"><span class="linenos">107</span></a><span class="sd">        Returns</span>
-</span><span id="L-108"><a href="#L-108"><span class="linenos">108</span></a><span class="sd">        -------</span>
-</span><span id="L-109"><a href="#L-109"><span class="linenos">109</span></a><span class="sd">        torch.utils.data.DataLoader</span>
-</span><span id="L-110"><a href="#L-110"><span class="linenos">110</span></a><span class="sd">            The test DataLoader (shuffle=False).</span>
-</span><span id="L-111"><a href="#L-111"><span class="linenos">111</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="L-112"><a href="#L-112"><span class="linenos">112</span></a>        <span class="k">return</span> <span class="n">DataLoader</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">test_data</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">num_workers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_workers</span><span class="p">)</span>
+</span><span id="L-82"><a href="#L-82"><span class="linenos"> 82</span></a>        <span class="k">return</span> <span class="n">DataLoader</span><span class="p">(</span>
+</span><span id="L-83"><a href="#L-83"><span class="linenos"> 83</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">train_ds</span><span class="p">,</span> 
+</span><span id="L-84"><a href="#L-84"><span class="linenos"> 84</span></a>            <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span> 
+</span><span id="L-85"><a href="#L-85"><span class="linenos"> 85</span></a>            <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> 
+</span><span id="L-86"><a href="#L-86"><span class="linenos"> 86</span></a>            <span class="n">num_workers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_workers</span><span class="p">,</span>
+</span><span id="L-87"><a href="#L-87"><span class="linenos"> 87</span></a>            <span class="n">pin_memory</span><span class="o">=</span><span class="kc">True</span>
+</span><span id="L-88"><a href="#L-88"><span class="linenos"> 88</span></a>        <span class="p">)</span>
+</span><span id="L-89"><a href="#L-89"><span class="linenos"> 89</span></a>
+</span><span id="L-90"><a href="#L-90"><span class="linenos"> 90</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">val_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="L-91"><a href="#L-91"><span class="linenos"> 91</span></a>        <span class="k">return</span> <span class="n">DataLoader</span><span class="p">(</span>
+</span><span id="L-92"><a href="#L-92"><span class="linenos"> 92</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">val_ds</span><span class="p">,</span> 
+</span><span id="L-93"><a href="#L-93"><span class="linenos"> 93</span></a>            <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span> 
+</span><span id="L-94"><a href="#L-94"><span class="linenos"> 94</span></a>            <span class="n">shuffle</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> 
+</span><span id="L-95"><a href="#L-95"><span class="linenos"> 95</span></a>            <span class="n">num_workers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_workers</span><span class="p">,</span>
+</span><span id="L-96"><a href="#L-96"><span class="linenos"> 96</span></a>            <span class="n">pin_memory</span><span class="o">=</span><span class="kc">True</span>
+</span><span id="L-97"><a href="#L-97"><span class="linenos"> 97</span></a>        <span class="p">)</span>
+</span><span id="L-98"><a href="#L-98"><span class="linenos"> 98</span></a>
+</span><span id="L-99"><a href="#L-99"><span class="linenos"> 99</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">test_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="L-100"><a href="#L-100"><span class="linenos">100</span></a>        <span class="k">return</span> <span class="n">DataLoader</span><span class="p">(</span>
+</span><span id="L-101"><a href="#L-101"><span class="linenos">101</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">val_ds</span><span class="p">,</span> 
+</span><span id="L-102"><a href="#L-102"><span class="linenos">102</span></a>            <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span> 
+</span><span id="L-103"><a href="#L-103"><span class="linenos">103</span></a>            <span class="n">shuffle</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> 
+</span><span id="L-104"><a href="#L-104"><span class="linenos">104</span></a>            <span class="n">num_workers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_workers</span>
+</span><span id="L-105"><a href="#L-105"><span class="linenos">105</span></a>        <span class="p">)</span>
 </span></pre></div>
 
 
@@ -219,120 +229,100 @@
 
     </div>
     <a class="headerlink" href="#AnimalsDataModule"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="AnimalsDataModule-7"><a href="#AnimalsDataModule-7"><span class="linenos">  7</span></a><span class="k">class</span><span class="w"> </span><span class="nc">AnimalsDataModule</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">LightningDataModule</span><span class="p">):</span>
-</span><span id="AnimalsDataModule-8"><a href="#AnimalsDataModule-8"><span class="linenos">  8</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="AnimalsDataModule-9"><a href="#AnimalsDataModule-9"><span class="linenos">  9</span></a><span class="sd">    PyTorch Lightning DataModule for an animal classification dataset.</span>
-</span><span id="AnimalsDataModule-10"><a href="#AnimalsDataModule-10"><span class="linenos"> 10</span></a>
-</span><span id="AnimalsDataModule-11"><a href="#AnimalsDataModule-11"><span class="linenos"> 11</span></a><span class="sd">    This class handles the loading, transformation, and splitting (training,</span>
-</span><span id="AnimalsDataModule-12"><a href="#AnimalsDataModule-12"><span class="linenos"> 12</span></a><span class="sd">    validation, test) of the image dataset.</span>
-</span><span id="AnimalsDataModule-13"><a href="#AnimalsDataModule-13"><span class="linenos"> 13</span></a>
-</span><span id="AnimalsDataModule-14"><a href="#AnimalsDataModule-14"><span class="linenos"> 14</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="AnimalsDataModule-15"><a href="#AnimalsDataModule-15"><span class="linenos"> 15</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_dir</span><span class="o">=</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> <span class="n">num_workers</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">test_frac</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">123</span><span class="p">):</span>
-</span><span id="AnimalsDataModule-16"><a href="#AnimalsDataModule-16"><span class="linenos"> 16</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="AnimalsDataModule-17"><a href="#AnimalsDataModule-17"><span class="linenos"> 17</span></a><span class="sd">        Initializes the DataModule.</span>
-</span><span id="AnimalsDataModule-18"><a href="#AnimalsDataModule-18"><span class="linenos"> 18</span></a>
-</span><span id="AnimalsDataModule-19"><a href="#AnimalsDataModule-19"><span class="linenos"> 19</span></a><span class="sd">        Parameters</span>
-</span><span id="AnimalsDataModule-20"><a href="#AnimalsDataModule-20"><span class="linenos"> 20</span></a><span class="sd">        ----------</span>
-</span><span id="AnimalsDataModule-21"><a href="#AnimalsDataModule-21"><span class="linenos"> 21</span></a><span class="sd">        data_dir : str, optional.</span>
-</span><span id="AnimalsDataModule-22"><a href="#AnimalsDataModule-22"><span class="linenos"> 22</span></a><span class="sd">            Directory containing the dataset (default is &quot;.&quot;).</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="AnimalsDataModule-20"><a href="#AnimalsDataModule-20"><span class="linenos"> 20</span></a><span class="k">class</span><span class="w"> </span><span class="nc">AnimalsDataModule</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">LightningDataModule</span><span class="p">):</span>
+</span><span id="AnimalsDataModule-21"><a href="#AnimalsDataModule-21"><span class="linenos"> 21</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="AnimalsDataModule-22"><a href="#AnimalsDataModule-22"><span class="linenos"> 22</span></a><span class="sd">    LightningDataModule for the Animal Image Dataset.</span>
 </span><span id="AnimalsDataModule-23"><a href="#AnimalsDataModule-23"><span class="linenos"> 23</span></a>
-</span><span id="AnimalsDataModule-24"><a href="#AnimalsDataModule-24"><span class="linenos"> 24</span></a><span class="sd">        batch_size : int, optional.</span>
-</span><span id="AnimalsDataModule-25"><a href="#AnimalsDataModule-25"><span class="linenos"> 25</span></a><span class="sd">            Batch size for the DataLoaders (default is 32).</span>
-</span><span id="AnimalsDataModule-26"><a href="#AnimalsDataModule-26"><span class="linenos"> 26</span></a>
-</span><span id="AnimalsDataModule-27"><a href="#AnimalsDataModule-27"><span class="linenos"> 27</span></a><span class="sd">        num_workers : int, optional.</span>
-</span><span id="AnimalsDataModule-28"><a href="#AnimalsDataModule-28"><span class="linenos"> 28</span></a><span class="sd">            Number of workers for the DataLoaders (default is 4).</span>
-</span><span id="AnimalsDataModule-29"><a href="#AnimalsDataModule-29"><span class="linenos"> 29</span></a>
-</span><span id="AnimalsDataModule-30"><a href="#AnimalsDataModule-30"><span class="linenos"> 30</span></a><span class="sd">        test_frac : float, optional.</span>
-</span><span id="AnimalsDataModule-31"><a href="#AnimalsDataModule-31"><span class="linenos"> 31</span></a><span class="sd">            Fraction of the dataset to reserve for testing (default is 0.2).</span>
-</span><span id="AnimalsDataModule-32"><a href="#AnimalsDataModule-32"><span class="linenos"> 32</span></a>
-</span><span id="AnimalsDataModule-33"><a href="#AnimalsDataModule-33"><span class="linenos"> 33</span></a><span class="sd">        seed : int, optional.</span>
-</span><span id="AnimalsDataModule-34"><a href="#AnimalsDataModule-34"><span class="linenos"> 34</span></a><span class="sd">            Random seed for data splitting (default is 123).</span>
-</span><span id="AnimalsDataModule-35"><a href="#AnimalsDataModule-35"><span class="linenos"> 35</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="AnimalsDataModule-36"><a href="#AnimalsDataModule-36"><span class="linenos"> 36</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-</span><span id="AnimalsDataModule-37"><a href="#AnimalsDataModule-37"><span class="linenos"> 37</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span> <span class="o">=</span> <span class="n">data_dir</span>
-</span><span id="AnimalsDataModule-38"><a href="#AnimalsDataModule-38"><span class="linenos"> 38</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Path to the data directory.&quot;&quot;&quot;</span>
-</span><span id="AnimalsDataModule-39"><a href="#AnimalsDataModule-39"><span class="linenos"> 39</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">=</span> <span class="n">batch_size</span>
-</span><span id="AnimalsDataModule-40"><a href="#AnimalsDataModule-40"><span class="linenos"> 40</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Number of samples per batch.&quot;&quot;&quot;</span>
-</span><span id="AnimalsDataModule-41"><a href="#AnimalsDataModule-41"><span class="linenos"> 41</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">num_workers</span> <span class="o">=</span> <span class="n">num_workers</span>
-</span><span id="AnimalsDataModule-42"><a href="#AnimalsDataModule-42"><span class="linenos"> 42</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Number of subprocesses for data loading.&quot;&quot;&quot;</span>
-</span><span id="AnimalsDataModule-43"><a href="#AnimalsDataModule-43"><span class="linenos"> 43</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">test_frac</span> <span class="o">=</span> <span class="n">test_frac</span>
-</span><span id="AnimalsDataModule-44"><a href="#AnimalsDataModule-44"><span class="linenos"> 44</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fraction of the dataset to reserve for testing.&quot;&quot;&quot;</span>
-</span><span id="AnimalsDataModule-45"><a href="#AnimalsDataModule-45"><span class="linenos"> 45</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">seed</span> <span class="o">=</span> <span class="n">seed</span>
-</span><span id="AnimalsDataModule-46"><a href="#AnimalsDataModule-46"><span class="linenos"> 46</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Random seed for data splitting.&quot;&quot;&quot;</span>
-</span><span id="AnimalsDataModule-47"><a href="#AnimalsDataModule-47"><span class="linenos"> 47</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">transform</span> <span class="o">=</span> <span class="n">transforms</span><span class="o">.</span><span class="n">Compose</span><span class="p">([</span>
-</span><span id="AnimalsDataModule-48"><a href="#AnimalsDataModule-48"><span class="linenos"> 48</span></a>            <span class="n">transforms</span><span class="o">.</span><span class="n">Resize</span><span class="p">((</span><span class="mi">224</span><span class="p">,</span> <span class="mi">224</span><span class="p">)),</span>
-</span><span id="AnimalsDataModule-49"><a href="#AnimalsDataModule-49"><span class="linenos"> 49</span></a>            <span class="n">transforms</span><span class="o">.</span><span class="n">ToTensor</span><span class="p">(),</span>
-</span><span id="AnimalsDataModule-50"><a href="#AnimalsDataModule-50"><span class="linenos"> 50</span></a>            <span class="n">transforms</span><span class="o">.</span><span class="n">Normalize</span><span class="p">(</span><span class="n">mean</span><span class="o">=</span><span class="p">[</span><span class="mf">0.485</span><span class="p">,</span> <span class="mf">0.456</span><span class="p">,</span> <span class="mf">0.406</span><span class="p">],</span> <span class="n">std</span><span class="o">=</span><span class="p">[</span><span class="mf">0.229</span><span class="p">,</span> <span class="mf">0.224</span><span class="p">,</span> <span class="mf">0.225</span><span class="p">]),</span>
-</span><span id="AnimalsDataModule-51"><a href="#AnimalsDataModule-51"><span class="linenos"> 51</span></a>        <span class="p">])</span>
-</span><span id="AnimalsDataModule-52"><a href="#AnimalsDataModule-52"><span class="linenos"> 52</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Transformations applied to each image.&quot;&quot;&quot;</span>
-</span><span id="AnimalsDataModule-53"><a href="#AnimalsDataModule-53"><span class="linenos"> 53</span></a>        
-</span><span id="AnimalsDataModule-54"><a href="#AnimalsDataModule-54"><span class="linenos"> 54</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stage</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-</span><span id="AnimalsDataModule-55"><a href="#AnimalsDataModule-55"><span class="linenos"> 55</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="AnimalsDataModule-56"><a href="#AnimalsDataModule-56"><span class="linenos"> 56</span></a><span class="sd">        Prepares the data and performs the train/val/test split.</span>
-</span><span id="AnimalsDataModule-57"><a href="#AnimalsDataModule-57"><span class="linenos"> 57</span></a>
-</span><span id="AnimalsDataModule-58"><a href="#AnimalsDataModule-58"><span class="linenos"> 58</span></a><span class="sd">        This method is called automatically by PyTorch Lightning. It loads the</span>
-</span><span id="AnimalsDataModule-59"><a href="#AnimalsDataModule-59"><span class="linenos"> 59</span></a><span class="sd">        full dataset, calculates the splits, and assigns the</span>
-</span><span id="AnimalsDataModule-60"><a href="#AnimalsDataModule-60"><span class="linenos"> 60</span></a><span class="sd">        `train_data`, `val_data`, and `test_data` subsets.</span>
-</span><span id="AnimalsDataModule-61"><a href="#AnimalsDataModule-61"><span class="linenos"> 61</span></a>
-</span><span id="AnimalsDataModule-62"><a href="#AnimalsDataModule-62"><span class="linenos"> 62</span></a><span class="sd">        Parameters</span>
-</span><span id="AnimalsDataModule-63"><a href="#AnimalsDataModule-63"><span class="linenos"> 63</span></a><span class="sd">        ----------</span>
-</span><span id="AnimalsDataModule-64"><a href="#AnimalsDataModule-64"><span class="linenos"> 64</span></a><span class="sd">        stage : str, optional.</span>
-</span><span id="AnimalsDataModule-65"><a href="#AnimalsDataModule-65"><span class="linenos"> 65</span></a><span class="sd">            Lightning stage (e.g., &quot;fit&quot;, &quot;test&quot;). Not used in this</span>
-</span><span id="AnimalsDataModule-66"><a href="#AnimalsDataModule-66"><span class="linenos"> 66</span></a><span class="sd">            implementation, as the data is split only once.</span>
-</span><span id="AnimalsDataModule-67"><a href="#AnimalsDataModule-67"><span class="linenos"> 67</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="AnimalsDataModule-68"><a href="#AnimalsDataModule-68"><span class="linenos"> 68</span></a>        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;train_data&quot;</span><span class="p">):</span>
-</span><span id="AnimalsDataModule-69"><a href="#AnimalsDataModule-69"><span class="linenos"> 69</span></a>            <span class="n">full_dataset</span> <span class="o">=</span> <span class="n">datasets</span><span class="o">.</span><span class="n">ImageFolder</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">)</span>
-</span><span id="AnimalsDataModule-70"><a href="#AnimalsDataModule-70"><span class="linenos"> 70</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">class_names</span> <span class="o">=</span> <span class="n">full_dataset</span><span class="o">.</span><span class="n">classes</span>
-</span><span id="AnimalsDataModule-71"><a href="#AnimalsDataModule-71"><span class="linenos"> 71</span></a>
-</span><span id="AnimalsDataModule-72"><a href="#AnimalsDataModule-72"><span class="linenos"> 72</span></a>            <span class="n">n_total</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">full_dataset</span><span class="p">)</span>
-</span><span id="AnimalsDataModule-73"><a href="#AnimalsDataModule-73"><span class="linenos"> 73</span></a>            <span class="n">n_test</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">n_total</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_frac</span><span class="p">)</span>
-</span><span id="AnimalsDataModule-74"><a href="#AnimalsDataModule-74"><span class="linenos"> 74</span></a>            <span class="n">n_val</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">n_total</span> <span class="o">-</span> <span class="n">n_test</span><span class="p">)</span> <span class="o">*</span> <span class="mf">0.25</span><span class="p">)</span>
-</span><span id="AnimalsDataModule-75"><a href="#AnimalsDataModule-75"><span class="linenos"> 75</span></a>            <span class="n">n_train</span> <span class="o">=</span> <span class="n">n_total</span> <span class="o">-</span> <span class="n">n_val</span> <span class="o">-</span> <span class="n">n_test</span>
-</span><span id="AnimalsDataModule-76"><a href="#AnimalsDataModule-76"><span class="linenos"> 76</span></a>
-</span><span id="AnimalsDataModule-77"><a href="#AnimalsDataModule-77"><span class="linenos"> 77</span></a>            <span class="n">generator</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">Generator</span><span class="p">()</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">seed</span><span class="p">)</span>
-</span><span id="AnimalsDataModule-78"><a href="#AnimalsDataModule-78"><span class="linenos"> 78</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">train_data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">val_data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_data</span> <span class="o">=</span> <span class="n">random_split</span><span class="p">(</span>
-</span><span id="AnimalsDataModule-79"><a href="#AnimalsDataModule-79"><span class="linenos"> 79</span></a>                <span class="n">full_dataset</span><span class="p">,</span> <span class="p">[</span><span class="n">n_train</span><span class="p">,</span> <span class="n">n_val</span><span class="p">,</span> <span class="n">n_test</span><span class="p">],</span> <span class="n">generator</span><span class="o">=</span><span class="n">generator</span>
-</span><span id="AnimalsDataModule-80"><a href="#AnimalsDataModule-80"><span class="linenos"> 80</span></a>            <span class="p">)</span>
+</span><span id="AnimalsDataModule-24"><a href="#AnimalsDataModule-24"><span class="linenos"> 24</span></a><span class="sd">    Ensures that images are augmented during training and normalized </span>
+</span><span id="AnimalsDataModule-25"><a href="#AnimalsDataModule-25"><span class="linenos"> 25</span></a><span class="sd">    correctly for pre-trained VGG architectures.</span>
+</span><span id="AnimalsDataModule-26"><a href="#AnimalsDataModule-26"><span class="linenos"> 26</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="AnimalsDataModule-27"><a href="#AnimalsDataModule-27"><span class="linenos"> 27</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_dir</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">16</span><span class="p">,</span> <span class="n">seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">42</span><span class="p">,</span> <span class="n">test_frac</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.2</span><span class="p">,</span> <span class="n">num_workers</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">):</span>
+</span><span id="AnimalsDataModule-28"><a href="#AnimalsDataModule-28"><span class="linenos"> 28</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+</span><span id="AnimalsDataModule-29"><a href="#AnimalsDataModule-29"><span class="linenos"> 29</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">data_dir</span><span class="p">)</span>
+</span><span id="AnimalsDataModule-30"><a href="#AnimalsDataModule-30"><span class="linenos"> 30</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">=</span> <span class="n">batch_size</span>
+</span><span id="AnimalsDataModule-31"><a href="#AnimalsDataModule-31"><span class="linenos"> 31</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">seed</span> <span class="o">=</span> <span class="n">seed</span>
+</span><span id="AnimalsDataModule-32"><a href="#AnimalsDataModule-32"><span class="linenos"> 32</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">test_frac</span> <span class="o">=</span> <span class="n">test_frac</span>
+</span><span id="AnimalsDataModule-33"><a href="#AnimalsDataModule-33"><span class="linenos"> 33</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">num_workers</span> <span class="o">=</span> <span class="n">num_workers</span>
+</span><span id="AnimalsDataModule-34"><a href="#AnimalsDataModule-34"><span class="linenos"> 34</span></a>        
+</span><span id="AnimalsDataModule-35"><a href="#AnimalsDataModule-35"><span class="linenos"> 35</span></a>        <span class="c1"># 1. Training Transformations (Data Augmentation)</span>
+</span><span id="AnimalsDataModule-36"><a href="#AnimalsDataModule-36"><span class="linenos"> 36</span></a>        <span class="c1"># Random cropping and flipping are essential to prevent overfitting on small datasets</span>
+</span><span id="AnimalsDataModule-37"><a href="#AnimalsDataModule-37"><span class="linenos"> 37</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">train_transform</span> <span class="o">=</span> <span class="n">transforms</span><span class="o">.</span><span class="n">Compose</span><span class="p">([</span>
+</span><span id="AnimalsDataModule-38"><a href="#AnimalsDataModule-38"><span class="linenos"> 38</span></a>            <span class="n">transforms</span><span class="o">.</span><span class="n">RandomResizedCrop</span><span class="p">(</span><span class="mi">224</span><span class="p">),</span>
+</span><span id="AnimalsDataModule-39"><a href="#AnimalsDataModule-39"><span class="linenos"> 39</span></a>            <span class="n">transforms</span><span class="o">.</span><span class="n">RandomHorizontalFlip</span><span class="p">(),</span>
+</span><span id="AnimalsDataModule-40"><a href="#AnimalsDataModule-40"><span class="linenos"> 40</span></a>            <span class="n">transforms</span><span class="o">.</span><span class="n">ColorJitter</span><span class="p">(</span><span class="n">brightness</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">contrast</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">saturation</span><span class="o">=</span><span class="mf">0.2</span><span class="p">),</span>
+</span><span id="AnimalsDataModule-41"><a href="#AnimalsDataModule-41"><span class="linenos"> 41</span></a>            <span class="n">transforms</span><span class="o">.</span><span class="n">ToTensor</span><span class="p">(),</span>
+</span><span id="AnimalsDataModule-42"><a href="#AnimalsDataModule-42"><span class="linenos"> 42</span></a>            <span class="n">transforms</span><span class="o">.</span><span class="n">Normalize</span><span class="p">(</span>
+</span><span id="AnimalsDataModule-43"><a href="#AnimalsDataModule-43"><span class="linenos"> 43</span></a>                <span class="n">mean</span><span class="o">=</span><span class="p">[</span><span class="mf">0.485</span><span class="p">,</span> <span class="mf">0.456</span><span class="p">,</span> <span class="mf">0.406</span><span class="p">],</span> 
+</span><span id="AnimalsDataModule-44"><a href="#AnimalsDataModule-44"><span class="linenos"> 44</span></a>                <span class="n">std</span><span class="o">=</span><span class="p">[</span><span class="mf">0.229</span><span class="p">,</span> <span class="mf">0.224</span><span class="p">,</span> <span class="mf">0.225</span><span class="p">]</span>
+</span><span id="AnimalsDataModule-45"><a href="#AnimalsDataModule-45"><span class="linenos"> 45</span></a>            <span class="p">)</span>
+</span><span id="AnimalsDataModule-46"><a href="#AnimalsDataModule-46"><span class="linenos"> 46</span></a>        <span class="p">])</span>
+</span><span id="AnimalsDataModule-47"><a href="#AnimalsDataModule-47"><span class="linenos"> 47</span></a>
+</span><span id="AnimalsDataModule-48"><a href="#AnimalsDataModule-48"><span class="linenos"> 48</span></a>        <span class="c1"># 2. Validation/Test Transformations (Deterministic)</span>
+</span><span id="AnimalsDataModule-49"><a href="#AnimalsDataModule-49"><span class="linenos"> 49</span></a>        <span class="c1"># Consistent with ImageNet validation protocols</span>
+</span><span id="AnimalsDataModule-50"><a href="#AnimalsDataModule-50"><span class="linenos"> 50</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">val_transform</span> <span class="o">=</span> <span class="n">transforms</span><span class="o">.</span><span class="n">Compose</span><span class="p">([</span>
+</span><span id="AnimalsDataModule-51"><a href="#AnimalsDataModule-51"><span class="linenos"> 51</span></a>            <span class="n">transforms</span><span class="o">.</span><span class="n">Resize</span><span class="p">(</span><span class="mi">256</span><span class="p">),</span>
+</span><span id="AnimalsDataModule-52"><a href="#AnimalsDataModule-52"><span class="linenos"> 52</span></a>            <span class="n">transforms</span><span class="o">.</span><span class="n">CenterCrop</span><span class="p">(</span><span class="mi">224</span><span class="p">),</span>
+</span><span id="AnimalsDataModule-53"><a href="#AnimalsDataModule-53"><span class="linenos"> 53</span></a>            <span class="n">transforms</span><span class="o">.</span><span class="n">ToTensor</span><span class="p">(),</span>
+</span><span id="AnimalsDataModule-54"><a href="#AnimalsDataModule-54"><span class="linenos"> 54</span></a>            <span class="n">transforms</span><span class="o">.</span><span class="n">Normalize</span><span class="p">(</span>
+</span><span id="AnimalsDataModule-55"><a href="#AnimalsDataModule-55"><span class="linenos"> 55</span></a>                <span class="n">mean</span><span class="o">=</span><span class="p">[</span><span class="mf">0.485</span><span class="p">,</span> <span class="mf">0.456</span><span class="p">,</span> <span class="mf">0.406</span><span class="p">],</span> 
+</span><span id="AnimalsDataModule-56"><a href="#AnimalsDataModule-56"><span class="linenos"> 56</span></a>                <span class="n">std</span><span class="o">=</span><span class="p">[</span><span class="mf">0.229</span><span class="p">,</span> <span class="mf">0.224</span><span class="p">,</span> <span class="mf">0.225</span><span class="p">]</span>
+</span><span id="AnimalsDataModule-57"><a href="#AnimalsDataModule-57"><span class="linenos"> 57</span></a>            <span class="p">)</span>
+</span><span id="AnimalsDataModule-58"><a href="#AnimalsDataModule-58"><span class="linenos"> 58</span></a>        <span class="p">])</span>
+</span><span id="AnimalsDataModule-59"><a href="#AnimalsDataModule-59"><span class="linenos"> 59</span></a>
+</span><span id="AnimalsDataModule-60"><a href="#AnimalsDataModule-60"><span class="linenos"> 60</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stage</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+</span><span id="AnimalsDataModule-61"><a href="#AnimalsDataModule-61"><span class="linenos"> 61</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="AnimalsDataModule-62"><a href="#AnimalsDataModule-62"><span class="linenos"> 62</span></a><span class="sd">        Loads the dataset and performs the train/validation split using </span>
+</span><span id="AnimalsDataModule-63"><a href="#AnimalsDataModule-63"><span class="linenos"> 63</span></a><span class="sd">        distinct transformation pipelines for each subset.</span>
+</span><span id="AnimalsDataModule-64"><a href="#AnimalsDataModule-64"><span class="linenos"> 64</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="AnimalsDataModule-65"><a href="#AnimalsDataModule-65"><span class="linenos"> 65</span></a>        <span class="c1"># We create two instances of the dataset pointing to the same root</span>
+</span><span id="AnimalsDataModule-66"><a href="#AnimalsDataModule-66"><span class="linenos"> 66</span></a>        <span class="c1"># but with different transformations.</span>
+</span><span id="AnimalsDataModule-67"><a href="#AnimalsDataModule-67"><span class="linenos"> 67</span></a>        <span class="n">train_full</span> <span class="o">=</span> <span class="n">datasets</span><span class="o">.</span><span class="n">ImageFolder</span><span class="p">(</span><span class="n">root</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">train_transform</span><span class="p">)</span>
+</span><span id="AnimalsDataModule-68"><a href="#AnimalsDataModule-68"><span class="linenos"> 68</span></a>        <span class="n">val_full</span> <span class="o">=</span> <span class="n">datasets</span><span class="o">.</span><span class="n">ImageFolder</span><span class="p">(</span><span class="n">root</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">val_transform</span><span class="p">)</span>
+</span><span id="AnimalsDataModule-69"><a href="#AnimalsDataModule-69"><span class="linenos"> 69</span></a>        
+</span><span id="AnimalsDataModule-70"><a href="#AnimalsDataModule-70"><span class="linenos"> 70</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">class_names</span> <span class="o">=</span> <span class="n">train_full</span><span class="o">.</span><span class="n">classes</span>
+</span><span id="AnimalsDataModule-71"><a href="#AnimalsDataModule-71"><span class="linenos"> 71</span></a>        
+</span><span id="AnimalsDataModule-72"><a href="#AnimalsDataModule-72"><span class="linenos"> 72</span></a>        <span class="c1"># Logic to ensure the same indices are used for splitting despite having two objects</span>
+</span><span id="AnimalsDataModule-73"><a href="#AnimalsDataModule-73"><span class="linenos"> 73</span></a>        <span class="n">num_samples</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">train_full</span><span class="p">)</span>
+</span><span id="AnimalsDataModule-74"><a href="#AnimalsDataModule-74"><span class="linenos"> 74</span></a>        <span class="n">indices</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randperm</span><span class="p">(</span><span class="n">num_samples</span><span class="p">,</span> <span class="n">generator</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">Generator</span><span class="p">()</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">seed</span><span class="p">))</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+</span><span id="AnimalsDataModule-75"><a href="#AnimalsDataModule-75"><span class="linenos"> 75</span></a>        
+</span><span id="AnimalsDataModule-76"><a href="#AnimalsDataModule-76"><span class="linenos"> 76</span></a>        <span class="n">n_val</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">num_samples</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_frac</span><span class="p">)</span>
+</span><span id="AnimalsDataModule-77"><a href="#AnimalsDataModule-77"><span class="linenos"> 77</span></a>        
+</span><span id="AnimalsDataModule-78"><a href="#AnimalsDataModule-78"><span class="linenos"> 78</span></a>        <span class="c1"># Create subsets that share the underlying data but apply the correct transform</span>
+</span><span id="AnimalsDataModule-79"><a href="#AnimalsDataModule-79"><span class="linenos"> 79</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">train_ds</span> <span class="o">=</span> <span class="n">Subset</span><span class="p">(</span><span class="n">train_full</span><span class="p">,</span> <span class="n">indices</span><span class="p">[</span><span class="n">n_val</span><span class="p">:])</span>
+</span><span id="AnimalsDataModule-80"><a href="#AnimalsDataModule-80"><span class="linenos"> 80</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">val_ds</span> <span class="o">=</span> <span class="n">Subset</span><span class="p">(</span><span class="n">val_full</span><span class="p">,</span> <span class="n">indices</span><span class="p">[:</span><span class="n">n_val</span><span class="p">])</span>
 </span><span id="AnimalsDataModule-81"><a href="#AnimalsDataModule-81"><span class="linenos"> 81</span></a>
 </span><span id="AnimalsDataModule-82"><a href="#AnimalsDataModule-82"><span class="linenos"> 82</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">train_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="AnimalsDataModule-83"><a href="#AnimalsDataModule-83"><span class="linenos"> 83</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="AnimalsDataModule-84"><a href="#AnimalsDataModule-84"><span class="linenos"> 84</span></a><span class="sd">        Creates the DataLoader for the training set.</span>
-</span><span id="AnimalsDataModule-85"><a href="#AnimalsDataModule-85"><span class="linenos"> 85</span></a>
-</span><span id="AnimalsDataModule-86"><a href="#AnimalsDataModule-86"><span class="linenos"> 86</span></a><span class="sd">        Returns</span>
-</span><span id="AnimalsDataModule-87"><a href="#AnimalsDataModule-87"><span class="linenos"> 87</span></a><span class="sd">        -------</span>
-</span><span id="AnimalsDataModule-88"><a href="#AnimalsDataModule-88"><span class="linenos"> 88</span></a><span class="sd">        torch.utils.data.DataLoader</span>
-</span><span id="AnimalsDataModule-89"><a href="#AnimalsDataModule-89"><span class="linenos"> 89</span></a><span class="sd">            The training DataLoader, with shuffling (shuffle=True).</span>
-</span><span id="AnimalsDataModule-90"><a href="#AnimalsDataModule-90"><span class="linenos"> 90</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="AnimalsDataModule-91"><a href="#AnimalsDataModule-91"><span class="linenos"> 91</span></a>        <span class="k">return</span> <span class="n">DataLoader</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">train_data</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">num_workers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_workers</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-</span><span id="AnimalsDataModule-92"><a href="#AnimalsDataModule-92"><span class="linenos"> 92</span></a>
-</span><span id="AnimalsDataModule-93"><a href="#AnimalsDataModule-93"><span class="linenos"> 93</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">val_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="AnimalsDataModule-94"><a href="#AnimalsDataModule-94"><span class="linenos"> 94</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="AnimalsDataModule-95"><a href="#AnimalsDataModule-95"><span class="linenos"> 95</span></a><span class="sd">        Creates the DataLoader for the validation set.</span>
-</span><span id="AnimalsDataModule-96"><a href="#AnimalsDataModule-96"><span class="linenos"> 96</span></a>
-</span><span id="AnimalsDataModule-97"><a href="#AnimalsDataModule-97"><span class="linenos"> 97</span></a><span class="sd">        Returns</span>
-</span><span id="AnimalsDataModule-98"><a href="#AnimalsDataModule-98"><span class="linenos"> 98</span></a><span class="sd">        -------</span>
-</span><span id="AnimalsDataModule-99"><a href="#AnimalsDataModule-99"><span class="linenos"> 99</span></a><span class="sd">        torch.utils.data.DataLoader</span>
-</span><span id="AnimalsDataModule-100"><a href="#AnimalsDataModule-100"><span class="linenos">100</span></a><span class="sd">            The validation DataLoader (shuffle=False).</span>
-</span><span id="AnimalsDataModule-101"><a href="#AnimalsDataModule-101"><span class="linenos">101</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="AnimalsDataModule-102"><a href="#AnimalsDataModule-102"><span class="linenos">102</span></a>        <span class="k">return</span> <span class="n">DataLoader</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">val_data</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">num_workers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_workers</span><span class="p">)</span>
-</span><span id="AnimalsDataModule-103"><a href="#AnimalsDataModule-103"><span class="linenos">103</span></a>
-</span><span id="AnimalsDataModule-104"><a href="#AnimalsDataModule-104"><span class="linenos">104</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">test_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="AnimalsDataModule-105"><a href="#AnimalsDataModule-105"><span class="linenos">105</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="AnimalsDataModule-106"><a href="#AnimalsDataModule-106"><span class="linenos">106</span></a><span class="sd">        Creates the DataLoader for the test set.</span>
-</span><span id="AnimalsDataModule-107"><a href="#AnimalsDataModule-107"><span class="linenos">107</span></a>
-</span><span id="AnimalsDataModule-108"><a href="#AnimalsDataModule-108"><span class="linenos">108</span></a><span class="sd">        Returns</span>
-</span><span id="AnimalsDataModule-109"><a href="#AnimalsDataModule-109"><span class="linenos">109</span></a><span class="sd">        -------</span>
-</span><span id="AnimalsDataModule-110"><a href="#AnimalsDataModule-110"><span class="linenos">110</span></a><span class="sd">        torch.utils.data.DataLoader</span>
-</span><span id="AnimalsDataModule-111"><a href="#AnimalsDataModule-111"><span class="linenos">111</span></a><span class="sd">            The test DataLoader (shuffle=False).</span>
-</span><span id="AnimalsDataModule-112"><a href="#AnimalsDataModule-112"><span class="linenos">112</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="AnimalsDataModule-113"><a href="#AnimalsDataModule-113"><span class="linenos">113</span></a>        <span class="k">return</span> <span class="n">DataLoader</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">test_data</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">num_workers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_workers</span><span class="p">)</span>
+</span><span id="AnimalsDataModule-83"><a href="#AnimalsDataModule-83"><span class="linenos"> 83</span></a>        <span class="k">return</span> <span class="n">DataLoader</span><span class="p">(</span>
+</span><span id="AnimalsDataModule-84"><a href="#AnimalsDataModule-84"><span class="linenos"> 84</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">train_ds</span><span class="p">,</span> 
+</span><span id="AnimalsDataModule-85"><a href="#AnimalsDataModule-85"><span class="linenos"> 85</span></a>            <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span> 
+</span><span id="AnimalsDataModule-86"><a href="#AnimalsDataModule-86"><span class="linenos"> 86</span></a>            <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> 
+</span><span id="AnimalsDataModule-87"><a href="#AnimalsDataModule-87"><span class="linenos"> 87</span></a>            <span class="n">num_workers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_workers</span><span class="p">,</span>
+</span><span id="AnimalsDataModule-88"><a href="#AnimalsDataModule-88"><span class="linenos"> 88</span></a>            <span class="n">pin_memory</span><span class="o">=</span><span class="kc">True</span>
+</span><span id="AnimalsDataModule-89"><a href="#AnimalsDataModule-89"><span class="linenos"> 89</span></a>        <span class="p">)</span>
+</span><span id="AnimalsDataModule-90"><a href="#AnimalsDataModule-90"><span class="linenos"> 90</span></a>
+</span><span id="AnimalsDataModule-91"><a href="#AnimalsDataModule-91"><span class="linenos"> 91</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">val_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="AnimalsDataModule-92"><a href="#AnimalsDataModule-92"><span class="linenos"> 92</span></a>        <span class="k">return</span> <span class="n">DataLoader</span><span class="p">(</span>
+</span><span id="AnimalsDataModule-93"><a href="#AnimalsDataModule-93"><span class="linenos"> 93</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">val_ds</span><span class="p">,</span> 
+</span><span id="AnimalsDataModule-94"><a href="#AnimalsDataModule-94"><span class="linenos"> 94</span></a>            <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span> 
+</span><span id="AnimalsDataModule-95"><a href="#AnimalsDataModule-95"><span class="linenos"> 95</span></a>            <span class="n">shuffle</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> 
+</span><span id="AnimalsDataModule-96"><a href="#AnimalsDataModule-96"><span class="linenos"> 96</span></a>            <span class="n">num_workers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_workers</span><span class="p">,</span>
+</span><span id="AnimalsDataModule-97"><a href="#AnimalsDataModule-97"><span class="linenos"> 97</span></a>            <span class="n">pin_memory</span><span class="o">=</span><span class="kc">True</span>
+</span><span id="AnimalsDataModule-98"><a href="#AnimalsDataModule-98"><span class="linenos"> 98</span></a>        <span class="p">)</span>
+</span><span id="AnimalsDataModule-99"><a href="#AnimalsDataModule-99"><span class="linenos"> 99</span></a>
+</span><span id="AnimalsDataModule-100"><a href="#AnimalsDataModule-100"><span class="linenos">100</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">test_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="AnimalsDataModule-101"><a href="#AnimalsDataModule-101"><span class="linenos">101</span></a>        <span class="k">return</span> <span class="n">DataLoader</span><span class="p">(</span>
+</span><span id="AnimalsDataModule-102"><a href="#AnimalsDataModule-102"><span class="linenos">102</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">val_ds</span><span class="p">,</span> 
+</span><span id="AnimalsDataModule-103"><a href="#AnimalsDataModule-103"><span class="linenos">103</span></a>            <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span> 
+</span><span id="AnimalsDataModule-104"><a href="#AnimalsDataModule-104"><span class="linenos">104</span></a>            <span class="n">shuffle</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> 
+</span><span id="AnimalsDataModule-105"><a href="#AnimalsDataModule-105"><span class="linenos">105</span></a>            <span class="n">num_workers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_workers</span>
+</span><span id="AnimalsDataModule-106"><a href="#AnimalsDataModule-106"><span class="linenos">106</span></a>        <span class="p">)</span>
 </span></pre></div>
 
 
-            <div class="docstring"><p>PyTorch Lightning DataModule for an animal classification dataset.</p>
+            <div class="docstring"><p>LightningDataModule for the Animal Image Dataset.</p>
 
-<p>This class handles the loading, transformation, and splitting (training,
-validation, test) of the image dataset.</p>
+<p>Ensures that images are augmented during training and normalized 
+correctly for pre-trained VGG architectures.</p>
 </div>
 
 
@@ -340,71 +330,54 @@ validation, test) of the image dataset.</p>
                                         <input id="AnimalsDataModule.__init__-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 <div class="attr function">
             
-        <span class="name">AnimalsDataModule</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">data_dir</span><span class="o">=</span><span class="s1">&#39;.&#39;</span>, </span><span class="param"><span class="n">batch_size</span><span class="o">=</span><span class="mi">32</span>, </span><span class="param"><span class="n">num_workers</span><span class="o">=</span><span class="mi">4</span>, </span><span class="param"><span class="n">test_frac</span><span class="o">=</span><span class="mf">0.2</span>, </span><span class="param"><span class="n">seed</span><span class="o">=</span><span class="mi">123</span></span>)</span>
+        <span class="name">AnimalsDataModule</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">data_dir</span><span class="p">:</span> <span class="nb">str</span>,</span><span class="param">	<span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">16</span>,</span><span class="param">	<span class="n">seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">42</span>,</span><span class="param">	<span class="n">test_frac</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.2</span>,</span><span class="param">	<span class="n">num_workers</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span></span>)</span>
 
                 <label class="view-source-button" for="AnimalsDataModule.__init__-view-source"><span>View Source</span></label>
 
     </div>
     <a class="headerlink" href="#AnimalsDataModule.__init__"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="AnimalsDataModule.__init__-15"><a href="#AnimalsDataModule.__init__-15"><span class="linenos">15</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_dir</span><span class="o">=</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> <span class="n">num_workers</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">test_frac</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">123</span><span class="p">):</span>
-</span><span id="AnimalsDataModule.__init__-16"><a href="#AnimalsDataModule.__init__-16"><span class="linenos">16</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="AnimalsDataModule.__init__-17"><a href="#AnimalsDataModule.__init__-17"><span class="linenos">17</span></a><span class="sd">        Initializes the DataModule.</span>
-</span><span id="AnimalsDataModule.__init__-18"><a href="#AnimalsDataModule.__init__-18"><span class="linenos">18</span></a>
-</span><span id="AnimalsDataModule.__init__-19"><a href="#AnimalsDataModule.__init__-19"><span class="linenos">19</span></a><span class="sd">        Parameters</span>
-</span><span id="AnimalsDataModule.__init__-20"><a href="#AnimalsDataModule.__init__-20"><span class="linenos">20</span></a><span class="sd">        ----------</span>
-</span><span id="AnimalsDataModule.__init__-21"><a href="#AnimalsDataModule.__init__-21"><span class="linenos">21</span></a><span class="sd">        data_dir : str, optional.</span>
-</span><span id="AnimalsDataModule.__init__-22"><a href="#AnimalsDataModule.__init__-22"><span class="linenos">22</span></a><span class="sd">            Directory containing the dataset (default is &quot;.&quot;).</span>
-</span><span id="AnimalsDataModule.__init__-23"><a href="#AnimalsDataModule.__init__-23"><span class="linenos">23</span></a>
-</span><span id="AnimalsDataModule.__init__-24"><a href="#AnimalsDataModule.__init__-24"><span class="linenos">24</span></a><span class="sd">        batch_size : int, optional.</span>
-</span><span id="AnimalsDataModule.__init__-25"><a href="#AnimalsDataModule.__init__-25"><span class="linenos">25</span></a><span class="sd">            Batch size for the DataLoaders (default is 32).</span>
-</span><span id="AnimalsDataModule.__init__-26"><a href="#AnimalsDataModule.__init__-26"><span class="linenos">26</span></a>
-</span><span id="AnimalsDataModule.__init__-27"><a href="#AnimalsDataModule.__init__-27"><span class="linenos">27</span></a><span class="sd">        num_workers : int, optional.</span>
-</span><span id="AnimalsDataModule.__init__-28"><a href="#AnimalsDataModule.__init__-28"><span class="linenos">28</span></a><span class="sd">            Number of workers for the DataLoaders (default is 4).</span>
-</span><span id="AnimalsDataModule.__init__-29"><a href="#AnimalsDataModule.__init__-29"><span class="linenos">29</span></a>
-</span><span id="AnimalsDataModule.__init__-30"><a href="#AnimalsDataModule.__init__-30"><span class="linenos">30</span></a><span class="sd">        test_frac : float, optional.</span>
-</span><span id="AnimalsDataModule.__init__-31"><a href="#AnimalsDataModule.__init__-31"><span class="linenos">31</span></a><span class="sd">            Fraction of the dataset to reserve for testing (default is 0.2).</span>
-</span><span id="AnimalsDataModule.__init__-32"><a href="#AnimalsDataModule.__init__-32"><span class="linenos">32</span></a>
-</span><span id="AnimalsDataModule.__init__-33"><a href="#AnimalsDataModule.__init__-33"><span class="linenos">33</span></a><span class="sd">        seed : int, optional.</span>
-</span><span id="AnimalsDataModule.__init__-34"><a href="#AnimalsDataModule.__init__-34"><span class="linenos">34</span></a><span class="sd">            Random seed for data splitting (default is 123).</span>
-</span><span id="AnimalsDataModule.__init__-35"><a href="#AnimalsDataModule.__init__-35"><span class="linenos">35</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="AnimalsDataModule.__init__-36"><a href="#AnimalsDataModule.__init__-36"><span class="linenos">36</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-</span><span id="AnimalsDataModule.__init__-37"><a href="#AnimalsDataModule.__init__-37"><span class="linenos">37</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span> <span class="o">=</span> <span class="n">data_dir</span>
-</span><span id="AnimalsDataModule.__init__-38"><a href="#AnimalsDataModule.__init__-38"><span class="linenos">38</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Path to the data directory.&quot;&quot;&quot;</span>
-</span><span id="AnimalsDataModule.__init__-39"><a href="#AnimalsDataModule.__init__-39"><span class="linenos">39</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">=</span> <span class="n">batch_size</span>
-</span><span id="AnimalsDataModule.__init__-40"><a href="#AnimalsDataModule.__init__-40"><span class="linenos">40</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Number of samples per batch.&quot;&quot;&quot;</span>
-</span><span id="AnimalsDataModule.__init__-41"><a href="#AnimalsDataModule.__init__-41"><span class="linenos">41</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">num_workers</span> <span class="o">=</span> <span class="n">num_workers</span>
-</span><span id="AnimalsDataModule.__init__-42"><a href="#AnimalsDataModule.__init__-42"><span class="linenos">42</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Number of subprocesses for data loading.&quot;&quot;&quot;</span>
-</span><span id="AnimalsDataModule.__init__-43"><a href="#AnimalsDataModule.__init__-43"><span class="linenos">43</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">test_frac</span> <span class="o">=</span> <span class="n">test_frac</span>
-</span><span id="AnimalsDataModule.__init__-44"><a href="#AnimalsDataModule.__init__-44"><span class="linenos">44</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fraction of the dataset to reserve for testing.&quot;&quot;&quot;</span>
-</span><span id="AnimalsDataModule.__init__-45"><a href="#AnimalsDataModule.__init__-45"><span class="linenos">45</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">seed</span> <span class="o">=</span> <span class="n">seed</span>
-</span><span id="AnimalsDataModule.__init__-46"><a href="#AnimalsDataModule.__init__-46"><span class="linenos">46</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Random seed for data splitting.&quot;&quot;&quot;</span>
-</span><span id="AnimalsDataModule.__init__-47"><a href="#AnimalsDataModule.__init__-47"><span class="linenos">47</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">transform</span> <span class="o">=</span> <span class="n">transforms</span><span class="o">.</span><span class="n">Compose</span><span class="p">([</span>
-</span><span id="AnimalsDataModule.__init__-48"><a href="#AnimalsDataModule.__init__-48"><span class="linenos">48</span></a>            <span class="n">transforms</span><span class="o">.</span><span class="n">Resize</span><span class="p">((</span><span class="mi">224</span><span class="p">,</span> <span class="mi">224</span><span class="p">)),</span>
-</span><span id="AnimalsDataModule.__init__-49"><a href="#AnimalsDataModule.__init__-49"><span class="linenos">49</span></a>            <span class="n">transforms</span><span class="o">.</span><span class="n">ToTensor</span><span class="p">(),</span>
-</span><span id="AnimalsDataModule.__init__-50"><a href="#AnimalsDataModule.__init__-50"><span class="linenos">50</span></a>            <span class="n">transforms</span><span class="o">.</span><span class="n">Normalize</span><span class="p">(</span><span class="n">mean</span><span class="o">=</span><span class="p">[</span><span class="mf">0.485</span><span class="p">,</span> <span class="mf">0.456</span><span class="p">,</span> <span class="mf">0.406</span><span class="p">],</span> <span class="n">std</span><span class="o">=</span><span class="p">[</span><span class="mf">0.229</span><span class="p">,</span> <span class="mf">0.224</span><span class="p">,</span> <span class="mf">0.225</span><span class="p">]),</span>
-</span><span id="AnimalsDataModule.__init__-51"><a href="#AnimalsDataModule.__init__-51"><span class="linenos">51</span></a>        <span class="p">])</span>
-</span><span id="AnimalsDataModule.__init__-52"><a href="#AnimalsDataModule.__init__-52"><span class="linenos">52</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Transformations applied to each image.&quot;&quot;&quot;</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="AnimalsDataModule.__init__-27"><a href="#AnimalsDataModule.__init__-27"><span class="linenos">27</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_dir</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">16</span><span class="p">,</span> <span class="n">seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">42</span><span class="p">,</span> <span class="n">test_frac</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.2</span><span class="p">,</span> <span class="n">num_workers</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">):</span>
+</span><span id="AnimalsDataModule.__init__-28"><a href="#AnimalsDataModule.__init__-28"><span class="linenos">28</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+</span><span id="AnimalsDataModule.__init__-29"><a href="#AnimalsDataModule.__init__-29"><span class="linenos">29</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">data_dir</span><span class="p">)</span>
+</span><span id="AnimalsDataModule.__init__-30"><a href="#AnimalsDataModule.__init__-30"><span class="linenos">30</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">=</span> <span class="n">batch_size</span>
+</span><span id="AnimalsDataModule.__init__-31"><a href="#AnimalsDataModule.__init__-31"><span class="linenos">31</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">seed</span> <span class="o">=</span> <span class="n">seed</span>
+</span><span id="AnimalsDataModule.__init__-32"><a href="#AnimalsDataModule.__init__-32"><span class="linenos">32</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">test_frac</span> <span class="o">=</span> <span class="n">test_frac</span>
+</span><span id="AnimalsDataModule.__init__-33"><a href="#AnimalsDataModule.__init__-33"><span class="linenos">33</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">num_workers</span> <span class="o">=</span> <span class="n">num_workers</span>
+</span><span id="AnimalsDataModule.__init__-34"><a href="#AnimalsDataModule.__init__-34"><span class="linenos">34</span></a>        
+</span><span id="AnimalsDataModule.__init__-35"><a href="#AnimalsDataModule.__init__-35"><span class="linenos">35</span></a>        <span class="c1"># 1. Training Transformations (Data Augmentation)</span>
+</span><span id="AnimalsDataModule.__init__-36"><a href="#AnimalsDataModule.__init__-36"><span class="linenos">36</span></a>        <span class="c1"># Random cropping and flipping are essential to prevent overfitting on small datasets</span>
+</span><span id="AnimalsDataModule.__init__-37"><a href="#AnimalsDataModule.__init__-37"><span class="linenos">37</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">train_transform</span> <span class="o">=</span> <span class="n">transforms</span><span class="o">.</span><span class="n">Compose</span><span class="p">([</span>
+</span><span id="AnimalsDataModule.__init__-38"><a href="#AnimalsDataModule.__init__-38"><span class="linenos">38</span></a>            <span class="n">transforms</span><span class="o">.</span><span class="n">RandomResizedCrop</span><span class="p">(</span><span class="mi">224</span><span class="p">),</span>
+</span><span id="AnimalsDataModule.__init__-39"><a href="#AnimalsDataModule.__init__-39"><span class="linenos">39</span></a>            <span class="n">transforms</span><span class="o">.</span><span class="n">RandomHorizontalFlip</span><span class="p">(),</span>
+</span><span id="AnimalsDataModule.__init__-40"><a href="#AnimalsDataModule.__init__-40"><span class="linenos">40</span></a>            <span class="n">transforms</span><span class="o">.</span><span class="n">ColorJitter</span><span class="p">(</span><span class="n">brightness</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">contrast</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">saturation</span><span class="o">=</span><span class="mf">0.2</span><span class="p">),</span>
+</span><span id="AnimalsDataModule.__init__-41"><a href="#AnimalsDataModule.__init__-41"><span class="linenos">41</span></a>            <span class="n">transforms</span><span class="o">.</span><span class="n">ToTensor</span><span class="p">(),</span>
+</span><span id="AnimalsDataModule.__init__-42"><a href="#AnimalsDataModule.__init__-42"><span class="linenos">42</span></a>            <span class="n">transforms</span><span class="o">.</span><span class="n">Normalize</span><span class="p">(</span>
+</span><span id="AnimalsDataModule.__init__-43"><a href="#AnimalsDataModule.__init__-43"><span class="linenos">43</span></a>                <span class="n">mean</span><span class="o">=</span><span class="p">[</span><span class="mf">0.485</span><span class="p">,</span> <span class="mf">0.456</span><span class="p">,</span> <span class="mf">0.406</span><span class="p">],</span> 
+</span><span id="AnimalsDataModule.__init__-44"><a href="#AnimalsDataModule.__init__-44"><span class="linenos">44</span></a>                <span class="n">std</span><span class="o">=</span><span class="p">[</span><span class="mf">0.229</span><span class="p">,</span> <span class="mf">0.224</span><span class="p">,</span> <span class="mf">0.225</span><span class="p">]</span>
+</span><span id="AnimalsDataModule.__init__-45"><a href="#AnimalsDataModule.__init__-45"><span class="linenos">45</span></a>            <span class="p">)</span>
+</span><span id="AnimalsDataModule.__init__-46"><a href="#AnimalsDataModule.__init__-46"><span class="linenos">46</span></a>        <span class="p">])</span>
+</span><span id="AnimalsDataModule.__init__-47"><a href="#AnimalsDataModule.__init__-47"><span class="linenos">47</span></a>
+</span><span id="AnimalsDataModule.__init__-48"><a href="#AnimalsDataModule.__init__-48"><span class="linenos">48</span></a>        <span class="c1"># 2. Validation/Test Transformations (Deterministic)</span>
+</span><span id="AnimalsDataModule.__init__-49"><a href="#AnimalsDataModule.__init__-49"><span class="linenos">49</span></a>        <span class="c1"># Consistent with ImageNet validation protocols</span>
+</span><span id="AnimalsDataModule.__init__-50"><a href="#AnimalsDataModule.__init__-50"><span class="linenos">50</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">val_transform</span> <span class="o">=</span> <span class="n">transforms</span><span class="o">.</span><span class="n">Compose</span><span class="p">([</span>
+</span><span id="AnimalsDataModule.__init__-51"><a href="#AnimalsDataModule.__init__-51"><span class="linenos">51</span></a>            <span class="n">transforms</span><span class="o">.</span><span class="n">Resize</span><span class="p">(</span><span class="mi">256</span><span class="p">),</span>
+</span><span id="AnimalsDataModule.__init__-52"><a href="#AnimalsDataModule.__init__-52"><span class="linenos">52</span></a>            <span class="n">transforms</span><span class="o">.</span><span class="n">CenterCrop</span><span class="p">(</span><span class="mi">224</span><span class="p">),</span>
+</span><span id="AnimalsDataModule.__init__-53"><a href="#AnimalsDataModule.__init__-53"><span class="linenos">53</span></a>            <span class="n">transforms</span><span class="o">.</span><span class="n">ToTensor</span><span class="p">(),</span>
+</span><span id="AnimalsDataModule.__init__-54"><a href="#AnimalsDataModule.__init__-54"><span class="linenos">54</span></a>            <span class="n">transforms</span><span class="o">.</span><span class="n">Normalize</span><span class="p">(</span>
+</span><span id="AnimalsDataModule.__init__-55"><a href="#AnimalsDataModule.__init__-55"><span class="linenos">55</span></a>                <span class="n">mean</span><span class="o">=</span><span class="p">[</span><span class="mf">0.485</span><span class="p">,</span> <span class="mf">0.456</span><span class="p">,</span> <span class="mf">0.406</span><span class="p">],</span> 
+</span><span id="AnimalsDataModule.__init__-56"><a href="#AnimalsDataModule.__init__-56"><span class="linenos">56</span></a>                <span class="n">std</span><span class="o">=</span><span class="p">[</span><span class="mf">0.229</span><span class="p">,</span> <span class="mf">0.224</span><span class="p">,</span> <span class="mf">0.225</span><span class="p">]</span>
+</span><span id="AnimalsDataModule.__init__-57"><a href="#AnimalsDataModule.__init__-57"><span class="linenos">57</span></a>            <span class="p">)</span>
+</span><span id="AnimalsDataModule.__init__-58"><a href="#AnimalsDataModule.__init__-58"><span class="linenos">58</span></a>        <span class="p">])</span>
 </span></pre></div>
 
 
-            <div class="docstring"><p>Initializes the DataModule.</p>
-
-<h2 id="parameters">Parameters</h2>
-
-<p>data_dir : str, optional.
-    Directory containing the dataset (default is ".").</p>
-
-<p>batch_size : int, optional.
-    Batch size for the DataLoaders (default is 32).</p>
-
-<p>num_workers : int, optional.
-    Number of workers for the DataLoaders (default is 4).</p>
-
-<p>test_frac : float, optional.
-    Fraction of the dataset to reserve for testing (default is 0.2).</p>
-
-<p>seed : int, optional.
-    Random seed for data splitting (default is 123).</p>
+            <div class="docstring"><p>Attributes:
+    prepare_data_per_node:
+        If True, each LOCAL_RANK=0 will call prepare data.
+        Otherwise only NODE_RANK=0, LOCAL_RANK=0 will prepare data.
+    allow_zero_length_dataloader_with_multiple_devices:
+        If True, dataloader with zero length within local rank is allowed.
+        Default value is False.</p>
 </div>
 
 
@@ -417,9 +390,7 @@ validation, test) of the image dataset.</p>
     </div>
     <a class="headerlink" href="#AnimalsDataModule.data_dir"></a>
     
-            <div class="docstring"><p>Path to the data directory.</p>
-</div>
-
+    
 
                             </div>
                             <div id="AnimalsDataModule.batch_size" class="classattr">
@@ -430,35 +401,7 @@ validation, test) of the image dataset.</p>
     </div>
     <a class="headerlink" href="#AnimalsDataModule.batch_size"></a>
     
-            <div class="docstring"><p>Number of samples per batch.</p>
-</div>
-
-
-                            </div>
-                            <div id="AnimalsDataModule.num_workers" class="classattr">
-                                <div class="attr variable">
-            <span class="name">num_workers</span>
-
-        
-    </div>
-    <a class="headerlink" href="#AnimalsDataModule.num_workers"></a>
     
-            <div class="docstring"><p>Number of subprocesses for data loading.</p>
-</div>
-
-
-                            </div>
-                            <div id="AnimalsDataModule.test_frac" class="classattr">
-                                <div class="attr variable">
-            <span class="name">test_frac</span>
-
-        
-    </div>
-    <a class="headerlink" href="#AnimalsDataModule.test_frac"></a>
-    
-            <div class="docstring"><p>Fraction of the dataset to reserve for testing.</p>
-</div>
-
 
                             </div>
                             <div id="AnimalsDataModule.seed" class="classattr">
@@ -469,22 +412,51 @@ validation, test) of the image dataset.</p>
     </div>
     <a class="headerlink" href="#AnimalsDataModule.seed"></a>
     
-            <div class="docstring"><p>Random seed for data splitting.</p>
-</div>
-
+    
 
                             </div>
-                            <div id="AnimalsDataModule.transform" class="classattr">
+                            <div id="AnimalsDataModule.test_frac" class="classattr">
                                 <div class="attr variable">
-            <span class="name">transform</span>
+            <span class="name">test_frac</span>
 
         
     </div>
-    <a class="headerlink" href="#AnimalsDataModule.transform"></a>
+    <a class="headerlink" href="#AnimalsDataModule.test_frac"></a>
     
-            <div class="docstring"><p>Transformations applied to each image.</p>
-</div>
+    
 
+                            </div>
+                            <div id="AnimalsDataModule.num_workers" class="classattr">
+                                <div class="attr variable">
+            <span class="name">num_workers</span>
+
+        
+    </div>
+    <a class="headerlink" href="#AnimalsDataModule.num_workers"></a>
+    
+    
+
+                            </div>
+                            <div id="AnimalsDataModule.train_transform" class="classattr">
+                                <div class="attr variable">
+            <span class="name">train_transform</span>
+
+        
+    </div>
+    <a class="headerlink" href="#AnimalsDataModule.train_transform"></a>
+    
+    
+
+                            </div>
+                            <div id="AnimalsDataModule.val_transform" class="classattr">
+                                <div class="attr variable">
+            <span class="name">val_transform</span>
+
+        
+    </div>
+    <a class="headerlink" href="#AnimalsDataModule.val_transform"></a>
+    
+    
 
                             </div>
                             <div id="AnimalsDataModule.setup" class="classattr">
@@ -492,53 +464,38 @@ validation, test) of the image dataset.</p>
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">setup</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">stage</span><span class="o">=</span><span class="kc">None</span></span><span class="return-annotation">):</span></span>
+        <span class="name">setup</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">stage</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></span><span class="return-annotation">):</span></span>
 
                 <label class="view-source-button" for="AnimalsDataModule.setup-view-source"><span>View Source</span></label>
 
     </div>
     <a class="headerlink" href="#AnimalsDataModule.setup"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="AnimalsDataModule.setup-54"><a href="#AnimalsDataModule.setup-54"><span class="linenos">54</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stage</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-</span><span id="AnimalsDataModule.setup-55"><a href="#AnimalsDataModule.setup-55"><span class="linenos">55</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="AnimalsDataModule.setup-56"><a href="#AnimalsDataModule.setup-56"><span class="linenos">56</span></a><span class="sd">        Prepares the data and performs the train/val/test split.</span>
-</span><span id="AnimalsDataModule.setup-57"><a href="#AnimalsDataModule.setup-57"><span class="linenos">57</span></a>
-</span><span id="AnimalsDataModule.setup-58"><a href="#AnimalsDataModule.setup-58"><span class="linenos">58</span></a><span class="sd">        This method is called automatically by PyTorch Lightning. It loads the</span>
-</span><span id="AnimalsDataModule.setup-59"><a href="#AnimalsDataModule.setup-59"><span class="linenos">59</span></a><span class="sd">        full dataset, calculates the splits, and assigns the</span>
-</span><span id="AnimalsDataModule.setup-60"><a href="#AnimalsDataModule.setup-60"><span class="linenos">60</span></a><span class="sd">        `train_data`, `val_data`, and `test_data` subsets.</span>
-</span><span id="AnimalsDataModule.setup-61"><a href="#AnimalsDataModule.setup-61"><span class="linenos">61</span></a>
-</span><span id="AnimalsDataModule.setup-62"><a href="#AnimalsDataModule.setup-62"><span class="linenos">62</span></a><span class="sd">        Parameters</span>
-</span><span id="AnimalsDataModule.setup-63"><a href="#AnimalsDataModule.setup-63"><span class="linenos">63</span></a><span class="sd">        ----------</span>
-</span><span id="AnimalsDataModule.setup-64"><a href="#AnimalsDataModule.setup-64"><span class="linenos">64</span></a><span class="sd">        stage : str, optional.</span>
-</span><span id="AnimalsDataModule.setup-65"><a href="#AnimalsDataModule.setup-65"><span class="linenos">65</span></a><span class="sd">            Lightning stage (e.g., &quot;fit&quot;, &quot;test&quot;). Not used in this</span>
-</span><span id="AnimalsDataModule.setup-66"><a href="#AnimalsDataModule.setup-66"><span class="linenos">66</span></a><span class="sd">            implementation, as the data is split only once.</span>
-</span><span id="AnimalsDataModule.setup-67"><a href="#AnimalsDataModule.setup-67"><span class="linenos">67</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="AnimalsDataModule.setup-68"><a href="#AnimalsDataModule.setup-68"><span class="linenos">68</span></a>        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;train_data&quot;</span><span class="p">):</span>
-</span><span id="AnimalsDataModule.setup-69"><a href="#AnimalsDataModule.setup-69"><span class="linenos">69</span></a>            <span class="n">full_dataset</span> <span class="o">=</span> <span class="n">datasets</span><span class="o">.</span><span class="n">ImageFolder</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">)</span>
-</span><span id="AnimalsDataModule.setup-70"><a href="#AnimalsDataModule.setup-70"><span class="linenos">70</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">class_names</span> <span class="o">=</span> <span class="n">full_dataset</span><span class="o">.</span><span class="n">classes</span>
-</span><span id="AnimalsDataModule.setup-71"><a href="#AnimalsDataModule.setup-71"><span class="linenos">71</span></a>
-</span><span id="AnimalsDataModule.setup-72"><a href="#AnimalsDataModule.setup-72"><span class="linenos">72</span></a>            <span class="n">n_total</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">full_dataset</span><span class="p">)</span>
-</span><span id="AnimalsDataModule.setup-73"><a href="#AnimalsDataModule.setup-73"><span class="linenos">73</span></a>            <span class="n">n_test</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">n_total</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_frac</span><span class="p">)</span>
-</span><span id="AnimalsDataModule.setup-74"><a href="#AnimalsDataModule.setup-74"><span class="linenos">74</span></a>            <span class="n">n_val</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">n_total</span> <span class="o">-</span> <span class="n">n_test</span><span class="p">)</span> <span class="o">*</span> <span class="mf">0.25</span><span class="p">)</span>
-</span><span id="AnimalsDataModule.setup-75"><a href="#AnimalsDataModule.setup-75"><span class="linenos">75</span></a>            <span class="n">n_train</span> <span class="o">=</span> <span class="n">n_total</span> <span class="o">-</span> <span class="n">n_val</span> <span class="o">-</span> <span class="n">n_test</span>
-</span><span id="AnimalsDataModule.setup-76"><a href="#AnimalsDataModule.setup-76"><span class="linenos">76</span></a>
-</span><span id="AnimalsDataModule.setup-77"><a href="#AnimalsDataModule.setup-77"><span class="linenos">77</span></a>            <span class="n">generator</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">Generator</span><span class="p">()</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">seed</span><span class="p">)</span>
-</span><span id="AnimalsDataModule.setup-78"><a href="#AnimalsDataModule.setup-78"><span class="linenos">78</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">train_data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">val_data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_data</span> <span class="o">=</span> <span class="n">random_split</span><span class="p">(</span>
-</span><span id="AnimalsDataModule.setup-79"><a href="#AnimalsDataModule.setup-79"><span class="linenos">79</span></a>                <span class="n">full_dataset</span><span class="p">,</span> <span class="p">[</span><span class="n">n_train</span><span class="p">,</span> <span class="n">n_val</span><span class="p">,</span> <span class="n">n_test</span><span class="p">],</span> <span class="n">generator</span><span class="o">=</span><span class="n">generator</span>
-</span><span id="AnimalsDataModule.setup-80"><a href="#AnimalsDataModule.setup-80"><span class="linenos">80</span></a>            <span class="p">)</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="AnimalsDataModule.setup-60"><a href="#AnimalsDataModule.setup-60"><span class="linenos">60</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stage</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+</span><span id="AnimalsDataModule.setup-61"><a href="#AnimalsDataModule.setup-61"><span class="linenos">61</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="AnimalsDataModule.setup-62"><a href="#AnimalsDataModule.setup-62"><span class="linenos">62</span></a><span class="sd">        Loads the dataset and performs the train/validation split using </span>
+</span><span id="AnimalsDataModule.setup-63"><a href="#AnimalsDataModule.setup-63"><span class="linenos">63</span></a><span class="sd">        distinct transformation pipelines for each subset.</span>
+</span><span id="AnimalsDataModule.setup-64"><a href="#AnimalsDataModule.setup-64"><span class="linenos">64</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="AnimalsDataModule.setup-65"><a href="#AnimalsDataModule.setup-65"><span class="linenos">65</span></a>        <span class="c1"># We create two instances of the dataset pointing to the same root</span>
+</span><span id="AnimalsDataModule.setup-66"><a href="#AnimalsDataModule.setup-66"><span class="linenos">66</span></a>        <span class="c1"># but with different transformations.</span>
+</span><span id="AnimalsDataModule.setup-67"><a href="#AnimalsDataModule.setup-67"><span class="linenos">67</span></a>        <span class="n">train_full</span> <span class="o">=</span> <span class="n">datasets</span><span class="o">.</span><span class="n">ImageFolder</span><span class="p">(</span><span class="n">root</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">train_transform</span><span class="p">)</span>
+</span><span id="AnimalsDataModule.setup-68"><a href="#AnimalsDataModule.setup-68"><span class="linenos">68</span></a>        <span class="n">val_full</span> <span class="o">=</span> <span class="n">datasets</span><span class="o">.</span><span class="n">ImageFolder</span><span class="p">(</span><span class="n">root</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">val_transform</span><span class="p">)</span>
+</span><span id="AnimalsDataModule.setup-69"><a href="#AnimalsDataModule.setup-69"><span class="linenos">69</span></a>        
+</span><span id="AnimalsDataModule.setup-70"><a href="#AnimalsDataModule.setup-70"><span class="linenos">70</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">class_names</span> <span class="o">=</span> <span class="n">train_full</span><span class="o">.</span><span class="n">classes</span>
+</span><span id="AnimalsDataModule.setup-71"><a href="#AnimalsDataModule.setup-71"><span class="linenos">71</span></a>        
+</span><span id="AnimalsDataModule.setup-72"><a href="#AnimalsDataModule.setup-72"><span class="linenos">72</span></a>        <span class="c1"># Logic to ensure the same indices are used for splitting despite having two objects</span>
+</span><span id="AnimalsDataModule.setup-73"><a href="#AnimalsDataModule.setup-73"><span class="linenos">73</span></a>        <span class="n">num_samples</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">train_full</span><span class="p">)</span>
+</span><span id="AnimalsDataModule.setup-74"><a href="#AnimalsDataModule.setup-74"><span class="linenos">74</span></a>        <span class="n">indices</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randperm</span><span class="p">(</span><span class="n">num_samples</span><span class="p">,</span> <span class="n">generator</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">Generator</span><span class="p">()</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">seed</span><span class="p">))</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+</span><span id="AnimalsDataModule.setup-75"><a href="#AnimalsDataModule.setup-75"><span class="linenos">75</span></a>        
+</span><span id="AnimalsDataModule.setup-76"><a href="#AnimalsDataModule.setup-76"><span class="linenos">76</span></a>        <span class="n">n_val</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">num_samples</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_frac</span><span class="p">)</span>
+</span><span id="AnimalsDataModule.setup-77"><a href="#AnimalsDataModule.setup-77"><span class="linenos">77</span></a>        
+</span><span id="AnimalsDataModule.setup-78"><a href="#AnimalsDataModule.setup-78"><span class="linenos">78</span></a>        <span class="c1"># Create subsets that share the underlying data but apply the correct transform</span>
+</span><span id="AnimalsDataModule.setup-79"><a href="#AnimalsDataModule.setup-79"><span class="linenos">79</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">train_ds</span> <span class="o">=</span> <span class="n">Subset</span><span class="p">(</span><span class="n">train_full</span><span class="p">,</span> <span class="n">indices</span><span class="p">[</span><span class="n">n_val</span><span class="p">:])</span>
+</span><span id="AnimalsDataModule.setup-80"><a href="#AnimalsDataModule.setup-80"><span class="linenos">80</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">val_ds</span> <span class="o">=</span> <span class="n">Subset</span><span class="p">(</span><span class="n">val_full</span><span class="p">,</span> <span class="n">indices</span><span class="p">[:</span><span class="n">n_val</span><span class="p">])</span>
 </span></pre></div>
 
 
-            <div class="docstring"><p>Prepares the data and performs the train/val/test split.</p>
-
-<p>This method is called automatically by PyTorch Lightning. It loads the
-full dataset, calculates the splits, and assigns the
-<code>train_data</code>, <code>val_data</code>, and <code>test_data</code> subsets.</p>
-
-<h2 id="parameters">Parameters</h2>
-
-<p>stage : str, optional.
-    Lightning stage (e.g., "fit", "test"). Not used in this
-    implementation, as the data is split only once.</p>
+            <div class="docstring"><p>Loads the dataset and performs the train/validation split using 
+distinct transformation pipelines for each subset.</p>
 </div>
 
 
@@ -555,24 +512,47 @@ full dataset, calculates the splits, and assigns the
     </div>
     <a class="headerlink" href="#AnimalsDataModule.train_dataloader"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="AnimalsDataModule.train_dataloader-82"><a href="#AnimalsDataModule.train_dataloader-82"><span class="linenos">82</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">train_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="AnimalsDataModule.train_dataloader-83"><a href="#AnimalsDataModule.train_dataloader-83"><span class="linenos">83</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="AnimalsDataModule.train_dataloader-84"><a href="#AnimalsDataModule.train_dataloader-84"><span class="linenos">84</span></a><span class="sd">        Creates the DataLoader for the training set.</span>
-</span><span id="AnimalsDataModule.train_dataloader-85"><a href="#AnimalsDataModule.train_dataloader-85"><span class="linenos">85</span></a>
-</span><span id="AnimalsDataModule.train_dataloader-86"><a href="#AnimalsDataModule.train_dataloader-86"><span class="linenos">86</span></a><span class="sd">        Returns</span>
-</span><span id="AnimalsDataModule.train_dataloader-87"><a href="#AnimalsDataModule.train_dataloader-87"><span class="linenos">87</span></a><span class="sd">        -------</span>
-</span><span id="AnimalsDataModule.train_dataloader-88"><a href="#AnimalsDataModule.train_dataloader-88"><span class="linenos">88</span></a><span class="sd">        torch.utils.data.DataLoader</span>
-</span><span id="AnimalsDataModule.train_dataloader-89"><a href="#AnimalsDataModule.train_dataloader-89"><span class="linenos">89</span></a><span class="sd">            The training DataLoader, with shuffling (shuffle=True).</span>
-</span><span id="AnimalsDataModule.train_dataloader-90"><a href="#AnimalsDataModule.train_dataloader-90"><span class="linenos">90</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="AnimalsDataModule.train_dataloader-91"><a href="#AnimalsDataModule.train_dataloader-91"><span class="linenos">91</span></a>        <span class="k">return</span> <span class="n">DataLoader</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">train_data</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">num_workers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_workers</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span><span id="AnimalsDataModule.train_dataloader-83"><a href="#AnimalsDataModule.train_dataloader-83"><span class="linenos">83</span></a>        <span class="k">return</span> <span class="n">DataLoader</span><span class="p">(</span>
+</span><span id="AnimalsDataModule.train_dataloader-84"><a href="#AnimalsDataModule.train_dataloader-84"><span class="linenos">84</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">train_ds</span><span class="p">,</span> 
+</span><span id="AnimalsDataModule.train_dataloader-85"><a href="#AnimalsDataModule.train_dataloader-85"><span class="linenos">85</span></a>            <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span> 
+</span><span id="AnimalsDataModule.train_dataloader-86"><a href="#AnimalsDataModule.train_dataloader-86"><span class="linenos">86</span></a>            <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> 
+</span><span id="AnimalsDataModule.train_dataloader-87"><a href="#AnimalsDataModule.train_dataloader-87"><span class="linenos">87</span></a>            <span class="n">num_workers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_workers</span><span class="p">,</span>
+</span><span id="AnimalsDataModule.train_dataloader-88"><a href="#AnimalsDataModule.train_dataloader-88"><span class="linenos">88</span></a>            <span class="n">pin_memory</span><span class="o">=</span><span class="kc">True</span>
+</span><span id="AnimalsDataModule.train_dataloader-89"><a href="#AnimalsDataModule.train_dataloader-89"><span class="linenos">89</span></a>        <span class="p">)</span>
 </span></pre></div>
 
 
-            <div class="docstring"><p>Creates the DataLoader for the training set.</p>
+            <div class="docstring"><p>An iterable or collection of iterables specifying training samples.</p>
 
-<h2 id="returns">Returns</h2>
+<p>For more information about multiple dataloaders, see this :ref:<code>section &lt;multiple-dataloaders&gt;</code>.</p>
 
-<p>torch.utils.data.DataLoader
-    The training DataLoader, with shuffling (shuffle=True).</p>
+<p>The dataloader you return will not be reloaded unless you set
+:paramref:<code>~lightning.pytorch.trainer.trainer.Trainer.reload_dataloaders_every_n_epochs</code> to
+a positive integer.</p>
+
+<p>For data processing use the following pattern:</p>
+
+<pre><code>- download in `prepare_data()`
+- process and split in `setup()`
+</code></pre>
+
+<p>However, the above are only necessary for distributed processing.</p>
+
+<div class="alert warning">
+
+<h6 id="do-not-assign-state-in-prepare_data">do not assign state in prepare_data</h6>
+
+</div>
+
+<ul>
+<li><code>~lightning.pytorch.trainer.trainer.Trainer.fit()</code></li>
+<li><code><a href="#AnimalsDataModule.prepare_data">prepare_data()</a></code></li>
+<li><code><a href="#AnimalsDataModule.setup">setup()</a></code></li>
+</ul>
+
+<p>Note:
+    Lightning tries to add the correct sampler for distributed and arbitrary hardware.
+    There is no need to set it yourself.</p>
 </div>
 
 
@@ -588,25 +568,41 @@ full dataset, calculates the splits, and assigns the
 
     </div>
     <a class="headerlink" href="#AnimalsDataModule.val_dataloader"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="AnimalsDataModule.val_dataloader-93"><a href="#AnimalsDataModule.val_dataloader-93"><span class="linenos"> 93</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">val_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="AnimalsDataModule.val_dataloader-94"><a href="#AnimalsDataModule.val_dataloader-94"><span class="linenos"> 94</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="AnimalsDataModule.val_dataloader-95"><a href="#AnimalsDataModule.val_dataloader-95"><span class="linenos"> 95</span></a><span class="sd">        Creates the DataLoader for the validation set.</span>
-</span><span id="AnimalsDataModule.val_dataloader-96"><a href="#AnimalsDataModule.val_dataloader-96"><span class="linenos"> 96</span></a>
-</span><span id="AnimalsDataModule.val_dataloader-97"><a href="#AnimalsDataModule.val_dataloader-97"><span class="linenos"> 97</span></a><span class="sd">        Returns</span>
-</span><span id="AnimalsDataModule.val_dataloader-98"><a href="#AnimalsDataModule.val_dataloader-98"><span class="linenos"> 98</span></a><span class="sd">        -------</span>
-</span><span id="AnimalsDataModule.val_dataloader-99"><a href="#AnimalsDataModule.val_dataloader-99"><span class="linenos"> 99</span></a><span class="sd">        torch.utils.data.DataLoader</span>
-</span><span id="AnimalsDataModule.val_dataloader-100"><a href="#AnimalsDataModule.val_dataloader-100"><span class="linenos">100</span></a><span class="sd">            The validation DataLoader (shuffle=False).</span>
-</span><span id="AnimalsDataModule.val_dataloader-101"><a href="#AnimalsDataModule.val_dataloader-101"><span class="linenos">101</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="AnimalsDataModule.val_dataloader-102"><a href="#AnimalsDataModule.val_dataloader-102"><span class="linenos">102</span></a>        <span class="k">return</span> <span class="n">DataLoader</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">val_data</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">num_workers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_workers</span><span class="p">)</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="AnimalsDataModule.val_dataloader-91"><a href="#AnimalsDataModule.val_dataloader-91"><span class="linenos">91</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">val_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="AnimalsDataModule.val_dataloader-92"><a href="#AnimalsDataModule.val_dataloader-92"><span class="linenos">92</span></a>        <span class="k">return</span> <span class="n">DataLoader</span><span class="p">(</span>
+</span><span id="AnimalsDataModule.val_dataloader-93"><a href="#AnimalsDataModule.val_dataloader-93"><span class="linenos">93</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">val_ds</span><span class="p">,</span> 
+</span><span id="AnimalsDataModule.val_dataloader-94"><a href="#AnimalsDataModule.val_dataloader-94"><span class="linenos">94</span></a>            <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span> 
+</span><span id="AnimalsDataModule.val_dataloader-95"><a href="#AnimalsDataModule.val_dataloader-95"><span class="linenos">95</span></a>            <span class="n">shuffle</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> 
+</span><span id="AnimalsDataModule.val_dataloader-96"><a href="#AnimalsDataModule.val_dataloader-96"><span class="linenos">96</span></a>            <span class="n">num_workers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_workers</span><span class="p">,</span>
+</span><span id="AnimalsDataModule.val_dataloader-97"><a href="#AnimalsDataModule.val_dataloader-97"><span class="linenos">97</span></a>            <span class="n">pin_memory</span><span class="o">=</span><span class="kc">True</span>
+</span><span id="AnimalsDataModule.val_dataloader-98"><a href="#AnimalsDataModule.val_dataloader-98"><span class="linenos">98</span></a>        <span class="p">)</span>
 </span></pre></div>
 
 
-            <div class="docstring"><p>Creates the DataLoader for the validation set.</p>
+            <div class="docstring"><p>An iterable or collection of iterables specifying validation samples.</p>
 
-<h2 id="returns">Returns</h2>
+<p>For more information about multiple dataloaders, see this :ref:<code>section &lt;multiple-dataloaders&gt;</code>.</p>
 
-<p>torch.utils.data.DataLoader
-    The validation DataLoader (shuffle=False).</p>
+<p>The dataloader you return will not be reloaded unless you set
+:paramref:<code>~lightning.pytorch.trainer.trainer.Trainer.reload_dataloaders_every_n_epochs</code> to
+a positive integer.</p>
+
+<p>It's recommended that all data downloads and preparation happen in <code><a href="#AnimalsDataModule.prepare_data">prepare_data()</a></code>.</p>
+
+<ul>
+<li><code>~lightning.pytorch.trainer.trainer.Trainer.fit()</code></li>
+<li><code>~lightning.pytorch.trainer.trainer.Trainer.validate()</code></li>
+<li><code><a href="#AnimalsDataModule.prepare_data">prepare_data()</a></code></li>
+<li><code><a href="#AnimalsDataModule.setup">setup()</a></code></li>
+</ul>
+
+<p>Note:
+    Lightning tries to add the correct sampler for distributed and arbitrary hardware
+    There is no need to set it yourself.</p>
+
+<p>Note:
+    If you don't need a validation dataset and a <code>validation_step()</code>, you don't need to
+    implement this method.</p>
 </div>
 
 
@@ -622,25 +618,47 @@ full dataset, calculates the splits, and assigns the
 
     </div>
     <a class="headerlink" href="#AnimalsDataModule.test_dataloader"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="AnimalsDataModule.test_dataloader-104"><a href="#AnimalsDataModule.test_dataloader-104"><span class="linenos">104</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">test_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="AnimalsDataModule.test_dataloader-105"><a href="#AnimalsDataModule.test_dataloader-105"><span class="linenos">105</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="AnimalsDataModule.test_dataloader-106"><a href="#AnimalsDataModule.test_dataloader-106"><span class="linenos">106</span></a><span class="sd">        Creates the DataLoader for the test set.</span>
-</span><span id="AnimalsDataModule.test_dataloader-107"><a href="#AnimalsDataModule.test_dataloader-107"><span class="linenos">107</span></a>
-</span><span id="AnimalsDataModule.test_dataloader-108"><a href="#AnimalsDataModule.test_dataloader-108"><span class="linenos">108</span></a><span class="sd">        Returns</span>
-</span><span id="AnimalsDataModule.test_dataloader-109"><a href="#AnimalsDataModule.test_dataloader-109"><span class="linenos">109</span></a><span class="sd">        -------</span>
-</span><span id="AnimalsDataModule.test_dataloader-110"><a href="#AnimalsDataModule.test_dataloader-110"><span class="linenos">110</span></a><span class="sd">        torch.utils.data.DataLoader</span>
-</span><span id="AnimalsDataModule.test_dataloader-111"><a href="#AnimalsDataModule.test_dataloader-111"><span class="linenos">111</span></a><span class="sd">            The test DataLoader (shuffle=False).</span>
-</span><span id="AnimalsDataModule.test_dataloader-112"><a href="#AnimalsDataModule.test_dataloader-112"><span class="linenos">112</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="AnimalsDataModule.test_dataloader-113"><a href="#AnimalsDataModule.test_dataloader-113"><span class="linenos">113</span></a>        <span class="k">return</span> <span class="n">DataLoader</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">test_data</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">num_workers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_workers</span><span class="p">)</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="AnimalsDataModule.test_dataloader-100"><a href="#AnimalsDataModule.test_dataloader-100"><span class="linenos">100</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">test_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="AnimalsDataModule.test_dataloader-101"><a href="#AnimalsDataModule.test_dataloader-101"><span class="linenos">101</span></a>        <span class="k">return</span> <span class="n">DataLoader</span><span class="p">(</span>
+</span><span id="AnimalsDataModule.test_dataloader-102"><a href="#AnimalsDataModule.test_dataloader-102"><span class="linenos">102</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">val_ds</span><span class="p">,</span> 
+</span><span id="AnimalsDataModule.test_dataloader-103"><a href="#AnimalsDataModule.test_dataloader-103"><span class="linenos">103</span></a>            <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span> 
+</span><span id="AnimalsDataModule.test_dataloader-104"><a href="#AnimalsDataModule.test_dataloader-104"><span class="linenos">104</span></a>            <span class="n">shuffle</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> 
+</span><span id="AnimalsDataModule.test_dataloader-105"><a href="#AnimalsDataModule.test_dataloader-105"><span class="linenos">105</span></a>            <span class="n">num_workers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_workers</span>
+</span><span id="AnimalsDataModule.test_dataloader-106"><a href="#AnimalsDataModule.test_dataloader-106"><span class="linenos">106</span></a>        <span class="p">)</span>
 </span></pre></div>
 
 
-            <div class="docstring"><p>Creates the DataLoader for the test set.</p>
+            <div class="docstring"><p>An iterable or collection of iterables specifying test samples.</p>
 
-<h2 id="returns">Returns</h2>
+<p>For more information about multiple dataloaders, see this :ref:<code>section &lt;multiple-dataloaders&gt;</code>.</p>
 
-<p>torch.utils.data.DataLoader
-    The test DataLoader (shuffle=False).</p>
+<p>For data processing use the following pattern:</p>
+
+<pre><code>- download in `prepare_data()`
+- process and split in `setup()`
+</code></pre>
+
+<p>However, the above are only necessary for distributed processing.</p>
+
+<div class="alert warning">
+
+<h6 id="do-not-assign-state-in-prepare_data">do not assign state in prepare_data</h6>
+
+</div>
+
+<ul>
+<li><code>~lightning.pytorch.trainer.trainer.Trainer.test()</code></li>
+<li><code><a href="#AnimalsDataModule.prepare_data">prepare_data()</a></code></li>
+<li><code><a href="#AnimalsDataModule.setup">setup()</a></code></li>
+</ul>
+
+<p>Note:
+    Lightning tries to add the correct sampler for distributed and arbitrary hardware.
+    There is no need to set it yourself.</p>
+
+<p>Note:
+    If you don't need a test dataset and a <code>test_step()</code>, you don't need to implement
+    this method.</p>
 </div>
 
 

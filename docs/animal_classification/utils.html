@@ -22,7 +22,6 @@
   <path fill-rule="evenodd" d="M4.146 8.354a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5H14.5a.5.5 0 0 1 0 1H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3z"/>
 </svg>                &nbsp;animal_classification</a>
 
-            <img src="https://em-content.zobj.net/source/microsoft-teams/337/lion_1f981.png" class="logo" alt="project logo"/>
 
             <input type="search" placeholder="Search..." role="searchbox" aria-label="search"
                    pattern=".+" required>
@@ -40,7 +39,6 @@
     </ul>
 
 
-            <footer>Animal Classification v1.0 • Built with PyTorch &amp; Lightning</footer>
 
         <a class="attribution" title="pdoc: Python API documentation generator" href="https://pdoc.dev" target="_blank">
             built with <span class="visually-hidden">pdoc</span><img
@@ -92,29 +90,26 @@
 </span><span id="L-31"><a href="#L-31"><span class="linenos">31</span></a>    <span class="c1"># no CUDA at all</span>
 </span><span id="L-32"><a href="#L-32"><span class="linenos">32</span></a>    <span class="k">return</span> <span class="s2">&quot;cpu&quot;</span>
 </span><span id="L-33"><a href="#L-33"><span class="linenos">33</span></a>
-</span><span id="L-34"><a href="#L-34"><span class="linenos">34</span></a>
-</span><span id="L-35"><a href="#L-35"><span class="linenos">35</span></a>
-</span><span id="L-36"><a href="#L-36"><span class="linenos">36</span></a>
-</span><span id="L-37"><a href="#L-37"><span class="linenos">37</span></a><span class="k">def</span><span class="w"> </span><span class="nf">get_packaged_mini_data_path</span><span class="p">():</span>
-</span><span id="L-38"><a href="#L-38"><span class="linenos">38</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-39"><a href="#L-39"><span class="linenos">39</span></a><span class="sd">    Locates the &#39;mini_animals&#39; dataset directory.</span>
-</span><span id="L-40"><a href="#L-40"><span class="linenos">40</span></a>
-</span><span id="L-41"><a href="#L-41"><span class="linenos">41</span></a><span class="sd">    This function attempts to find the dataset inside the installed package</span>
-</span><span id="L-42"><a href="#L-42"><span class="linenos">42</span></a><span class="sd">    (site-packages) using `importlib.resources`. If the package is not</span>
-</span><span id="L-43"><a href="#L-43"><span class="linenos">43</span></a><span class="sd">    installed (e.g., during local development), it falls back to the</span>
-</span><span id="L-44"><a href="#L-44"><span class="linenos">44</span></a><span class="sd">    relative local path.</span>
-</span><span id="L-45"><a href="#L-45"><span class="linenos">45</span></a>
-</span><span id="L-46"><a href="#L-46"><span class="linenos">46</span></a><span class="sd">    Returns</span>
-</span><span id="L-47"><a href="#L-47"><span class="linenos">47</span></a><span class="sd">    -------</span>
-</span><span id="L-48"><a href="#L-48"><span class="linenos">48</span></a><span class="sd">    pathlib.Path</span>
-</span><span id="L-49"><a href="#L-49"><span class="linenos">49</span></a><span class="sd">        The path object pointing to the &#39;mini_animals/animals&#39; directory.</span>
-</span><span id="L-50"><a href="#L-50"><span class="linenos">50</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="L-51"><a href="#L-51"><span class="linenos">51</span></a>    <span class="c1"># Use files() to correctly reference the path inside site-packages</span>
-</span><span id="L-52"><a href="#L-52"><span class="linenos">52</span></a>    <span class="k">try</span><span class="p">:</span>
-</span><span id="L-53"><a href="#L-53"><span class="linenos">53</span></a>        <span class="k">return</span> <span class="n">pkg_resources</span><span class="o">.</span><span class="n">files</span><span class="p">(</span><span class="s1">&#39;animal_classification&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s1">&#39;data/mini_animals/animals&#39;</span><span class="p">)</span>
-</span><span id="L-54"><a href="#L-54"><span class="linenos">54</span></a>    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-</span><span id="L-55"><a href="#L-55"><span class="linenos">55</span></a>        <span class="c1"># Fallback for local dev setup where package is not installed as a wheel</span>
-</span><span id="L-56"><a href="#L-56"><span class="linenos">56</span></a>        <span class="k">return</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;data/mini_animals/animals&quot;</span><span class="p">)</span>
+</span><span id="L-34"><a href="#L-34"><span class="linenos">34</span></a><span class="k">def</span><span class="w"> </span><span class="nf">get_packaged_mini_data_path</span><span class="p">():</span>
+</span><span id="L-35"><a href="#L-35"><span class="linenos">35</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-36"><a href="#L-36"><span class="linenos">36</span></a><span class="sd">    Locates the &#39;mini_animals&#39; dataset directory.</span>
+</span><span id="L-37"><a href="#L-37"><span class="linenos">37</span></a>
+</span><span id="L-38"><a href="#L-38"><span class="linenos">38</span></a><span class="sd">    This function attempts to find the dataset inside the installed package</span>
+</span><span id="L-39"><a href="#L-39"><span class="linenos">39</span></a><span class="sd">    (site-packages) using `importlib.resources`. If the package is not</span>
+</span><span id="L-40"><a href="#L-40"><span class="linenos">40</span></a><span class="sd">    installed (e.g., during local development), it falls back to the</span>
+</span><span id="L-41"><a href="#L-41"><span class="linenos">41</span></a><span class="sd">    relative local path.</span>
+</span><span id="L-42"><a href="#L-42"><span class="linenos">42</span></a>
+</span><span id="L-43"><a href="#L-43"><span class="linenos">43</span></a><span class="sd">    Returns</span>
+</span><span id="L-44"><a href="#L-44"><span class="linenos">44</span></a><span class="sd">    -------</span>
+</span><span id="L-45"><a href="#L-45"><span class="linenos">45</span></a><span class="sd">    pathlib.Path</span>
+</span><span id="L-46"><a href="#L-46"><span class="linenos">46</span></a><span class="sd">        The path object pointing to the &#39;mini_animals/animals&#39; directory.</span>
+</span><span id="L-47"><a href="#L-47"><span class="linenos">47</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="L-48"><a href="#L-48"><span class="linenos">48</span></a>    <span class="c1"># Use files() to correctly reference the path inside site-packages</span>
+</span><span id="L-49"><a href="#L-49"><span class="linenos">49</span></a>    <span class="k">try</span><span class="p">:</span>
+</span><span id="L-50"><a href="#L-50"><span class="linenos">50</span></a>        <span class="k">return</span> <span class="n">pkg_resources</span><span class="o">.</span><span class="n">files</span><span class="p">(</span><span class="s1">&#39;animal_classification&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s1">&#39;data/mini_animals/animals&#39;</span><span class="p">)</span>
+</span><span id="L-51"><a href="#L-51"><span class="linenos">51</span></a>    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+</span><span id="L-52"><a href="#L-52"><span class="linenos">52</span></a>        <span class="c1"># Fallback for local dev setup where package is not installed as a wheel</span>
+</span><span id="L-53"><a href="#L-53"><span class="linenos">53</span></a>        <span class="k">return</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;data/mini_animals/animals&quot;</span><span class="p">)</span>
 </span></pre></div>
 
 
@@ -186,26 +181,26 @@ falls back to CPU and prints a warning.</p>
 
     </div>
     <a class="headerlink" href="#get_packaged_mini_data_path"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="get_packaged_mini_data_path-38"><a href="#get_packaged_mini_data_path-38"><span class="linenos">38</span></a><span class="k">def</span><span class="w"> </span><span class="nf">get_packaged_mini_data_path</span><span class="p">():</span>
-</span><span id="get_packaged_mini_data_path-39"><a href="#get_packaged_mini_data_path-39"><span class="linenos">39</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="get_packaged_mini_data_path-40"><a href="#get_packaged_mini_data_path-40"><span class="linenos">40</span></a><span class="sd">    Locates the &#39;mini_animals&#39; dataset directory.</span>
-</span><span id="get_packaged_mini_data_path-41"><a href="#get_packaged_mini_data_path-41"><span class="linenos">41</span></a>
-</span><span id="get_packaged_mini_data_path-42"><a href="#get_packaged_mini_data_path-42"><span class="linenos">42</span></a><span class="sd">    This function attempts to find the dataset inside the installed package</span>
-</span><span id="get_packaged_mini_data_path-43"><a href="#get_packaged_mini_data_path-43"><span class="linenos">43</span></a><span class="sd">    (site-packages) using `importlib.resources`. If the package is not</span>
-</span><span id="get_packaged_mini_data_path-44"><a href="#get_packaged_mini_data_path-44"><span class="linenos">44</span></a><span class="sd">    installed (e.g., during local development), it falls back to the</span>
-</span><span id="get_packaged_mini_data_path-45"><a href="#get_packaged_mini_data_path-45"><span class="linenos">45</span></a><span class="sd">    relative local path.</span>
-</span><span id="get_packaged_mini_data_path-46"><a href="#get_packaged_mini_data_path-46"><span class="linenos">46</span></a>
-</span><span id="get_packaged_mini_data_path-47"><a href="#get_packaged_mini_data_path-47"><span class="linenos">47</span></a><span class="sd">    Returns</span>
-</span><span id="get_packaged_mini_data_path-48"><a href="#get_packaged_mini_data_path-48"><span class="linenos">48</span></a><span class="sd">    -------</span>
-</span><span id="get_packaged_mini_data_path-49"><a href="#get_packaged_mini_data_path-49"><span class="linenos">49</span></a><span class="sd">    pathlib.Path</span>
-</span><span id="get_packaged_mini_data_path-50"><a href="#get_packaged_mini_data_path-50"><span class="linenos">50</span></a><span class="sd">        The path object pointing to the &#39;mini_animals/animals&#39; directory.</span>
-</span><span id="get_packaged_mini_data_path-51"><a href="#get_packaged_mini_data_path-51"><span class="linenos">51</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="get_packaged_mini_data_path-52"><a href="#get_packaged_mini_data_path-52"><span class="linenos">52</span></a>    <span class="c1"># Use files() to correctly reference the path inside site-packages</span>
-</span><span id="get_packaged_mini_data_path-53"><a href="#get_packaged_mini_data_path-53"><span class="linenos">53</span></a>    <span class="k">try</span><span class="p">:</span>
-</span><span id="get_packaged_mini_data_path-54"><a href="#get_packaged_mini_data_path-54"><span class="linenos">54</span></a>        <span class="k">return</span> <span class="n">pkg_resources</span><span class="o">.</span><span class="n">files</span><span class="p">(</span><span class="s1">&#39;animal_classification&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s1">&#39;data/mini_animals/animals&#39;</span><span class="p">)</span>
-</span><span id="get_packaged_mini_data_path-55"><a href="#get_packaged_mini_data_path-55"><span class="linenos">55</span></a>    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-</span><span id="get_packaged_mini_data_path-56"><a href="#get_packaged_mini_data_path-56"><span class="linenos">56</span></a>        <span class="c1"># Fallback for local dev setup where package is not installed as a wheel</span>
-</span><span id="get_packaged_mini_data_path-57"><a href="#get_packaged_mini_data_path-57"><span class="linenos">57</span></a>        <span class="k">return</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;data/mini_animals/animals&quot;</span><span class="p">)</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="get_packaged_mini_data_path-35"><a href="#get_packaged_mini_data_path-35"><span class="linenos">35</span></a><span class="k">def</span><span class="w"> </span><span class="nf">get_packaged_mini_data_path</span><span class="p">():</span>
+</span><span id="get_packaged_mini_data_path-36"><a href="#get_packaged_mini_data_path-36"><span class="linenos">36</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="get_packaged_mini_data_path-37"><a href="#get_packaged_mini_data_path-37"><span class="linenos">37</span></a><span class="sd">    Locates the &#39;mini_animals&#39; dataset directory.</span>
+</span><span id="get_packaged_mini_data_path-38"><a href="#get_packaged_mini_data_path-38"><span class="linenos">38</span></a>
+</span><span id="get_packaged_mini_data_path-39"><a href="#get_packaged_mini_data_path-39"><span class="linenos">39</span></a><span class="sd">    This function attempts to find the dataset inside the installed package</span>
+</span><span id="get_packaged_mini_data_path-40"><a href="#get_packaged_mini_data_path-40"><span class="linenos">40</span></a><span class="sd">    (site-packages) using `importlib.resources`. If the package is not</span>
+</span><span id="get_packaged_mini_data_path-41"><a href="#get_packaged_mini_data_path-41"><span class="linenos">41</span></a><span class="sd">    installed (e.g., during local development), it falls back to the</span>
+</span><span id="get_packaged_mini_data_path-42"><a href="#get_packaged_mini_data_path-42"><span class="linenos">42</span></a><span class="sd">    relative local path.</span>
+</span><span id="get_packaged_mini_data_path-43"><a href="#get_packaged_mini_data_path-43"><span class="linenos">43</span></a>
+</span><span id="get_packaged_mini_data_path-44"><a href="#get_packaged_mini_data_path-44"><span class="linenos">44</span></a><span class="sd">    Returns</span>
+</span><span id="get_packaged_mini_data_path-45"><a href="#get_packaged_mini_data_path-45"><span class="linenos">45</span></a><span class="sd">    -------</span>
+</span><span id="get_packaged_mini_data_path-46"><a href="#get_packaged_mini_data_path-46"><span class="linenos">46</span></a><span class="sd">    pathlib.Path</span>
+</span><span id="get_packaged_mini_data_path-47"><a href="#get_packaged_mini_data_path-47"><span class="linenos">47</span></a><span class="sd">        The path object pointing to the &#39;mini_animals/animals&#39; directory.</span>
+</span><span id="get_packaged_mini_data_path-48"><a href="#get_packaged_mini_data_path-48"><span class="linenos">48</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="get_packaged_mini_data_path-49"><a href="#get_packaged_mini_data_path-49"><span class="linenos">49</span></a>    <span class="c1"># Use files() to correctly reference the path inside site-packages</span>
+</span><span id="get_packaged_mini_data_path-50"><a href="#get_packaged_mini_data_path-50"><span class="linenos">50</span></a>    <span class="k">try</span><span class="p">:</span>
+</span><span id="get_packaged_mini_data_path-51"><a href="#get_packaged_mini_data_path-51"><span class="linenos">51</span></a>        <span class="k">return</span> <span class="n">pkg_resources</span><span class="o">.</span><span class="n">files</span><span class="p">(</span><span class="s1">&#39;animal_classification&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s1">&#39;data/mini_animals/animals&#39;</span><span class="p">)</span>
+</span><span id="get_packaged_mini_data_path-52"><a href="#get_packaged_mini_data_path-52"><span class="linenos">52</span></a>    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+</span><span id="get_packaged_mini_data_path-53"><a href="#get_packaged_mini_data_path-53"><span class="linenos">53</span></a>        <span class="c1"># Fallback for local dev setup where package is not installed as a wheel</span>
+</span><span id="get_packaged_mini_data_path-54"><a href="#get_packaged_mini_data_path-54"><span class="linenos">54</span></a>        <span class="k">return</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;data/mini_animals/animals&quot;</span><span class="p">)</span>
 </span></pre></div>
 
 
