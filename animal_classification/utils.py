@@ -42,7 +42,7 @@ def get_packaged_mini_data_path():
 
     Returns
     -------
-    pathlib.Path
+    pathlib.Path\n
         The path object pointing to the 'mini_animals/animals' directory.
     """
     # Use files() to correctly reference the path inside site-packages

@@ -21,17 +21,14 @@ def reduce_dataset(images_per_class, image_size, progress=None, seed=123):
 
     Parameters
     ----------
-    images_per_class : int.
-        Number of images to randomly select and save for each class.
-        
-    image_size : int.
-        The target width and height (in pixels) to resize images to.
-
-    progress : callable, optional.
+    images_per_class : int.\n
+        Number of images to randomly select and save for each class.\n
+    image_size : int.\n
+        The target width and height (in pixels) to resize images to.\n
+    progress : callable, optional.\n
         A callback function to update progress bars (e.g., for Gradio).
-        Should accept a float (0.0 to 1.0) and a description string.
-        
-    seed : int, optional.
+        Should accept a float (0.0 to 1.0) and a description string.\n
+    seed : int, optional.\n
         Random seed for reproducibility (default is 123).
     """
     random.seed(seed)

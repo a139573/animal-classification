@@ -21,9 +21,42 @@ class AnimalsDataModule(pl.LightningDataModule):
     LightningDataModule for the Animal Image Dataset.
 
     Ensures that images are augmented during training and normalized 
-    correctly for pre-trained VGG architectures.
+    correctly for pre-trained VGG architectures. It manages the full
+    lifecycle of data loading, from raw images on disk to batched tensors.
+
+    Attributes
+    ----------
+    train_ds : Subset\n
+        The training subset with data augmentation applied.\n
+    val_ds : Subset\n
+        The validation subset with deterministic transformations.\n
+    class_names : list\n
+        List of strings containing the animal species names.
     """
-    def __init__(self, data_dir: str, batch_size: int = 16, seed: int = 42, test_frac: float = 0.2, num_workers: int = 2):
+    def __init__(
+        self, 
+        data_dir: str, 
+        batch_size: int = 16, 
+        seed: int = 42, 
+        test_frac: float = 0.2, 
+        num_workers: int = 2
+    ):
+        """
+        Initialize the DataModule with directory paths and hyper-parameters.
+
+        Parameters
+        ----------
+        data_dir : str\n
+            Path to the root directory containing species subfolders.\n
+        batch_size : int, optional\n
+            Number of images per training/validation batch (default: 16).\n
+        seed : int, optional\n
+            Random seed for reproducible data splitting (default: 42).\n
+        test_frac : float, optional\n
+            The proportion of the dataset to include in the validation split (default: 0.2).\n
+        num_workers : int, optional\n
+            Number of subprocesses to use for data loading (default: 2).
+        """
         super().__init__()
         self.data_dir = Path(data_dir)
         self.batch_size = batch_size
@@ -58,8 +91,16 @@ class AnimalsDataModule(pl.LightningDataModule):
 
     def setup(self, stage: Optional[str] = None):
         """
-        Loads the dataset and performs the train/validation split using 
-        distinct transformation pipelines for each subset.
+        Loads the dataset and performs the train/validation split.
+
+        Creates two distinct transformation pipelines for each subset while ensuring
+        that the same random indices are used to avoid data leakage.
+
+        Parameters
+        ----------
+        stage : str, optional\n
+            The stage for which the setup is called ('fit' or 'test'). 
+            Defaults to None.
         """
         # We create two instances of the dataset pointing to the same root
         # but with different transformations.
@@ -70,7 +111,10 @@ class AnimalsDataModule(pl.LightningDataModule):
         
         # Logic to ensure the same indices are used for splitting despite having two objects
         num_samples = len(train_full)
-        indices = torch.randperm(num_samples, generator=torch.Generator().manual_seed(self.seed)).tolist()
+        indices = torch.randperm(
+            num_samples, 
+            generator=torch.Generator().manual_seed(self.seed)
+        ).tolist()
         
         n_val = int(num_samples * self.test_frac)
         
@@ -79,6 +123,14 @@ class AnimalsDataModule(pl.LightningDataModule):
         self.val_ds = Subset(val_full, indices[:n_val])
 
     def train_dataloader(self):
+        """
+        Constructs the training data loader.
+
+        Returns
+        -------
+        DataLoader\n
+            The batched and shuffled training data loader.
+        """
         return DataLoader(
             self.train_ds, 
             batch_size=self.batch_size, 
@@ -88,6 +140,14 @@ class AnimalsDataModule(pl.LightningDataModule):
         )
 
     def val_dataloader(self):
+        """
+        Constructs the validation data loader.
+
+        Returns
+        -------
+        DataLoader\n
+            The batched validation data loader (not shuffled).
+        """
         return DataLoader(
             self.val_ds, 
             batch_size=self.batch_size, 
@@ -97,6 +157,15 @@ class AnimalsDataModule(pl.LightningDataModule):
         )
 
     def test_dataloader(self):
+        """
+        Constructs the test data loader. 
+        Note: Currently uses the validation split for consistency during internal evaluation.
+
+        Returns
+        -------
+        DataLoader\n 
+            The batched test data loader.
+        """
         return DataLoader(
             self.val_ds, 
             batch_size=self.batch_size, 

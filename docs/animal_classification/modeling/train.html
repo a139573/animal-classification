@@ -206,12 +206,12 @@ python<span class="w"> </span>-m<span class="w"> </span><a href="">animal_classi
 </span><span id="L-97"><a href="#L-97"><span class="linenos"> 97</span></a><span class="sd">        Number of CPU subprocesses for data loading.\n</span>
 </span><span id="L-98"><a href="#L-98"><span class="linenos"> 98</span></a><span class="sd">    is_demo : bool.\n</span>
 </span><span id="L-99"><a href="#L-99"><span class="linenos"> 99</span></a><span class="sd">        If `True`, runs in Dashboard mode (in-memory).\n</span>
-</span><span id="L-100"><a href="#L-100"><span class="linenos">100</span></a><span class="sd">    progress : gradio.Progress, optional.</span>
+</span><span id="L-100"><a href="#L-100"><span class="linenos">100</span></a><span class="sd">    progress : gradio.Progress, optional\n</span>
 </span><span id="L-101"><a href="#L-101"><span class="linenos">101</span></a><span class="sd">        Gradio progress tracker.</span>
 </span><span id="L-102"><a href="#L-102"><span class="linenos">102</span></a>
 </span><span id="L-103"><a href="#L-103"><span class="linenos">103</span></a><span class="sd">    Returns</span>
 </span><span id="L-104"><a href="#L-104"><span class="linenos">104</span></a><span class="sd">    -------</span>
-</span><span id="L-105"><a href="#L-105"><span class="linenos">105</span></a><span class="sd">    dict</span>
+</span><span id="L-105"><a href="#L-105"><span class="linenos">105</span></a><span class="sd">    dict\n</span>
 </span><span id="L-106"><a href="#L-106"><span class="linenos">106</span></a><span class="sd">        A dictionary containing training metrics and the model object.</span>
 </span><span id="L-107"><a href="#L-107"><span class="linenos">107</span></a><span class="sd">    &quot;&quot;&quot;</span>
 </span><span id="L-108"><a href="#L-108"><span class="linenos">108</span></a>    <span class="c1"># Normalize architecture string to lowercase</span>
@@ -563,12 +563,12 @@ by the Gradio web interface.</p>
 </span><span id="train_model-98"><a href="#train_model-98"><span class="linenos"> 98</span></a><span class="sd">        Number of CPU subprocesses for data loading.\n</span>
 </span><span id="train_model-99"><a href="#train_model-99"><span class="linenos"> 99</span></a><span class="sd">    is_demo : bool.\n</span>
 </span><span id="train_model-100"><a href="#train_model-100"><span class="linenos">100</span></a><span class="sd">        If `True`, runs in Dashboard mode (in-memory).\n</span>
-</span><span id="train_model-101"><a href="#train_model-101"><span class="linenos">101</span></a><span class="sd">    progress : gradio.Progress, optional.</span>
+</span><span id="train_model-101"><a href="#train_model-101"><span class="linenos">101</span></a><span class="sd">    progress : gradio.Progress, optional\n</span>
 </span><span id="train_model-102"><a href="#train_model-102"><span class="linenos">102</span></a><span class="sd">        Gradio progress tracker.</span>
 </span><span id="train_model-103"><a href="#train_model-103"><span class="linenos">103</span></a>
 </span><span id="train_model-104"><a href="#train_model-104"><span class="linenos">104</span></a><span class="sd">    Returns</span>
 </span><span id="train_model-105"><a href="#train_model-105"><span class="linenos">105</span></a><span class="sd">    -------</span>
-</span><span id="train_model-106"><a href="#train_model-106"><span class="linenos">106</span></a><span class="sd">    dict</span>
+</span><span id="train_model-106"><a href="#train_model-106"><span class="linenos">106</span></a><span class="sd">    dict\n</span>
 </span><span id="train_model-107"><a href="#train_model-107"><span class="linenos">107</span></a><span class="sd">        A dictionary containing training metrics and the model object.</span>
 </span><span id="train_model-108"><a href="#train_model-108"><span class="linenos">108</span></a><span class="sd">    &quot;&quot;&quot;</span>
 </span><span id="train_model-109"><a href="#train_model-109"><span class="linenos">109</span></a>    <span class="c1"># Normalize architecture string to lowercase</span>
@@ -729,13 +729,17 @@ by the Gradio web interface.</p>
 <pre><code>If `True`, runs in Dashboard mode (in-memory).
 </code></pre>
 
-<p>progress : gradio.Progress, optional.
-    Gradio progress tracker.</p>
+<p>progress : gradio.Progress, optional</p>
+
+<pre><code>Gradio progress tracker.
+</code></pre>
 
 <h2 id="returns">Returns</h2>
 
-<p>dict
-    A dictionary containing training metrics and the model object.</p>
+<p>dict</p>
+
+<pre><code>A dictionary containing training metrics and the model object.
+</code></pre>
 </div>
 
 

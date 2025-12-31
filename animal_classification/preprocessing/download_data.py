@@ -19,12 +19,12 @@ def flatten_folder(path: Path) -> Path:
 
     Parameters
     ----------
-    path : Path
+    path : Path\n
         The initial directory path to inspect.
 
     Returns
     -------
-    Path
+    Path\n
         The path to the deepest single-child subdirectory found,
         or the original path if no flattening was needed.
     """

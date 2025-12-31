@@ -128,7 +128,7 @@ and returning PIL images (Dashboard mode).</p>
 </span><span id="L-32"><a href="#L-32"><span class="linenos"> 32</span></a>
 </span><span id="L-33"><a href="#L-33"><span class="linenos"> 33</span></a><span class="sd">    Parameters</span>
 </span><span id="L-34"><a href="#L-34"><span class="linenos"> 34</span></a><span class="sd">    ----------</span>
-</span><span id="L-35"><a href="#L-35"><span class="linenos"> 35</span></a><span class="sd">    data_dir : Path</span>
+</span><span id="L-35"><a href="#L-35"><span class="linenos"> 35</span></a><span class="sd">    data_dir : Path\n</span>
 </span><span id="L-36"><a href="#L-36"><span class="linenos"> 36</span></a><span class="sd">        The root directory containing animal class subfolders.</span>
 </span><span id="L-37"><a href="#L-37"><span class="linenos"> 37</span></a>
 </span><span id="L-38"><a href="#L-38"><span class="linenos"> 38</span></a><span class="sd">    Returns</span>
@@ -152,11 +152,11 @@ and returning PIL images (Dashboard mode).</p>
 </span><span id="L-56"><a href="#L-56"><span class="linenos"> 56</span></a>
 </span><span id="L-57"><a href="#L-57"><span class="linenos"> 57</span></a><span class="sd">    Parameters</span>
 </span><span id="L-58"><a href="#L-58"><span class="linenos"> 58</span></a><span class="sd">    ----------</span>
-</span><span id="L-59"><a href="#L-59"><span class="linenos"> 59</span></a><span class="sd">    data_dir : Path</span>
-</span><span id="L-60"><a href="#L-60"><span class="linenos"> 60</span></a><span class="sd">        The root directory of the dataset.</span>
-</span><span id="L-61"><a href="#L-61"><span class="linenos"> 61</span></a><span class="sd">    species_name : str</span>
-</span><span id="L-62"><a href="#L-62"><span class="linenos"> 62</span></a><span class="sd">        The folder name of the target species.</span>
-</span><span id="L-63"><a href="#L-63"><span class="linenos"> 63</span></a><span class="sd">    num_samples : int, optional</span>
+</span><span id="L-59"><a href="#L-59"><span class="linenos"> 59</span></a><span class="sd">    data_dir : Path\n</span>
+</span><span id="L-60"><a href="#L-60"><span class="linenos"> 60</span></a><span class="sd">        The root directory of the dataset.\n</span>
+</span><span id="L-61"><a href="#L-61"><span class="linenos"> 61</span></a><span class="sd">    species_name : str\n</span>
+</span><span id="L-62"><a href="#L-62"><span class="linenos"> 62</span></a><span class="sd">        The folder name of the target species.\n</span>
+</span><span id="L-63"><a href="#L-63"><span class="linenos"> 63</span></a><span class="sd">    num_samples : int, optional\n</span>
 </span><span id="L-64"><a href="#L-64"><span class="linenos"> 64</span></a><span class="sd">        Maximum number of samples to retrieve (default: 8).</span>
 </span><span id="L-65"><a href="#L-65"><span class="linenos"> 65</span></a>
 </span><span id="L-66"><a href="#L-66"><span class="linenos"> 66</span></a><span class="sd">    Returns</span>
@@ -185,12 +185,12 @@ and returning PIL images (Dashboard mode).</p>
 </span><span id="L-89"><a href="#L-89"><span class="linenos"> 89</span></a>
 </span><span id="L-90"><a href="#L-90"><span class="linenos"> 90</span></a><span class="sd">    Parameters</span>
 </span><span id="L-91"><a href="#L-91"><span class="linenos"> 91</span></a><span class="sd">    ----------</span>
-</span><span id="L-92"><a href="#L-92"><span class="linenos"> 92</span></a><span class="sd">    data_dir : Path</span>
+</span><span id="L-92"><a href="#L-92"><span class="linenos"> 92</span></a><span class="sd">    data_dir : Path\n</span>
 </span><span id="L-93"><a href="#L-93"><span class="linenos"> 93</span></a><span class="sd">        The directory containing the class folders.</span>
 </span><span id="L-94"><a href="#L-94"><span class="linenos"> 94</span></a>
 </span><span id="L-95"><a href="#L-95"><span class="linenos"> 95</span></a><span class="sd">    Returns</span>
 </span><span id="L-96"><a href="#L-96"><span class="linenos"> 96</span></a><span class="sd">    -------</span>
-</span><span id="L-97"><a href="#L-97"><span class="linenos"> 97</span></a><span class="sd">    PIL.Image.Image</span>
+</span><span id="L-97"><a href="#L-97"><span class="linenos"> 97</span></a><span class="sd">    PIL.Image.Image\n</span>
 </span><span id="L-98"><a href="#L-98"><span class="linenos"> 98</span></a><span class="sd">        The generated stacked bar plot as a PIL image object.</span>
 </span><span id="L-99"><a href="#L-99"><span class="linenos"> 99</span></a><span class="sd">    &quot;&quot;&quot;</span>
 </span><span id="L-100"><a href="#L-100"><span class="linenos">100</span></a>    <span class="n">class_folders</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">([</span><span class="n">d</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">data_dir</span><span class="o">.</span><span class="n">iterdir</span><span class="p">()</span> <span class="k">if</span> <span class="n">d</span><span class="o">.</span><span class="n">is_dir</span><span class="p">()])</span>
@@ -236,12 +236,12 @@ and returning PIL images (Dashboard mode).</p>
 </span><span id="L-140"><a href="#L-140"><span class="linenos">140</span></a>
 </span><span id="L-141"><a href="#L-141"><span class="linenos">141</span></a><span class="sd">    Parameters</span>
 </span><span id="L-142"><a href="#L-142"><span class="linenos">142</span></a><span class="sd">    ----------</span>
-</span><span id="L-143"><a href="#L-143"><span class="linenos">143</span></a><span class="sd">    fig : matplotlib.figure.Figure, optional</span>
+</span><span id="L-143"><a href="#L-143"><span class="linenos">143</span></a><span class="sd">    fig : matplotlib.figure.Figure, optional\n</span>
 </span><span id="L-144"><a href="#L-144"><span class="linenos">144</span></a><span class="sd">        The figure to convert. If None, uses the current active figure.</span>
 </span><span id="L-145"><a href="#L-145"><span class="linenos">145</span></a><span class="sd">    </span>
 </span><span id="L-146"><a href="#L-146"><span class="linenos">146</span></a><span class="sd">    Returns</span>
 </span><span id="L-147"><a href="#L-147"><span class="linenos">147</span></a><span class="sd">    -------</span>
-</span><span id="L-148"><a href="#L-148"><span class="linenos">148</span></a><span class="sd">    PIL.Image.Image</span>
+</span><span id="L-148"><a href="#L-148"><span class="linenos">148</span></a><span class="sd">    PIL.Image.Image\n</span>
 </span><span id="L-149"><a href="#L-149"><span class="linenos">149</span></a><span class="sd">        The plot rendered as an image object.</span>
 </span><span id="L-150"><a href="#L-150"><span class="linenos">150</span></a><span class="sd">    &quot;&quot;&quot;</span>
 </span><span id="L-151"><a href="#L-151"><span class="linenos">151</span></a>    <span class="n">buf</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">()</span>
@@ -264,16 +264,16 @@ and returning PIL images (Dashboard mode).</p>
 </span><span id="L-168"><a href="#L-168"><span class="linenos">168</span></a><span class="sd">    Parameters</span>
 </span><span id="L-169"><a href="#L-169"><span class="linenos">169</span></a><span class="sd">    ----------</span>
 </span><span id="L-170"><a href="#L-170"><span class="linenos">170</span></a><span class="sd">    train_loss : list</span>
-</span><span id="L-171"><a href="#L-171"><span class="linenos">171</span></a><span class="sd">        Historical values of training loss per epoch.</span>
-</span><span id="L-172"><a href="#L-172"><span class="linenos">172</span></a><span class="sd">    val_loss : list</span>
-</span><span id="L-173"><a href="#L-173"><span class="linenos">173</span></a><span class="sd">        Historical values of validation loss per epoch.</span>
-</span><span id="L-174"><a href="#L-174"><span class="linenos">174</span></a><span class="sd">    val_acc : list</span>
-</span><span id="L-175"><a href="#L-175"><span class="linenos">175</span></a><span class="sd">        Historical values of validation accuracy per epoch.</span>
-</span><span id="L-176"><a href="#L-176"><span class="linenos">176</span></a><span class="sd">    architecture_name : str, optional</span>
-</span><span id="L-177"><a href="#L-177"><span class="linenos">177</span></a><span class="sd">        Name of the model backbone used (default: &quot;Model&quot;).</span>
-</span><span id="L-178"><a href="#L-178"><span class="linenos">178</span></a><span class="sd">    output_path : Path, optional</span>
-</span><span id="L-179"><a href="#L-179"><span class="linenos">179</span></a><span class="sd">        Filesystem path to save the generated image (ignored if is_demo is True).</span>
-</span><span id="L-180"><a href="#L-180"><span class="linenos">180</span></a><span class="sd">    is_demo : bool, optional</span>
+</span><span id="L-171"><a href="#L-171"><span class="linenos">171</span></a><span class="sd">        Historical values of training loss per epoch.\n</span>
+</span><span id="L-172"><a href="#L-172"><span class="linenos">172</span></a><span class="sd">    val_loss : list\n</span>
+</span><span id="L-173"><a href="#L-173"><span class="linenos">173</span></a><span class="sd">        Historical values of validation loss per epoch.\n</span>
+</span><span id="L-174"><a href="#L-174"><span class="linenos">174</span></a><span class="sd">    val_acc : list\n</span>
+</span><span id="L-175"><a href="#L-175"><span class="linenos">175</span></a><span class="sd">        Historical values of validation accuracy per epoch.\n</span>
+</span><span id="L-176"><a href="#L-176"><span class="linenos">176</span></a><span class="sd">    architecture_name : str, optional\n</span>
+</span><span id="L-177"><a href="#L-177"><span class="linenos">177</span></a><span class="sd">        Name of the model backbone used (default: &quot;Model&quot;).\n</span>
+</span><span id="L-178"><a href="#L-178"><span class="linenos">178</span></a><span class="sd">    output_path : Path, optional\n</span>
+</span><span id="L-179"><a href="#L-179"><span class="linenos">179</span></a><span class="sd">        Filesystem path to save the generated image (ignored if is_demo is True).\n</span>
+</span><span id="L-180"><a href="#L-180"><span class="linenos">180</span></a><span class="sd">    is_demo : bool, optional\n</span>
 </span><span id="L-181"><a href="#L-181"><span class="linenos">181</span></a><span class="sd">        If True, returns the plot as a PIL Image object (default: False).</span>
 </span><span id="L-182"><a href="#L-182"><span class="linenos">182</span></a>
 </span><span id="L-183"><a href="#L-183"><span class="linenos">183</span></a><span class="sd">    Returns</span>
@@ -318,20 +318,20 @@ and returning PIL images (Dashboard mode).</p>
 </span><span id="L-222"><a href="#L-222"><span class="linenos">222</span></a>
 </span><span id="L-223"><a href="#L-223"><span class="linenos">223</span></a><span class="sd">    Parameters</span>
 </span><span id="L-224"><a href="#L-224"><span class="linenos">224</span></a><span class="sd">    ----------</span>
-</span><span id="L-225"><a href="#L-225"><span class="linenos">225</span></a><span class="sd">    y_true : array-like</span>
-</span><span id="L-226"><a href="#L-226"><span class="linenos">226</span></a><span class="sd">        Ground truth (correct) target values.</span>
-</span><span id="L-227"><a href="#L-227"><span class="linenos">227</span></a><span class="sd">    y_pred : array-like</span>
-</span><span id="L-228"><a href="#L-228"><span class="linenos">228</span></a><span class="sd">        Estimated targets as returned by a classifier.</span>
-</span><span id="L-229"><a href="#L-229"><span class="linenos">229</span></a><span class="sd">    architecture_name : str</span>
-</span><span id="L-230"><a href="#L-230"><span class="linenos">230</span></a><span class="sd">        Name of the model (for the plot title).</span>
-</span><span id="L-231"><a href="#L-231"><span class="linenos">231</span></a><span class="sd">    output_path : Path, optional</span>
-</span><span id="L-232"><a href="#L-232"><span class="linenos">232</span></a><span class="sd">        Directory to save the `.png` file if `is_demo=False`.</span>
-</span><span id="L-233"><a href="#L-233"><span class="linenos">233</span></a><span class="sd">    is_demo : bool</span>
+</span><span id="L-225"><a href="#L-225"><span class="linenos">225</span></a><span class="sd">    y_true : array-like\n</span>
+</span><span id="L-226"><a href="#L-226"><span class="linenos">226</span></a><span class="sd">        Ground truth (correct) target values.\n</span>
+</span><span id="L-227"><a href="#L-227"><span class="linenos">227</span></a><span class="sd">    y_pred : array-like\n</span>
+</span><span id="L-228"><a href="#L-228"><span class="linenos">228</span></a><span class="sd">        Estimated targets as returned by a classifier.\n</span>
+</span><span id="L-229"><a href="#L-229"><span class="linenos">229</span></a><span class="sd">    architecture_name : str\n</span>
+</span><span id="L-230"><a href="#L-230"><span class="linenos">230</span></a><span class="sd">        Name of the model (for the plot title).\n</span>
+</span><span id="L-231"><a href="#L-231"><span class="linenos">231</span></a><span class="sd">    output_path : Path, optional\n</span>
+</span><span id="L-232"><a href="#L-232"><span class="linenos">232</span></a><span class="sd">        Directory to save the `.png` file if `is_demo=False`.\n</span>
+</span><span id="L-233"><a href="#L-233"><span class="linenos">233</span></a><span class="sd">    is_demo : bool\n</span>
 </span><span id="L-234"><a href="#L-234"><span class="linenos">234</span></a><span class="sd">        If True, returns a PIL Image instead of saving to disk.</span>
 </span><span id="L-235"><a href="#L-235"><span class="linenos">235</span></a>
 </span><span id="L-236"><a href="#L-236"><span class="linenos">236</span></a><span class="sd">    Returns</span>
 </span><span id="L-237"><a href="#L-237"><span class="linenos">237</span></a><span class="sd">    -------</span>
-</span><span id="L-238"><a href="#L-238"><span class="linenos">238</span></a><span class="sd">    PIL.Image.Image or numpy.ndarray</span>
+</span><span id="L-238"><a href="#L-238"><span class="linenos">238</span></a><span class="sd">    PIL.Image.Image or numpy.ndarray\n</span>
 </span><span id="L-239"><a href="#L-239"><span class="linenos">239</span></a><span class="sd">        Returns the PIL Image if `is_demo=True`.</span>
 </span><span id="L-240"><a href="#L-240"><span class="linenos">240</span></a><span class="sd">        Returns the raw confusion matrix array if `is_demo=False`.</span>
 </span><span id="L-241"><a href="#L-241"><span class="linenos">241</span></a><span class="sd">    &quot;&quot;&quot;</span>
@@ -360,22 +360,22 @@ and returning PIL images (Dashboard mode).</p>
 </span><span id="L-264"><a href="#L-264"><span class="linenos">264</span></a>
 </span><span id="L-265"><a href="#L-265"><span class="linenos">265</span></a><span class="sd">    Parameters</span>
 </span><span id="L-266"><a href="#L-266"><span class="linenos">266</span></a><span class="sd">    ----------</span>
-</span><span id="L-267"><a href="#L-267"><span class="linenos">267</span></a><span class="sd">    y_true : array-like</span>
-</span><span id="L-268"><a href="#L-268"><span class="linenos">268</span></a><span class="sd">        Ground truth labels.</span>
-</span><span id="L-269"><a href="#L-269"><span class="linenos">269</span></a><span class="sd">    y_probs : array-like</span>
-</span><span id="L-270"><a href="#L-270"><span class="linenos">270</span></a><span class="sd">        Probability estimates of the positive class.</span>
-</span><span id="L-271"><a href="#L-271"><span class="linenos">271</span></a><span class="sd">    num_classes : int</span>
-</span><span id="L-272"><a href="#L-272"><span class="linenos">272</span></a><span class="sd">        Total number of classes.</span>
-</span><span id="L-273"><a href="#L-273"><span class="linenos">273</span></a><span class="sd">    architecture_name : str</span>
-</span><span id="L-274"><a href="#L-274"><span class="linenos">274</span></a><span class="sd">        Name of the model.</span>
-</span><span id="L-275"><a href="#L-275"><span class="linenos">275</span></a><span class="sd">    output_path : Path, optional</span>
-</span><span id="L-276"><a href="#L-276"><span class="linenos">276</span></a><span class="sd">        Path to save the plot.</span>
-</span><span id="L-277"><a href="#L-277"><span class="linenos">277</span></a><span class="sd">    is_demo : bool</span>
+</span><span id="L-267"><a href="#L-267"><span class="linenos">267</span></a><span class="sd">    y_true : array-like\n</span>
+</span><span id="L-268"><a href="#L-268"><span class="linenos">268</span></a><span class="sd">        Ground truth labels.\n</span>
+</span><span id="L-269"><a href="#L-269"><span class="linenos">269</span></a><span class="sd">    y_probs : array-like\n</span>
+</span><span id="L-270"><a href="#L-270"><span class="linenos">270</span></a><span class="sd">        Probability estimates of the positive class.\n</span>
+</span><span id="L-271"><a href="#L-271"><span class="linenos">271</span></a><span class="sd">    num_classes : int\n</span>
+</span><span id="L-272"><a href="#L-272"><span class="linenos">272</span></a><span class="sd">        Total number of classes.\n</span>
+</span><span id="L-273"><a href="#L-273"><span class="linenos">273</span></a><span class="sd">    architecture_name : str\n</span>
+</span><span id="L-274"><a href="#L-274"><span class="linenos">274</span></a><span class="sd">        Name of the model.\n</span>
+</span><span id="L-275"><a href="#L-275"><span class="linenos">275</span></a><span class="sd">    output_path : Path, optional\n</span>
+</span><span id="L-276"><a href="#L-276"><span class="linenos">276</span></a><span class="sd">        Path to save the plot.\n</span>
+</span><span id="L-277"><a href="#L-277"><span class="linenos">277</span></a><span class="sd">    is_demo : bool\n</span>
 </span><span id="L-278"><a href="#L-278"><span class="linenos">278</span></a><span class="sd">        If True, returns the plot as an image and the AUC score.</span>
 </span><span id="L-279"><a href="#L-279"><span class="linenos">279</span></a>
 </span><span id="L-280"><a href="#L-280"><span class="linenos">280</span></a><span class="sd">    Returns</span>
 </span><span id="L-281"><a href="#L-281"><span class="linenos">281</span></a><span class="sd">    -------</span>
-</span><span id="L-282"><a href="#L-282"><span class="linenos">282</span></a><span class="sd">    tuple</span>
+</span><span id="L-282"><a href="#L-282"><span class="linenos">282</span></a><span class="sd">    tuple\n</span>
 </span><span id="L-283"><a href="#L-283"><span class="linenos">283</span></a><span class="sd">        A tuple containing (PIL.Image.Image, float_auc_score) if `is_demo=True`.</span>
 </span><span id="L-284"><a href="#L-284"><span class="linenos">284</span></a><span class="sd">        A tuple containing (None, float_auc_score) if `is_demo=False`.</span>
 </span><span id="L-285"><a href="#L-285"><span class="linenos">285</span></a><span class="sd">    &quot;&quot;&quot;</span>
@@ -436,22 +436,22 @@ and returning PIL images (Dashboard mode).</p>
 </span><span id="L-340"><a href="#L-340"><span class="linenos">340</span></a>
 </span><span id="L-341"><a href="#L-341"><span class="linenos">341</span></a><span class="sd">    Parameters</span>
 </span><span id="L-342"><a href="#L-342"><span class="linenos">342</span></a><span class="sd">    ----------</span>
-</span><span id="L-343"><a href="#L-343"><span class="linenos">343</span></a><span class="sd">    y_true : array-like</span>
-</span><span id="L-344"><a href="#L-344"><span class="linenos">344</span></a><span class="sd">        True labels.</span>
-</span><span id="L-345"><a href="#L-345"><span class="linenos">345</span></a><span class="sd">    y_probs : array-like</span>
-</span><span id="L-346"><a href="#L-346"><span class="linenos">346</span></a><span class="sd">        Predicted probabilities.</span>
-</span><span id="L-347"><a href="#L-347"><span class="linenos">347</span></a><span class="sd">    num_classes : int</span>
-</span><span id="L-348"><a href="#L-348"><span class="linenos">348</span></a><span class="sd">        Number of classes.</span>
-</span><span id="L-349"><a href="#L-349"><span class="linenos">349</span></a><span class="sd">    architecture_name : str</span>
-</span><span id="L-350"><a href="#L-350"><span class="linenos">350</span></a><span class="sd">        Name of the model.</span>
-</span><span id="L-351"><a href="#L-351"><span class="linenos">351</span></a><span class="sd">    output_path : Path, optional</span>
-</span><span id="L-352"><a href="#L-352"><span class="linenos">352</span></a><span class="sd">        Save location on the filesystem.</span>
-</span><span id="L-353"><a href="#L-353"><span class="linenos">353</span></a><span class="sd">    is_demo : bool</span>
+</span><span id="L-343"><a href="#L-343"><span class="linenos">343</span></a><span class="sd">    y_true : array-like\n</span>
+</span><span id="L-344"><a href="#L-344"><span class="linenos">344</span></a><span class="sd">        True labels.\n</span>
+</span><span id="L-345"><a href="#L-345"><span class="linenos">345</span></a><span class="sd">    y_probs : array-like\n</span>
+</span><span id="L-346"><a href="#L-346"><span class="linenos">346</span></a><span class="sd">        Predicted probabilities.\n</span>
+</span><span id="L-347"><a href="#L-347"><span class="linenos">347</span></a><span class="sd">    num_classes : int\n</span>
+</span><span id="L-348"><a href="#L-348"><span class="linenos">348</span></a><span class="sd">        Number of classes.\n</span>
+</span><span id="L-349"><a href="#L-349"><span class="linenos">349</span></a><span class="sd">    architecture_name : str\n</span>
+</span><span id="L-350"><a href="#L-350"><span class="linenos">350</span></a><span class="sd">        Name of the model.\n</span>
+</span><span id="L-351"><a href="#L-351"><span class="linenos">351</span></a><span class="sd">    output_path : Path, optional\n</span>
+</span><span id="L-352"><a href="#L-352"><span class="linenos">352</span></a><span class="sd">        Save location on the filesystem.\n</span>
+</span><span id="L-353"><a href="#L-353"><span class="linenos">353</span></a><span class="sd">    is_demo : bool\n</span>
 </span><span id="L-354"><a href="#L-354"><span class="linenos">354</span></a><span class="sd">        If True, returns the generated plot as a PIL image object.</span>
 </span><span id="L-355"><a href="#L-355"><span class="linenos">355</span></a><span class="sd">        </span>
 </span><span id="L-356"><a href="#L-356"><span class="linenos">356</span></a><span class="sd">    Returns</span>
 </span><span id="L-357"><a href="#L-357"><span class="linenos">357</span></a><span class="sd">    -------</span>
-</span><span id="L-358"><a href="#L-358"><span class="linenos">358</span></a><span class="sd">    PIL.Image.Image or None</span>
+</span><span id="L-358"><a href="#L-358"><span class="linenos">358</span></a><span class="sd">    PIL.Image.Image or None\n</span>
 </span><span id="L-359"><a href="#L-359"><span class="linenos">359</span></a><span class="sd">        The reliability diagram image object if is_demo is True, otherwise None.</span>
 </span><span id="L-360"><a href="#L-360"><span class="linenos">360</span></a><span class="sd">    &quot;&quot;&quot;</span>
 </span><span id="L-361"><a href="#L-361"><span class="linenos">361</span></a>    <span class="k">try</span><span class="p">:</span>
@@ -509,7 +509,7 @@ and returning PIL images (Dashboard mode).</p>
 </span><span id="get_dataset_stats-33"><a href="#get_dataset_stats-33"><span class="linenos">33</span></a>
 </span><span id="get_dataset_stats-34"><a href="#get_dataset_stats-34"><span class="linenos">34</span></a><span class="sd">    Parameters</span>
 </span><span id="get_dataset_stats-35"><a href="#get_dataset_stats-35"><span class="linenos">35</span></a><span class="sd">    ----------</span>
-</span><span id="get_dataset_stats-36"><a href="#get_dataset_stats-36"><span class="linenos">36</span></a><span class="sd">    data_dir : Path</span>
+</span><span id="get_dataset_stats-36"><a href="#get_dataset_stats-36"><span class="linenos">36</span></a><span class="sd">    data_dir : Path\n</span>
 </span><span id="get_dataset_stats-37"><a href="#get_dataset_stats-37"><span class="linenos">37</span></a><span class="sd">        The root directory containing animal class subfolders.</span>
 </span><span id="get_dataset_stats-38"><a href="#get_dataset_stats-38"><span class="linenos">38</span></a>
 </span><span id="get_dataset_stats-39"><a href="#get_dataset_stats-39"><span class="linenos">39</span></a><span class="sd">    Returns</span>
@@ -533,8 +533,10 @@ to provide a summary of the dataset's composition.</p>
 
 <h2 id="parameters">Parameters</h2>
 
-<p>data_dir : Path
-    The root directory containing animal class subfolders.</p>
+<p>data_dir : Path</p>
+
+<pre><code>The root directory containing animal class subfolders.
+</code></pre>
 
 <h2 id="returns">Returns</h2>
 
@@ -566,11 +568,11 @@ to provide a summary of the dataset's composition.</p>
 </span><span id="get_species_samples-57"><a href="#get_species_samples-57"><span class="linenos">57</span></a>
 </span><span id="get_species_samples-58"><a href="#get_species_samples-58"><span class="linenos">58</span></a><span class="sd">    Parameters</span>
 </span><span id="get_species_samples-59"><a href="#get_species_samples-59"><span class="linenos">59</span></a><span class="sd">    ----------</span>
-</span><span id="get_species_samples-60"><a href="#get_species_samples-60"><span class="linenos">60</span></a><span class="sd">    data_dir : Path</span>
-</span><span id="get_species_samples-61"><a href="#get_species_samples-61"><span class="linenos">61</span></a><span class="sd">        The root directory of the dataset.</span>
-</span><span id="get_species_samples-62"><a href="#get_species_samples-62"><span class="linenos">62</span></a><span class="sd">    species_name : str</span>
-</span><span id="get_species_samples-63"><a href="#get_species_samples-63"><span class="linenos">63</span></a><span class="sd">        The folder name of the target species.</span>
-</span><span id="get_species_samples-64"><a href="#get_species_samples-64"><span class="linenos">64</span></a><span class="sd">    num_samples : int, optional</span>
+</span><span id="get_species_samples-60"><a href="#get_species_samples-60"><span class="linenos">60</span></a><span class="sd">    data_dir : Path\n</span>
+</span><span id="get_species_samples-61"><a href="#get_species_samples-61"><span class="linenos">61</span></a><span class="sd">        The root directory of the dataset.\n</span>
+</span><span id="get_species_samples-62"><a href="#get_species_samples-62"><span class="linenos">62</span></a><span class="sd">    species_name : str\n</span>
+</span><span id="get_species_samples-63"><a href="#get_species_samples-63"><span class="linenos">63</span></a><span class="sd">        The folder name of the target species.\n</span>
+</span><span id="get_species_samples-64"><a href="#get_species_samples-64"><span class="linenos">64</span></a><span class="sd">    num_samples : int, optional\n</span>
 </span><span id="get_species_samples-65"><a href="#get_species_samples-65"><span class="linenos">65</span></a><span class="sd">        Maximum number of samples to retrieve (default: 8).</span>
 </span><span id="get_species_samples-66"><a href="#get_species_samples-66"><span class="linenos">66</span></a>
 </span><span id="get_species_samples-67"><a href="#get_species_samples-67"><span class="linenos">67</span></a><span class="sd">    Returns</span>
@@ -598,12 +600,20 @@ metadata or hidden system files and provides samples for UI visualization.</p>
 
 <h2 id="parameters">Parameters</h2>
 
-<p>data_dir : Path
-    The root directory of the dataset.
-species_name : str
-    The folder name of the target species.
-num_samples : int, optional
-    Maximum number of samples to retrieve (default: 8).</p>
+<p>data_dir : Path</p>
+
+<pre><code>The root directory of the dataset.
+</code></pre>
+
+<p>species_name : str</p>
+
+<pre><code>The folder name of the target species.
+</code></pre>
+
+<p>num_samples : int, optional</p>
+
+<pre><code>Maximum number of samples to retrieve (default: 8).
+</code></pre>
 
 <h2 id="returns">Returns</h2>
 
@@ -634,12 +644,12 @@ num_samples : int, optional
 </span><span id="plot_color_analysis-90"><a href="#plot_color_analysis-90"><span class="linenos"> 90</span></a>
 </span><span id="plot_color_analysis-91"><a href="#plot_color_analysis-91"><span class="linenos"> 91</span></a><span class="sd">    Parameters</span>
 </span><span id="plot_color_analysis-92"><a href="#plot_color_analysis-92"><span class="linenos"> 92</span></a><span class="sd">    ----------</span>
-</span><span id="plot_color_analysis-93"><a href="#plot_color_analysis-93"><span class="linenos"> 93</span></a><span class="sd">    data_dir : Path</span>
+</span><span id="plot_color_analysis-93"><a href="#plot_color_analysis-93"><span class="linenos"> 93</span></a><span class="sd">    data_dir : Path\n</span>
 </span><span id="plot_color_analysis-94"><a href="#plot_color_analysis-94"><span class="linenos"> 94</span></a><span class="sd">        The directory containing the class folders.</span>
 </span><span id="plot_color_analysis-95"><a href="#plot_color_analysis-95"><span class="linenos"> 95</span></a>
 </span><span id="plot_color_analysis-96"><a href="#plot_color_analysis-96"><span class="linenos"> 96</span></a><span class="sd">    Returns</span>
 </span><span id="plot_color_analysis-97"><a href="#plot_color_analysis-97"><span class="linenos"> 97</span></a><span class="sd">    -------</span>
-</span><span id="plot_color_analysis-98"><a href="#plot_color_analysis-98"><span class="linenos"> 98</span></a><span class="sd">    PIL.Image.Image</span>
+</span><span id="plot_color_analysis-98"><a href="#plot_color_analysis-98"><span class="linenos"> 98</span></a><span class="sd">    PIL.Image.Image\n</span>
 </span><span id="plot_color_analysis-99"><a href="#plot_color_analysis-99"><span class="linenos"> 99</span></a><span class="sd">        The generated stacked bar plot as a PIL image object.</span>
 </span><span id="plot_color_analysis-100"><a href="#plot_color_analysis-100"><span class="linenos">100</span></a><span class="sd">    &quot;&quot;&quot;</span>
 </span><span id="plot_color_analysis-101"><a href="#plot_color_analysis-101"><span class="linenos">101</span></a>    <span class="n">class_folders</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">([</span><span class="n">d</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">data_dir</span><span class="o">.</span><span class="n">iterdir</span><span class="p">()</span> <span class="k">if</span> <span class="n">d</span><span class="o">.</span><span class="n">is_dir</span><span class="p">()])</span>
@@ -683,13 +693,17 @@ Limited to 25 species for plot readability.</p>
 
 <h2 id="parameters">Parameters</h2>
 
-<p>data_dir : Path
-    The directory containing the class folders.</p>
+<p>data_dir : Path</p>
+
+<pre><code>The directory containing the class folders.
+</code></pre>
 
 <h2 id="returns">Returns</h2>
 
-<p>PIL.Image.Image
-    The generated stacked bar plot as a PIL image object.</p>
+<p>PIL.Image.Image</p>
+
+<pre><code>The generated stacked bar plot as a PIL image object.
+</code></pre>
 </div>
 
 
@@ -714,12 +728,12 @@ Limited to 25 species for plot readability.</p>
 </span><span id="fig_to_image-141"><a href="#fig_to_image-141"><span class="linenos">141</span></a>
 </span><span id="fig_to_image-142"><a href="#fig_to_image-142"><span class="linenos">142</span></a><span class="sd">    Parameters</span>
 </span><span id="fig_to_image-143"><a href="#fig_to_image-143"><span class="linenos">143</span></a><span class="sd">    ----------</span>
-</span><span id="fig_to_image-144"><a href="#fig_to_image-144"><span class="linenos">144</span></a><span class="sd">    fig : matplotlib.figure.Figure, optional</span>
+</span><span id="fig_to_image-144"><a href="#fig_to_image-144"><span class="linenos">144</span></a><span class="sd">    fig : matplotlib.figure.Figure, optional\n</span>
 </span><span id="fig_to_image-145"><a href="#fig_to_image-145"><span class="linenos">145</span></a><span class="sd">        The figure to convert. If None, uses the current active figure.</span>
 </span><span id="fig_to_image-146"><a href="#fig_to_image-146"><span class="linenos">146</span></a><span class="sd">    </span>
 </span><span id="fig_to_image-147"><a href="#fig_to_image-147"><span class="linenos">147</span></a><span class="sd">    Returns</span>
 </span><span id="fig_to_image-148"><a href="#fig_to_image-148"><span class="linenos">148</span></a><span class="sd">    -------</span>
-</span><span id="fig_to_image-149"><a href="#fig_to_image-149"><span class="linenos">149</span></a><span class="sd">    PIL.Image.Image</span>
+</span><span id="fig_to_image-149"><a href="#fig_to_image-149"><span class="linenos">149</span></a><span class="sd">    PIL.Image.Image\n</span>
 </span><span id="fig_to_image-150"><a href="#fig_to_image-150"><span class="linenos">150</span></a><span class="sd">        The plot rendered as an image object.</span>
 </span><span id="fig_to_image-151"><a href="#fig_to_image-151"><span class="linenos">151</span></a><span class="sd">    &quot;&quot;&quot;</span>
 </span><span id="fig_to_image-152"><a href="#fig_to_image-152"><span class="linenos">152</span></a>    <span class="n">buf</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">()</span>
@@ -741,13 +755,17 @@ in memory without saving them to disk.</p>
 
 <h2 id="parameters">Parameters</h2>
 
-<p>fig : matplotlib.figure.Figure, optional
-    The figure to convert. If None, uses the current active figure.</p>
+<p>fig : matplotlib.figure.Figure, optional</p>
+
+<pre><code>The figure to convert. If None, uses the current active figure.
+</code></pre>
 
 <h2 id="returns">Returns</h2>
 
-<p>PIL.Image.Image
-    The plot rendered as an image object.</p>
+<p>PIL.Image.Image</p>
+
+<pre><code>The plot rendered as an image object.
+</code></pre>
 </div>
 
 
@@ -773,16 +791,16 @@ in memory without saving them to disk.</p>
 </span><span id="plot_training_curves-169"><a href="#plot_training_curves-169"><span class="linenos">169</span></a><span class="sd">    Parameters</span>
 </span><span id="plot_training_curves-170"><a href="#plot_training_curves-170"><span class="linenos">170</span></a><span class="sd">    ----------</span>
 </span><span id="plot_training_curves-171"><a href="#plot_training_curves-171"><span class="linenos">171</span></a><span class="sd">    train_loss : list</span>
-</span><span id="plot_training_curves-172"><a href="#plot_training_curves-172"><span class="linenos">172</span></a><span class="sd">        Historical values of training loss per epoch.</span>
-</span><span id="plot_training_curves-173"><a href="#plot_training_curves-173"><span class="linenos">173</span></a><span class="sd">    val_loss : list</span>
-</span><span id="plot_training_curves-174"><a href="#plot_training_curves-174"><span class="linenos">174</span></a><span class="sd">        Historical values of validation loss per epoch.</span>
-</span><span id="plot_training_curves-175"><a href="#plot_training_curves-175"><span class="linenos">175</span></a><span class="sd">    val_acc : list</span>
-</span><span id="plot_training_curves-176"><a href="#plot_training_curves-176"><span class="linenos">176</span></a><span class="sd">        Historical values of validation accuracy per epoch.</span>
-</span><span id="plot_training_curves-177"><a href="#plot_training_curves-177"><span class="linenos">177</span></a><span class="sd">    architecture_name : str, optional</span>
-</span><span id="plot_training_curves-178"><a href="#plot_training_curves-178"><span class="linenos">178</span></a><span class="sd">        Name of the model backbone used (default: &quot;Model&quot;).</span>
-</span><span id="plot_training_curves-179"><a href="#plot_training_curves-179"><span class="linenos">179</span></a><span class="sd">    output_path : Path, optional</span>
-</span><span id="plot_training_curves-180"><a href="#plot_training_curves-180"><span class="linenos">180</span></a><span class="sd">        Filesystem path to save the generated image (ignored if is_demo is True).</span>
-</span><span id="plot_training_curves-181"><a href="#plot_training_curves-181"><span class="linenos">181</span></a><span class="sd">    is_demo : bool, optional</span>
+</span><span id="plot_training_curves-172"><a href="#plot_training_curves-172"><span class="linenos">172</span></a><span class="sd">        Historical values of training loss per epoch.\n</span>
+</span><span id="plot_training_curves-173"><a href="#plot_training_curves-173"><span class="linenos">173</span></a><span class="sd">    val_loss : list\n</span>
+</span><span id="plot_training_curves-174"><a href="#plot_training_curves-174"><span class="linenos">174</span></a><span class="sd">        Historical values of validation loss per epoch.\n</span>
+</span><span id="plot_training_curves-175"><a href="#plot_training_curves-175"><span class="linenos">175</span></a><span class="sd">    val_acc : list\n</span>
+</span><span id="plot_training_curves-176"><a href="#plot_training_curves-176"><span class="linenos">176</span></a><span class="sd">        Historical values of validation accuracy per epoch.\n</span>
+</span><span id="plot_training_curves-177"><a href="#plot_training_curves-177"><span class="linenos">177</span></a><span class="sd">    architecture_name : str, optional\n</span>
+</span><span id="plot_training_curves-178"><a href="#plot_training_curves-178"><span class="linenos">178</span></a><span class="sd">        Name of the model backbone used (default: &quot;Model&quot;).\n</span>
+</span><span id="plot_training_curves-179"><a href="#plot_training_curves-179"><span class="linenos">179</span></a><span class="sd">    output_path : Path, optional\n</span>
+</span><span id="plot_training_curves-180"><a href="#plot_training_curves-180"><span class="linenos">180</span></a><span class="sd">        Filesystem path to save the generated image (ignored if is_demo is True).\n</span>
+</span><span id="plot_training_curves-181"><a href="#plot_training_curves-181"><span class="linenos">181</span></a><span class="sd">    is_demo : bool, optional\n</span>
 </span><span id="plot_training_curves-182"><a href="#plot_training_curves-182"><span class="linenos">182</span></a><span class="sd">        If True, returns the plot as a PIL Image object (default: False).</span>
 </span><span id="plot_training_curves-183"><a href="#plot_training_curves-183"><span class="linenos">183</span></a>
 </span><span id="plot_training_curves-184"><a href="#plot_training_curves-184"><span class="linenos">184</span></a><span class="sd">    Returns</span>
@@ -831,17 +849,32 @@ providing immediate feedback on model learning and potential overfitting.</p>
 <h2 id="parameters">Parameters</h2>
 
 <p>train_loss : list
-    Historical values of training loss per epoch.
-val_loss : list
-    Historical values of validation loss per epoch.
-val_acc : list
-    Historical values of validation accuracy per epoch.
-architecture_name : str, optional
-    Name of the model backbone used (default: "Model").
-output_path : Path, optional
-    Filesystem path to save the generated image (ignored if is_demo is True).
-is_demo : bool, optional
-    If True, returns the plot as a PIL Image object (default: False).</p>
+    Historical values of training loss per epoch.</p>
+
+<p>val_loss : list</p>
+
+<pre><code>Historical values of validation loss per epoch.
+</code></pre>
+
+<p>val_acc : list</p>
+
+<pre><code>Historical values of validation accuracy per epoch.
+</code></pre>
+
+<p>architecture_name : str, optional</p>
+
+<pre><code>Name of the model backbone used (default: "Model").
+</code></pre>
+
+<p>output_path : Path, optional</p>
+
+<pre><code>Filesystem path to save the generated image (ignored if is_demo is True).
+</code></pre>
+
+<p>is_demo : bool, optional</p>
+
+<pre><code>If True, returns the plot as a PIL Image object (default: False).
+</code></pre>
 
 <h2 id="returns">Returns</h2>
 
@@ -868,20 +901,20 @@ is_demo : bool, optional
 </span><span id="plot_confusion_matrix-223"><a href="#plot_confusion_matrix-223"><span class="linenos">223</span></a>
 </span><span id="plot_confusion_matrix-224"><a href="#plot_confusion_matrix-224"><span class="linenos">224</span></a><span class="sd">    Parameters</span>
 </span><span id="plot_confusion_matrix-225"><a href="#plot_confusion_matrix-225"><span class="linenos">225</span></a><span class="sd">    ----------</span>
-</span><span id="plot_confusion_matrix-226"><a href="#plot_confusion_matrix-226"><span class="linenos">226</span></a><span class="sd">    y_true : array-like</span>
-</span><span id="plot_confusion_matrix-227"><a href="#plot_confusion_matrix-227"><span class="linenos">227</span></a><span class="sd">        Ground truth (correct) target values.</span>
-</span><span id="plot_confusion_matrix-228"><a href="#plot_confusion_matrix-228"><span class="linenos">228</span></a><span class="sd">    y_pred : array-like</span>
-</span><span id="plot_confusion_matrix-229"><a href="#plot_confusion_matrix-229"><span class="linenos">229</span></a><span class="sd">        Estimated targets as returned by a classifier.</span>
-</span><span id="plot_confusion_matrix-230"><a href="#plot_confusion_matrix-230"><span class="linenos">230</span></a><span class="sd">    architecture_name : str</span>
-</span><span id="plot_confusion_matrix-231"><a href="#plot_confusion_matrix-231"><span class="linenos">231</span></a><span class="sd">        Name of the model (for the plot title).</span>
-</span><span id="plot_confusion_matrix-232"><a href="#plot_confusion_matrix-232"><span class="linenos">232</span></a><span class="sd">    output_path : Path, optional</span>
-</span><span id="plot_confusion_matrix-233"><a href="#plot_confusion_matrix-233"><span class="linenos">233</span></a><span class="sd">        Directory to save the `.png` file if `is_demo=False`.</span>
-</span><span id="plot_confusion_matrix-234"><a href="#plot_confusion_matrix-234"><span class="linenos">234</span></a><span class="sd">    is_demo : bool</span>
+</span><span id="plot_confusion_matrix-226"><a href="#plot_confusion_matrix-226"><span class="linenos">226</span></a><span class="sd">    y_true : array-like\n</span>
+</span><span id="plot_confusion_matrix-227"><a href="#plot_confusion_matrix-227"><span class="linenos">227</span></a><span class="sd">        Ground truth (correct) target values.\n</span>
+</span><span id="plot_confusion_matrix-228"><a href="#plot_confusion_matrix-228"><span class="linenos">228</span></a><span class="sd">    y_pred : array-like\n</span>
+</span><span id="plot_confusion_matrix-229"><a href="#plot_confusion_matrix-229"><span class="linenos">229</span></a><span class="sd">        Estimated targets as returned by a classifier.\n</span>
+</span><span id="plot_confusion_matrix-230"><a href="#plot_confusion_matrix-230"><span class="linenos">230</span></a><span class="sd">    architecture_name : str\n</span>
+</span><span id="plot_confusion_matrix-231"><a href="#plot_confusion_matrix-231"><span class="linenos">231</span></a><span class="sd">        Name of the model (for the plot title).\n</span>
+</span><span id="plot_confusion_matrix-232"><a href="#plot_confusion_matrix-232"><span class="linenos">232</span></a><span class="sd">    output_path : Path, optional\n</span>
+</span><span id="plot_confusion_matrix-233"><a href="#plot_confusion_matrix-233"><span class="linenos">233</span></a><span class="sd">        Directory to save the `.png` file if `is_demo=False`.\n</span>
+</span><span id="plot_confusion_matrix-234"><a href="#plot_confusion_matrix-234"><span class="linenos">234</span></a><span class="sd">    is_demo : bool\n</span>
 </span><span id="plot_confusion_matrix-235"><a href="#plot_confusion_matrix-235"><span class="linenos">235</span></a><span class="sd">        If True, returns a PIL Image instead of saving to disk.</span>
 </span><span id="plot_confusion_matrix-236"><a href="#plot_confusion_matrix-236"><span class="linenos">236</span></a>
 </span><span id="plot_confusion_matrix-237"><a href="#plot_confusion_matrix-237"><span class="linenos">237</span></a><span class="sd">    Returns</span>
 </span><span id="plot_confusion_matrix-238"><a href="#plot_confusion_matrix-238"><span class="linenos">238</span></a><span class="sd">    -------</span>
-</span><span id="plot_confusion_matrix-239"><a href="#plot_confusion_matrix-239"><span class="linenos">239</span></a><span class="sd">    PIL.Image.Image or numpy.ndarray</span>
+</span><span id="plot_confusion_matrix-239"><a href="#plot_confusion_matrix-239"><span class="linenos">239</span></a><span class="sd">    PIL.Image.Image or numpy.ndarray\n</span>
 </span><span id="plot_confusion_matrix-240"><a href="#plot_confusion_matrix-240"><span class="linenos">240</span></a><span class="sd">        Returns the PIL Image if `is_demo=True`.</span>
 </span><span id="plot_confusion_matrix-241"><a href="#plot_confusion_matrix-241"><span class="linenos">241</span></a><span class="sd">        Returns the raw confusion matrix array if `is_demo=False`.</span>
 </span><span id="plot_confusion_matrix-242"><a href="#plot_confusion_matrix-242"><span class="linenos">242</span></a><span class="sd">    &quot;&quot;&quot;</span>
@@ -907,22 +940,38 @@ is_demo : bool, optional
 
 <h2 id="parameters">Parameters</h2>
 
-<p>y_true : array-like
-    Ground truth (correct) target values.
-y_pred : array-like
-    Estimated targets as returned by a classifier.
-architecture_name : str
-    Name of the model (for the plot title).
-output_path : Path, optional
-    Directory to save the <code>.png</code> file if <code>is_demo=False</code>.
-is_demo : bool
-    If True, returns a PIL Image instead of saving to disk.</p>
+<p>y_true : array-like</p>
+
+<pre><code>Ground truth (correct) target values.
+</code></pre>
+
+<p>y_pred : array-like</p>
+
+<pre><code>Estimated targets as returned by a classifier.
+</code></pre>
+
+<p>architecture_name : str</p>
+
+<pre><code>Name of the model (for the plot title).
+</code></pre>
+
+<p>output_path : Path, optional</p>
+
+<pre><code>Directory to save the `.png` file if `is_demo=False`.
+</code></pre>
+
+<p>is_demo : bool</p>
+
+<pre><code>If True, returns a PIL Image instead of saving to disk.
+</code></pre>
 
 <h2 id="returns">Returns</h2>
 
-<p>PIL.Image.Image or numpy.ndarray
-    Returns the PIL Image if <code>is_demo=True</code>.
-    Returns the raw confusion matrix array if <code>is_demo=False</code>.</p>
+<p>PIL.Image.Image or numpy.ndarray</p>
+
+<pre><code>Returns the PIL Image if `is_demo=True`.
+Returns the raw confusion matrix array if `is_demo=False`.
+</code></pre>
 </div>
 
 
@@ -947,22 +996,22 @@ is_demo : bool
 </span><span id="plot_roc_curves-265"><a href="#plot_roc_curves-265"><span class="linenos">265</span></a>
 </span><span id="plot_roc_curves-266"><a href="#plot_roc_curves-266"><span class="linenos">266</span></a><span class="sd">    Parameters</span>
 </span><span id="plot_roc_curves-267"><a href="#plot_roc_curves-267"><span class="linenos">267</span></a><span class="sd">    ----------</span>
-</span><span id="plot_roc_curves-268"><a href="#plot_roc_curves-268"><span class="linenos">268</span></a><span class="sd">    y_true : array-like</span>
-</span><span id="plot_roc_curves-269"><a href="#plot_roc_curves-269"><span class="linenos">269</span></a><span class="sd">        Ground truth labels.</span>
-</span><span id="plot_roc_curves-270"><a href="#plot_roc_curves-270"><span class="linenos">270</span></a><span class="sd">    y_probs : array-like</span>
-</span><span id="plot_roc_curves-271"><a href="#plot_roc_curves-271"><span class="linenos">271</span></a><span class="sd">        Probability estimates of the positive class.</span>
-</span><span id="plot_roc_curves-272"><a href="#plot_roc_curves-272"><span class="linenos">272</span></a><span class="sd">    num_classes : int</span>
-</span><span id="plot_roc_curves-273"><a href="#plot_roc_curves-273"><span class="linenos">273</span></a><span class="sd">        Total number of classes.</span>
-</span><span id="plot_roc_curves-274"><a href="#plot_roc_curves-274"><span class="linenos">274</span></a><span class="sd">    architecture_name : str</span>
-</span><span id="plot_roc_curves-275"><a href="#plot_roc_curves-275"><span class="linenos">275</span></a><span class="sd">        Name of the model.</span>
-</span><span id="plot_roc_curves-276"><a href="#plot_roc_curves-276"><span class="linenos">276</span></a><span class="sd">    output_path : Path, optional</span>
-</span><span id="plot_roc_curves-277"><a href="#plot_roc_curves-277"><span class="linenos">277</span></a><span class="sd">        Path to save the plot.</span>
-</span><span id="plot_roc_curves-278"><a href="#plot_roc_curves-278"><span class="linenos">278</span></a><span class="sd">    is_demo : bool</span>
+</span><span id="plot_roc_curves-268"><a href="#plot_roc_curves-268"><span class="linenos">268</span></a><span class="sd">    y_true : array-like\n</span>
+</span><span id="plot_roc_curves-269"><a href="#plot_roc_curves-269"><span class="linenos">269</span></a><span class="sd">        Ground truth labels.\n</span>
+</span><span id="plot_roc_curves-270"><a href="#plot_roc_curves-270"><span class="linenos">270</span></a><span class="sd">    y_probs : array-like\n</span>
+</span><span id="plot_roc_curves-271"><a href="#plot_roc_curves-271"><span class="linenos">271</span></a><span class="sd">        Probability estimates of the positive class.\n</span>
+</span><span id="plot_roc_curves-272"><a href="#plot_roc_curves-272"><span class="linenos">272</span></a><span class="sd">    num_classes : int\n</span>
+</span><span id="plot_roc_curves-273"><a href="#plot_roc_curves-273"><span class="linenos">273</span></a><span class="sd">        Total number of classes.\n</span>
+</span><span id="plot_roc_curves-274"><a href="#plot_roc_curves-274"><span class="linenos">274</span></a><span class="sd">    architecture_name : str\n</span>
+</span><span id="plot_roc_curves-275"><a href="#plot_roc_curves-275"><span class="linenos">275</span></a><span class="sd">        Name of the model.\n</span>
+</span><span id="plot_roc_curves-276"><a href="#plot_roc_curves-276"><span class="linenos">276</span></a><span class="sd">    output_path : Path, optional\n</span>
+</span><span id="plot_roc_curves-277"><a href="#plot_roc_curves-277"><span class="linenos">277</span></a><span class="sd">        Path to save the plot.\n</span>
+</span><span id="plot_roc_curves-278"><a href="#plot_roc_curves-278"><span class="linenos">278</span></a><span class="sd">    is_demo : bool\n</span>
 </span><span id="plot_roc_curves-279"><a href="#plot_roc_curves-279"><span class="linenos">279</span></a><span class="sd">        If True, returns the plot as an image and the AUC score.</span>
 </span><span id="plot_roc_curves-280"><a href="#plot_roc_curves-280"><span class="linenos">280</span></a>
 </span><span id="plot_roc_curves-281"><a href="#plot_roc_curves-281"><span class="linenos">281</span></a><span class="sd">    Returns</span>
 </span><span id="plot_roc_curves-282"><a href="#plot_roc_curves-282"><span class="linenos">282</span></a><span class="sd">    -------</span>
-</span><span id="plot_roc_curves-283"><a href="#plot_roc_curves-283"><span class="linenos">283</span></a><span class="sd">    tuple</span>
+</span><span id="plot_roc_curves-283"><a href="#plot_roc_curves-283"><span class="linenos">283</span></a><span class="sd">    tuple\n</span>
 </span><span id="plot_roc_curves-284"><a href="#plot_roc_curves-284"><span class="linenos">284</span></a><span class="sd">        A tuple containing (PIL.Image.Image, float_auc_score) if `is_demo=True`.</span>
 </span><span id="plot_roc_curves-285"><a href="#plot_roc_curves-285"><span class="linenos">285</span></a><span class="sd">        A tuple containing (None, float_auc_score) if `is_demo=False`.</span>
 </span><span id="plot_roc_curves-286"><a href="#plot_roc_curves-286"><span class="linenos">286</span></a><span class="sd">    &quot;&quot;&quot;</span>
@@ -1023,24 +1072,43 @@ and computes the macro-average AUC score.</p>
 
 <h2 id="parameters">Parameters</h2>
 
-<p>y_true : array-like
-    Ground truth labels.
-y_probs : array-like
-    Probability estimates of the positive class.
-num_classes : int
-    Total number of classes.
-architecture_name : str
-    Name of the model.
-output_path : Path, optional
-    Path to save the plot.
-is_demo : bool
-    If True, returns the plot as an image and the AUC score.</p>
+<p>y_true : array-like</p>
+
+<pre><code>Ground truth labels.
+</code></pre>
+
+<p>y_probs : array-like</p>
+
+<pre><code>Probability estimates of the positive class.
+</code></pre>
+
+<p>num_classes : int</p>
+
+<pre><code>Total number of classes.
+</code></pre>
+
+<p>architecture_name : str</p>
+
+<pre><code>Name of the model.
+</code></pre>
+
+<p>output_path : Path, optional</p>
+
+<pre><code>Path to save the plot.
+</code></pre>
+
+<p>is_demo : bool</p>
+
+<pre><code>If True, returns the plot as an image and the AUC score.
+</code></pre>
 
 <h2 id="returns">Returns</h2>
 
-<p>tuple
-    A tuple containing (PIL.Image.Image, float_auc_score) if <code>is_demo=True</code>.
-    A tuple containing (None, float_auc_score) if <code>is_demo=False</code>.</p>
+<p>tuple</p>
+
+<pre><code>A tuple containing (PIL.Image.Image, float_auc_score) if `is_demo=True`.
+A tuple containing (None, float_auc_score) if `is_demo=False`.
+</code></pre>
 </div>
 
 
@@ -1065,22 +1133,22 @@ is_demo : bool
 </span><span id="plot_calibration_curve-341"><a href="#plot_calibration_curve-341"><span class="linenos">341</span></a>
 </span><span id="plot_calibration_curve-342"><a href="#plot_calibration_curve-342"><span class="linenos">342</span></a><span class="sd">    Parameters</span>
 </span><span id="plot_calibration_curve-343"><a href="#plot_calibration_curve-343"><span class="linenos">343</span></a><span class="sd">    ----------</span>
-</span><span id="plot_calibration_curve-344"><a href="#plot_calibration_curve-344"><span class="linenos">344</span></a><span class="sd">    y_true : array-like</span>
-</span><span id="plot_calibration_curve-345"><a href="#plot_calibration_curve-345"><span class="linenos">345</span></a><span class="sd">        True labels.</span>
-</span><span id="plot_calibration_curve-346"><a href="#plot_calibration_curve-346"><span class="linenos">346</span></a><span class="sd">    y_probs : array-like</span>
-</span><span id="plot_calibration_curve-347"><a href="#plot_calibration_curve-347"><span class="linenos">347</span></a><span class="sd">        Predicted probabilities.</span>
-</span><span id="plot_calibration_curve-348"><a href="#plot_calibration_curve-348"><span class="linenos">348</span></a><span class="sd">    num_classes : int</span>
-</span><span id="plot_calibration_curve-349"><a href="#plot_calibration_curve-349"><span class="linenos">349</span></a><span class="sd">        Number of classes.</span>
-</span><span id="plot_calibration_curve-350"><a href="#plot_calibration_curve-350"><span class="linenos">350</span></a><span class="sd">    architecture_name : str</span>
-</span><span id="plot_calibration_curve-351"><a href="#plot_calibration_curve-351"><span class="linenos">351</span></a><span class="sd">        Name of the model.</span>
-</span><span id="plot_calibration_curve-352"><a href="#plot_calibration_curve-352"><span class="linenos">352</span></a><span class="sd">    output_path : Path, optional</span>
-</span><span id="plot_calibration_curve-353"><a href="#plot_calibration_curve-353"><span class="linenos">353</span></a><span class="sd">        Save location on the filesystem.</span>
-</span><span id="plot_calibration_curve-354"><a href="#plot_calibration_curve-354"><span class="linenos">354</span></a><span class="sd">    is_demo : bool</span>
+</span><span id="plot_calibration_curve-344"><a href="#plot_calibration_curve-344"><span class="linenos">344</span></a><span class="sd">    y_true : array-like\n</span>
+</span><span id="plot_calibration_curve-345"><a href="#plot_calibration_curve-345"><span class="linenos">345</span></a><span class="sd">        True labels.\n</span>
+</span><span id="plot_calibration_curve-346"><a href="#plot_calibration_curve-346"><span class="linenos">346</span></a><span class="sd">    y_probs : array-like\n</span>
+</span><span id="plot_calibration_curve-347"><a href="#plot_calibration_curve-347"><span class="linenos">347</span></a><span class="sd">        Predicted probabilities.\n</span>
+</span><span id="plot_calibration_curve-348"><a href="#plot_calibration_curve-348"><span class="linenos">348</span></a><span class="sd">    num_classes : int\n</span>
+</span><span id="plot_calibration_curve-349"><a href="#plot_calibration_curve-349"><span class="linenos">349</span></a><span class="sd">        Number of classes.\n</span>
+</span><span id="plot_calibration_curve-350"><a href="#plot_calibration_curve-350"><span class="linenos">350</span></a><span class="sd">    architecture_name : str\n</span>
+</span><span id="plot_calibration_curve-351"><a href="#plot_calibration_curve-351"><span class="linenos">351</span></a><span class="sd">        Name of the model.\n</span>
+</span><span id="plot_calibration_curve-352"><a href="#plot_calibration_curve-352"><span class="linenos">352</span></a><span class="sd">    output_path : Path, optional\n</span>
+</span><span id="plot_calibration_curve-353"><a href="#plot_calibration_curve-353"><span class="linenos">353</span></a><span class="sd">        Save location on the filesystem.\n</span>
+</span><span id="plot_calibration_curve-354"><a href="#plot_calibration_curve-354"><span class="linenos">354</span></a><span class="sd">    is_demo : bool\n</span>
 </span><span id="plot_calibration_curve-355"><a href="#plot_calibration_curve-355"><span class="linenos">355</span></a><span class="sd">        If True, returns the generated plot as a PIL image object.</span>
 </span><span id="plot_calibration_curve-356"><a href="#plot_calibration_curve-356"><span class="linenos">356</span></a><span class="sd">        </span>
 </span><span id="plot_calibration_curve-357"><a href="#plot_calibration_curve-357"><span class="linenos">357</span></a><span class="sd">    Returns</span>
 </span><span id="plot_calibration_curve-358"><a href="#plot_calibration_curve-358"><span class="linenos">358</span></a><span class="sd">    -------</span>
-</span><span id="plot_calibration_curve-359"><a href="#plot_calibration_curve-359"><span class="linenos">359</span></a><span class="sd">    PIL.Image.Image or None</span>
+</span><span id="plot_calibration_curve-359"><a href="#plot_calibration_curve-359"><span class="linenos">359</span></a><span class="sd">    PIL.Image.Image or None\n</span>
 </span><span id="plot_calibration_curve-360"><a href="#plot_calibration_curve-360"><span class="linenos">360</span></a><span class="sd">        The reliability diagram image object if is_demo is True, otherwise None.</span>
 </span><span id="plot_calibration_curve-361"><a href="#plot_calibration_curve-361"><span class="linenos">361</span></a><span class="sd">    &quot;&quot;&quot;</span>
 </span><span id="plot_calibration_curve-362"><a href="#plot_calibration_curve-362"><span class="linenos">362</span></a>    <span class="k">try</span><span class="p">:</span>
@@ -1124,23 +1192,42 @@ A perfectly calibrated model will follow the diagonal line.</p>
 
 <h2 id="parameters">Parameters</h2>
 
-<p>y_true : array-like
-    True labels.
-y_probs : array-like
-    Predicted probabilities.
-num_classes : int
-    Number of classes.
-architecture_name : str
-    Name of the model.
-output_path : Path, optional
-    Save location on the filesystem.
-is_demo : bool
-    If True, returns the generated plot as a PIL image object.</p>
+<p>y_true : array-like</p>
+
+<pre><code>True labels.
+</code></pre>
+
+<p>y_probs : array-like</p>
+
+<pre><code>Predicted probabilities.
+</code></pre>
+
+<p>num_classes : int</p>
+
+<pre><code>Number of classes.
+</code></pre>
+
+<p>architecture_name : str</p>
+
+<pre><code>Name of the model.
+</code></pre>
+
+<p>output_path : Path, optional</p>
+
+<pre><code>Save location on the filesystem.
+</code></pre>
+
+<p>is_demo : bool</p>
+
+<pre><code>If True, returns the generated plot as a PIL image object.
+</code></pre>
 
 <h2 id="returns">Returns</h2>
 
-<p>PIL.Image.Image or None
-    The reliability diagram image object if is_demo is True, otherwise None.</p>
+<p>PIL.Image.Image or None</p>
+
+<pre><code>The reliability diagram image object if is_demo is True, otherwise None.
+</code></pre>
 </div>
 
 

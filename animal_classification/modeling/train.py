@@ -97,12 +97,12 @@ def train_model( architecture: str = "vgg16", dataset_choice: str = "mini", seed
         Number of CPU subprocesses for data loading.\n
     is_demo : bool.\n
         If `True`, runs in Dashboard mode (in-memory).\n
-    progress : gradio.Progress, optional.
+    progress : gradio.Progress, optional\n
         Gradio progress tracker.
 
     Returns
     -------
-    dict
+    dict\n
         A dictionary containing training metrics and the model object.
     """
     # Normalize architecture string to lowercase

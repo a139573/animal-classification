@@ -89,7 +89,7 @@ def update_species_gallery(species_name):
 
     Returns
     -------
-    list.
+    list\n
         A list of PIL.Image objects representing random samples of the chosen species.
     """
     if not species_name:

@@ -32,7 +32,7 @@ def get_dataset_stats(data_dir: Path):
 
     Parameters
     ----------
-    data_dir : Path
+    data_dir : Path\n
         The root directory containing animal class subfolders.
 
     Returns
@@ -56,11 +56,11 @@ def get_species_samples(data_dir: Path, species_name: str, num_samples=8):
 
     Parameters
     ----------
-    data_dir : Path
-        The root directory of the dataset.
-    species_name : str
-        The folder name of the target species.
-    num_samples : int, optional
+    data_dir : Path\n
+        The root directory of the dataset.\n
+    species_name : str\n
+        The folder name of the target species.\n
+    num_samples : int, optional\n
         Maximum number of samples to retrieve (default: 8).
 
     Returns
@@ -89,12 +89,12 @@ def plot_color_analysis(data_dir: Path):
 
     Parameters
     ----------
-    data_dir : Path
+    data_dir : Path\n
         The directory containing the class folders.
 
     Returns
     -------
-    PIL.Image.Image
+    PIL.Image.Image\n
         The generated stacked bar plot as a PIL image object.
     """
     class_folders = sorted([d for d in data_dir.iterdir() if d.is_dir()])
@@ -140,12 +140,12 @@ def fig_to_image(fig=None):
 
     Parameters
     ----------
-    fig : matplotlib.figure.Figure, optional
+    fig : matplotlib.figure.Figure, optional\n
         The figure to convert. If None, uses the current active figure.
     
     Returns
     -------
-    PIL.Image.Image
+    PIL.Image.Image\n
         The plot rendered as an image object.
     """
     buf = io.BytesIO()
@@ -168,16 +168,16 @@ def plot_training_curves(train_loss, val_loss, val_acc, architecture_name="Model
     Parameters
     ----------
     train_loss : list
-        Historical values of training loss per epoch.
-    val_loss : list
-        Historical values of validation loss per epoch.
-    val_acc : list
-        Historical values of validation accuracy per epoch.
-    architecture_name : str, optional
-        Name of the model backbone used (default: "Model").
-    output_path : Path, optional
-        Filesystem path to save the generated image (ignored if is_demo is True).
-    is_demo : bool, optional
+        Historical values of training loss per epoch.\n
+    val_loss : list\n
+        Historical values of validation loss per epoch.\n
+    val_acc : list\n
+        Historical values of validation accuracy per epoch.\n
+    architecture_name : str, optional\n
+        Name of the model backbone used (default: "Model").\n
+    output_path : Path, optional\n
+        Filesystem path to save the generated image (ignored if is_demo is True).\n
+    is_demo : bool, optional\n
         If True, returns the plot as a PIL Image object (default: False).
 
     Returns
@@ -222,20 +222,20 @@ def plot_confusion_matrix(y_true, y_pred, architecture_name="Model", output_path
 
     Parameters
     ----------
-    y_true : array-like
-        Ground truth (correct) target values.
-    y_pred : array-like
-        Estimated targets as returned by a classifier.
-    architecture_name : str
-        Name of the model (for the plot title).
-    output_path : Path, optional
-        Directory to save the `.png` file if `is_demo=False`.
-    is_demo : bool
+    y_true : array-like\n
+        Ground truth (correct) target values.\n
+    y_pred : array-like\n
+        Estimated targets as returned by a classifier.\n
+    architecture_name : str\n
+        Name of the model (for the plot title).\n
+    output_path : Path, optional\n
+        Directory to save the `.png` file if `is_demo=False`.\n
+    is_demo : bool\n
         If True, returns a PIL Image instead of saving to disk.
 
     Returns
     -------
-    PIL.Image.Image or numpy.ndarray
+    PIL.Image.Image or numpy.ndarray\n
         Returns the PIL Image if `is_demo=True`.
         Returns the raw confusion matrix array if `is_demo=False`.
     """
@@ -264,22 +264,22 @@ def plot_roc_curves(y_true, y_probs, num_classes, architecture_name="Model", out
 
     Parameters
     ----------
-    y_true : array-like
-        Ground truth labels.
-    y_probs : array-like
-        Probability estimates of the positive class.
-    num_classes : int
-        Total number of classes.
-    architecture_name : str
-        Name of the model.
-    output_path : Path, optional
-        Path to save the plot.
-    is_demo : bool
+    y_true : array-like\n
+        Ground truth labels.\n
+    y_probs : array-like\n
+        Probability estimates of the positive class.\n
+    num_classes : int\n
+        Total number of classes.\n
+    architecture_name : str\n
+        Name of the model.\n
+    output_path : Path, optional\n
+        Path to save the plot.\n
+    is_demo : bool\n
         If True, returns the plot as an image and the AUC score.
 
     Returns
     -------
-    tuple
+    tuple\n
         A tuple containing (PIL.Image.Image, float_auc_score) if `is_demo=True`.
         A tuple containing (None, float_auc_score) if `is_demo=False`.
     """
@@ -340,22 +340,22 @@ def plot_calibration_curve(y_true, y_probs, num_classes, architecture_name="Mode
 
     Parameters
     ----------
-    y_true : array-like
-        True labels.
-    y_probs : array-like
-        Predicted probabilities.
-    num_classes : int
-        Number of classes.
-    architecture_name : str
-        Name of the model.
-    output_path : Path, optional
-        Save location on the filesystem.
-    is_demo : bool
+    y_true : array-like\n
+        True labels.\n
+    y_probs : array-like\n
+        Predicted probabilities.\n
+    num_classes : int\n
+        Number of classes.\n
+    architecture_name : str\n
+        Name of the model.\n
+    output_path : Path, optional\n
+        Save location on the filesystem.\n
+    is_demo : bool\n
         If True, returns the generated plot as a PIL image object.
         
     Returns
     -------
-    PIL.Image.Image or None
+    PIL.Image.Image or None\n
         The reliability diagram image object if is_demo is True, otherwise None.
     """
     try:
