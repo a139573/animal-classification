@@ -21,10 +21,27 @@ from PIL import Image
 from sklearn.metrics import confusion_matrix, roc_auc_score, roc_curve
 from sklearn.calibration import calibration_curve
 
-# DATA EXPLORATION PLOTS
+# --- DATA EXPLORATION PLOTS ---
 
 def get_dataset_stats(data_dir: Path):
-    """Calculates basic statistics for the dataset exploration tab."""
+    """
+    Calculates basic statistics for the dataset exploration tab.
+
+    Inspects the provided directory to count classes and filter valid image files
+    to provide a summary of the dataset's composition.
+
+    Parameters
+    ----------
+    data_dir : Path
+        The root directory containing animal class subfolders.
+
+    Returns
+    -------
+    tuple
+        A tuple containing (pd.DataFrame of counts per species, 
+        int total_number_of_classes, int total_image_count, 
+        list_of_species_names).
+    """
     class_folders = sorted([d for d in data_dir.iterdir() if d.is_dir()])
     counts = {d.name: len([f for f in d.glob('*') if f.suffix.lower() in {'.jpg', '.jpeg', '.png', '.bmp', '.webp'}]) for d in class_folders}
     df = pd.DataFrame(list(counts.items()), columns=['Species', 'Image Count'])
@@ -32,8 +49,24 @@ def get_dataset_stats(data_dir: Path):
 
 def get_species_samples(data_dir: Path, species_name: str, num_samples=8):
     """
-    Returns a list of PIL images for a specific species. 
-    Filters for common image extensions to prevent loading metadata or hidden files.
+    Returns a list of random PIL images for a specific animal species. 
+
+    This function filters for common image extensions to prevent loading 
+    metadata or hidden system files and provides samples for UI visualization.
+
+    Parameters
+    ----------
+    data_dir : Path
+        The root directory of the dataset.
+    species_name : str
+        The folder name of the target species.
+    num_samples : int, optional
+        Maximum number of samples to retrieve (default: 8).
+
+    Returns
+    -------
+    list
+        A list of PIL.Image objects corresponding to the sampled images.
     """
     species_path = data_dir / species_name
     if not species_path.exists():
@@ -49,7 +82,20 @@ def get_species_samples(data_dir: Path, species_name: str, num_samples=8):
 def plot_color_analysis(data_dir: Path):
     """
     Performs RGB profile analysis on a subset of classes for visualization.
-    We take a sample of 25 species alphabetically to keep the plot readable.
+
+    Computes the average R, G, and B channel intensities across a sample of 
+    species to visualize color dominance in different animal groups. 
+    Limited to 25 species for plot readability.
+
+    Parameters
+    ----------
+    data_dir : Path
+        The directory containing the class folders.
+
+    Returns
+    -------
+    PIL.Image.Image
+        The generated stacked bar plot as a PIL image object.
     """
     class_folders = sorted([d for d in data_dir.iterdir() if d.is_dir()])
     rgb_means = []
@@ -83,7 +129,7 @@ def plot_color_analysis(data_dir: Path):
     return fig_to_image(fig)
 
 
-# MODEL EVALUATION PLOTS
+# --- MODEL EVALUATION PLOTS ---
 
 def fig_to_image(fig=None):
     """
@@ -94,7 +140,7 @@ def fig_to_image(fig=None):
 
     Parameters
     ----------
-    fig : matplotlib.figure.Figure, optional.
+    fig : matplotlib.figure.Figure, optional
         The figure to convert. If None, uses the current active figure.
     
     Returns
@@ -114,7 +160,30 @@ def fig_to_image(fig=None):
 
 def plot_training_curves(train_loss, val_loss, val_acc, architecture_name="Model", output_path=None, is_demo=False):
     """
-    Generates dual-axis convergence plots for training/validation loss and accuracy.
+    Generates dual-axis convergence plots for training/validation performance.
+
+    Visualizes how loss decreases and accuracy increases over training epochs,
+    providing immediate feedback on model learning and potential overfitting.
+
+    Parameters
+    ----------
+    train_loss : list
+        Historical values of training loss per epoch.
+    val_loss : list
+        Historical values of validation loss per epoch.
+    val_acc : list
+        Historical values of validation accuracy per epoch.
+    architecture_name : str, optional
+        Name of the model backbone used (default: "Model").
+    output_path : Path, optional
+        Filesystem path to save the generated image (ignored if is_demo is True).
+    is_demo : bool, optional
+        If True, returns the plot as a PIL Image object (default: False).
+
+    Returns
+    -------
+    PIL.Image.Image or None
+        Returns the image object if in demo mode, otherwise None.
     """
     plt.style.use('seaborn-v0_8-muted')
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
@@ -153,27 +222,21 @@ def plot_confusion_matrix(y_true, y_pred, architecture_name="Model", output_path
 
     Parameters
     ----------
-    y_true : array-like.
+    y_true : array-like
         Ground truth (correct) target values.
-
-    y_pred : array-like.
+    y_pred : array-like
         Estimated targets as returned by a classifier.
-
-    architecture_name : str.
+    architecture_name : str
         Name of the model (for the plot title).
-
-    output_path : Path, optional.
+    output_path : Path, optional
         Directory to save the `.png` file if `is_demo=False`.
-
-    is_demo : bool.
+    is_demo : bool
         If True, returns a PIL Image instead of saving to disk.
 
     Returns
     -------
     PIL.Image.Image or numpy.ndarray
-
         Returns the PIL Image if `is_demo=True`.
-
         Returns the raw confusion matrix array if `is_demo=False`.
     """
     cm = confusion_matrix(y_true, y_pred)
@@ -201,31 +264,24 @@ def plot_roc_curves(y_true, y_probs, num_classes, architecture_name="Model", out
 
     Parameters
     ----------
-    y_true : array-like.
+    y_true : array-like
         Ground truth labels.
-
-    y_probs : array-like.
+    y_probs : array-like
         Probability estimates of the positive class.
-
-    num_classes : int.
+    num_classes : int
         Total number of classes.
-
-    architecture_name : str.
+    architecture_name : str
         Name of the model.
-
-    output_path : Path, optional.
+    output_path : Path, optional
         Path to save the plot.
-
-    is_demo : bool.
+    is_demo : bool
         If True, returns the plot as an image and the AUC score.
 
     Returns
     -------
     tuple
-    
-        (PIL.Image.Image, float) if `is_demo=True`.
-
-        (None, float) if `is_demo=False`.
+        A tuple containing (PIL.Image.Image, float_auc_score) if `is_demo=True`.
+        A tuple containing (None, float_auc_score) if `is_demo=False`.
     """
     try:
         fig, ax = plt.subplots(figsize=(8, 6))
@@ -284,23 +340,23 @@ def plot_calibration_curve(y_true, y_probs, num_classes, architecture_name="Mode
 
     Parameters
     ----------
-    y_true : array-like.
+    y_true : array-like
         True labels.
-
-    y_probs : array-like.
+    y_probs : array-like
         Predicted probabilities.
-
-    num_classes : int.
+    num_classes : int
         Number of classes.
-
-    architecture_name : str.
+    architecture_name : str
         Name of the model.
-
     output_path : Path, optional
-        Save location.
-
-    is_demo : bool.
-        Return image object if True.
+        Save location on the filesystem.
+    is_demo : bool
+        If True, returns the generated plot as a PIL image object.
+        
+    Returns
+    -------
+    PIL.Image.Image or None
+        The reliability diagram image object if is_demo is True, otherwise None.
     """
     try:
         fig, ax = plt.subplots(figsize=(6, 6))
@@ -333,4 +389,3 @@ def plot_calibration_curve(y_true, y_probs, num_classes, architecture_name="Mode
     except Exception as e:
         print(f"⚠️ Calibration plot failed: {e}")
         return None
- 

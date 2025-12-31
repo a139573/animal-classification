@@ -39,7 +39,22 @@ from animal_classification.utils import get_accelerator, get_packaged_mini_data_
 torch.set_float32_matmul_precision("medium")
 
 class GradioProgressCallback(pl.Callback): 
-    """ Hooks into the training loop to update the Gradio web UI progress bar. """
+    """ 
+    Lightning callback to synchronize training progress with the Gradio UI.
+
+    This class hooks into the training loop's batch-end events to calculate 
+    the overall completion percentage and update the progress bar provided 
+    by the Gradio web interface.
+
+    Attributes
+    ----------
+    progress_fn : gradio.Progress\n
+        The progress tracker instance injected by the Gradio interface.\n
+    max_epochs : int\n
+        The total number of epochs configured for the training run.\n
+    total_batches : int\n
+        Cached count of training batches per epoch.
+    """
     def __init__(self, progress_fn, max_epochs):
         super().__init__()
         self.progress_fn = progress_fn
@@ -51,6 +66,7 @@ class GradioProgressCallback(pl.Callback):
             self.total_batches = len(trainer.train_dataloader)
 
         current_epoch = trainer.current_epoch
+        # Calculate global progress
         total_steps = self.max_epochs * self.total_batches
         global_step = current_epoch * self.total_batches + batch_idx + 1
         pct = global_step / total_steps
@@ -60,8 +76,37 @@ class GradioProgressCallback(pl.Callback):
             desc=f"Epoch {current_epoch+1}/{self.max_epochs} — batch {batch_idx+1}/{self.total_batches}"
         )
 
-def main( architecture: str = "vgg16", dataset_choice: str = "mini", seed: int = 42, test_frac: float = 0.2, max_epochs: int = 5, batch_size: int = 16, lr: float = 1e-3, num_workers: int = 2, is_demo: bool = False, progress: gr.Progress = None, ): 
-    """ Executes the training pipeline. """
+def train_model( architecture: str = "vgg16", dataset_choice: str = "mini", seed: int = 42, test_frac: float = 0.2, max_epochs: int = 5, batch_size: int = 16, lr: float = 1e-3, num_workers: int = 2, is_demo: bool = False, progress: gr.Progress = None, ): 
+    """ Executes the training pipeline.
+
+    Parameters
+    ----------
+    architecture : str.\n
+        The model backbone to use. Options: `'vgg16'`, `'vgg11'`.\n
+    dataset_choice : str.\n
+        Which dataset folder to use. Options: `'mini'` (default), `'full'`.\n
+    seed : int.\n
+        Random seed for reproducibility.\n
+    test_frac : float.\n
+        Fraction of data to hold out for testing.\n
+    max_epochs : int.\n
+        Total number of training epochs.\n
+    batch_size : int.\n
+        Number of images per training batch.\n
+    num_workers : int.\n
+        Number of CPU subprocesses for data loading.\n
+    is_demo : bool.\n
+        If `True`, runs in Dashboard mode (in-memory).\n
+    progress : gradio.Progress, optional.
+        Gradio progress tracker.
+
+    Returns
+    -------
+    dict
+        A dictionary containing training metrics and the model object.
+    """
+    # Normalize architecture string to lowercase
+    architecture = architecture.lower()
 
     # 1. Setup Hardware
     accelerator = get_accelerator()
@@ -172,24 +217,36 @@ def main( architecture: str = "vgg16", dataset_choice: str = "mini", seed: int =
         "train_loss_list": train_loss if is_demo else None,
     }
 
-if __name__ == "__main__":
+def main():
+    """ 
+    Command-line interface entry point. 
+    This parses arguments and then calls the logic in train_model().
+    """
     parser = argparse.ArgumentParser(description="Train Animal Classification Model") 
-    parser.add_argument("--architecture", default="vgg16", choices=["vgg16", "vgg11"]) 
-    parser.add_argument("--dataset-choice", default="mini", choices=["full", "mini"]) 
+    parser.add_argument("--architecture", default="vgg16", choices=["vgg16", "vgg11"], help="Backbone (vgg16 or vgg11)") 
+    parser.add_argument("--dataset-choice", default="mini", choices=["full", "mini"], help="Data subset") 
     parser.add_argument("--seed", type=int, default=42) 
     parser.add_argument("--test-frac", type=float, default=0.2) 
     parser.add_argument("--max-epochs", type=int, default=5) 
     parser.add_argument("--batch-size", type=int, default=16)
-    parser.add_argument("--lr", type=float, default=1e-3, help="Learning rate for Adam optimizer")
+    parser.add_argument("--lr", type=float, default=1e-4, help="Learning rate for Adam optimizer")
+    parser.add_argument("--num-workers", type=int, default=2)
 
     args = parser.parse_args()
 
-    main(
+    print(f"🚀 Training Triggered via CLI. Architecture: {args.architecture}")
+
+    # Call logic with all parsed arguments
+    train_model(
         architecture=args.architecture,
         dataset_choice=args.dataset_choice,
         seed=args.seed,
         test_frac=args.test_frac,
         max_epochs=args.max_epochs,
         batch_size=args.batch_size,
-        lr=args.lr
+        lr=args.lr,
+        num_workers=args.num_workers
     )
+
+if __name__ == "__main__":
+    main()

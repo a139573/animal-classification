@@ -48,37 +48,29 @@ def run_inference( model_path: Path = None, data_dir: Path = None, architecture:
 
     Parameters
     ----------
-    model_path : Path, optional.
-        Path to the `.ckpt` checkpoint file. Required if `trained_model` is None.
-
-    data_dir : Path, optional.
-        Path to the dataset directory.
-
-    architecture : str.
-        Model architecture name ('vgg16' or 'vgg11').
-
-    trained_model : pl.LightningModule, optional
-        An in-memory model object (used by the Dashboard). If provided, `model_path` is ignored.
-
-    output_path : Path, optional.
-        Directory to save results (arrays and plots). Ignored in demo mode.
-
-    batch_size : int.
-        Batch size for inference.
-
-    num_workers : int.
-        Number of data loading workers.
-
-    is_demo : bool.
-        If `True`, returns raw objects for the UI instead of saving to disk.
-
+    model_path : Path, optional\n
+        Path to the `.ckpt` checkpoint file. Required if `trained_model` is None.\n
+    data_dir : Path, optional.\n
+        Path to the dataset directory\n
+    architecture : str.\n
+        Model architecture name ('vgg16' or 'vgg11')\n
+    trained_model : pl.LightningModule, optional\n
+        An in-memory model object (used by the Dashboard). If provided, `model_path` is ignored.\n
+    output_path : Path, optional\n
+        Directory to save results (arrays and plots). Ignored in demo mode.\n
+    batch_size : int\n
+        Batch size for inference.\n
+    num_workers : int\n
+        Number of data loading workers.\n
+    is_demo : bool\n
+        If `True`, returns raw objects for the UI instead of saving to disk.\n
+        
     Returns
     -------
-    tuple (if is_demo=True).
-        (probs, labels, accuracy, f1_macro, confusion_matrix_img, roc_img, calibration_img)
-
-    dict (if is_demo=False).
-        Dictionary containing metrics and the output path.
+    tuple (if is_demo=True)\n
+        (probs, labels, accuracy, f1_macro, confusion_matrix_img, roc_img, calibration_img)\n
+    dict (if is_demo=False).\n
+        Dictionary containing metrics and the output path.\n
     """
     architecture = architecture.lower()
 
@@ -87,12 +79,8 @@ def run_inference( model_path: Path = None, data_dir: Path = None, architecture:
         output_path.mkdir(parents=True, exist_ok=True)
 
     # 1. Dataset Setup
-    if is_demo:
-        # Use the robust utility to find data in the package or locally
+    if is_demo or data_dir is None:
         data_dir = get_packaged_mini_data_path()
-
-    if data_dir is None:
-        raise ValueError("Data directory must be provided if not in demo mode.")
 
     data_module = AnimalsDataModule(
         data_dir=data_dir, 
@@ -107,25 +95,22 @@ def run_inference( model_path: Path = None, data_dir: Path = None, architecture:
     if trained_model is None:
         print(f"🔄 Loading model from checkpoint: {model_path}")
         
-        # Check for class count mismatch between checkpoint and current data_dir
         try:
             checkpoint = torch.load(model_path, map_location="cpu")
             ckpt_hparams = checkpoint.get("hyper_parameters", {})
             ckpt_num_classes = ckpt_hparams.get("num_classes")
             
             if ckpt_num_classes and ckpt_num_classes != num_classes:
-                print(f"⚠️ Warning: Checkpoint has {ckpt_num_classes} classes, but current data has {num_classes}.")
-                print(f"🔄 Adjusting model to {ckpt_num_classes} classes to prevent size mismatch.")
+                print(f"⚠️ Class mismatch: Checkpoint ({ckpt_num_classes}) vs Data ({num_classes}). Adjusting...")
                 num_classes = ckpt_num_classes
         except Exception as e:
-            print(f"⚠️ Could not inspect checkpoint metadata: {e}")
+            print(f"⚠️ Metadata inspection failed: {e}")
 
-        # Use Lightning's native loader which handles strict matching automatically
         trained_model = VGGNet.load_from_checkpoint(
             checkpoint_path=model_path,
             architecture=architecture,
             num_classes=num_classes,
-            strict=False # Allow minor mismatches
+            strict=False 
         )
 
     trained_model.eval()
@@ -134,20 +119,8 @@ def run_inference( model_path: Path = None, data_dir: Path = None, architecture:
 
     # 3. Prediction Loop
     all_probs, all_labels = [], []
-    val_dataset = val_loader.dataset
-
-    try:
-        if hasattr(val_dataset, 'samples'): # Standard ImageFolder
-            all_paths = [str(Path(s[0]).resolve()) for s in val_dataset.samples]
-        elif hasattr(val_dataset, 'dataset') and hasattr(val_dataset, 'indices'): # Subset
-            all_paths = [str(Path(val_dataset.dataset.samples[i][0]).resolve()) for i in val_dataset.indices]
-        else:
-            all_paths = []
-    except Exception as e:
-        print(f"⚠️ Warning: Image path extraction failed: {e}")
-        all_paths = []
-
-    print(f"🚀 Running inference on {len(val_dataset)} samples...")
+    print(f"🚀 Running inference on {len(val_loader.dataset)} samples...")
+    
     with torch.no_grad():
         for batch_images, batch_labels in val_loader:
             outputs = trained_model(batch_images.to(device))
@@ -162,40 +135,51 @@ def run_inference( model_path: Path = None, data_dir: Path = None, architecture:
     if not is_demo and output_path:
         np.save(output_path / "val_probs.npy", all_probs)
         np.save(output_path / "val_labels.npy", all_labels)
-        if all_paths:
-            np.save(output_path / "val_paths.npy", np.array(all_paths))
 
-    # 5. Metrics and Diagnostics
-    metrics = {
-        "accuracy": accuracy_score(all_labels, predictions),
-        "f1_macro": f1_score(all_labels, predictions, average="macro")
-    }
+    # 5. Metrics
+    acc = accuracy_score(all_labels, predictions)
+    f1 = f1_score(all_labels, predictions, average="macro")
 
     cm_img = plot_confusion_matrix(all_labels, predictions, architecture, output_path, is_demo)
     roc_img, auc_score = plot_roc_curves(all_labels, all_probs, num_classes, architecture, output_path, is_demo)
     cal_img = plot_calibration_curve(all_labels, all_probs, num_classes, architecture, output_path, is_demo)
 
-    metrics["auc_macro"] = auc_score
-
     if is_demo:
-        return all_probs, all_labels, metrics["accuracy"], metrics["f1_macro"], cm_img, roc_img, cal_img
+        return all_probs, all_labels, acc, f1, cm_img, roc_img, cal_img
 
-    return {**metrics, "output_path": output_path}
+    return {"accuracy": acc, "f1_macro": f1, "auc_macro": auc_score, "output_path": output_path}
 
 def extract_version(filepath): 
-    """Parses version numbers from checkpoint filenames (e.g., v2 -> 2).""" 
+    """
+    Extracts the version number from a PyTorch Lightning checkpoint filename.
+
+    PyTorch Lightning often appends '-v1', '-v2', etc., to checkpoints if 
+    multiple versions exist. This function parses that integer to help 
+    identify the most recent or 'highest' versioned file.
+
+    Parameters
+    ----------
+    filepath : str\n
+        The full path or filename of the checkpoint.
+
+    Returns
+    -------
+    int\n
+        The version number extracted (e.g., 2 from 'vgg16-v2.ckpt'). 
+        Returns 0 if no version pattern is found.
+    """
     match = re.search(r'-v(\d+).ckpt$', filepath)
     return int(match.group(1)) if match else 0
 
 def main(): 
     parser = argparse.ArgumentParser(description="Run inference on trained animal classification models.")
-    parser.add_argument("--model-path", type=str, default=DEFAULT_MODEL_PATTERN, help="Path to checkpoint or glob pattern.") 
-    parser.add_argument("--dataset-choice", type=str, default="mini", choices=["mini", "full"], help="Choice of dataset (mini or full).")
-    parser.add_argument("--data-dir", type=str, default=None, help="Manual override for the data directory.") 
-    parser.add_argument("--architecture", type=str.lower, default="vgg16", choices=["vgg16", "vgg11"], help="Model architecture.") 
-    parser.add_argument("--output-path", type=str, default=DEFAULT_OUTPUT_PATH, help="Output directory for reports.") 
-    parser.add_argument("--batch-size", type=int, default=16, help="Batch size for inference.") 
-    parser.add_argument("--num-workers", type=int, default=2, help="Number of data loading workers.") 
+    parser.add_argument("--model-path", type=str, default=DEFAULT_MODEL_PATTERN) 
+    parser.add_argument("--dataset-choice", type=str, default="mini", choices=["mini", "full"])
+    parser.add_argument("--data-dir", type=str, default=None) 
+    parser.add_argument("--architecture", type=str.lower, default="vgg16", choices=["vgg16", "vgg11"]) 
+    parser.add_argument("--output-path", type=str, default=DEFAULT_OUTPUT_PATH) 
+    parser.add_argument("--batch-size", type=int, default=16) 
+    parser.add_argument("--num-workers", type=int, default=2) 
     args = parser.parse_args()
 
     # 1. Resolve Data Path
@@ -203,23 +187,30 @@ def main():
         data_path = Path(args.data_dir)
     elif args.dataset_choice == "mini":
         data_path = get_packaged_mini_data_path()
-    else: # full
-        # Assumes standard structure created by the download script
+    else: 
         data_path = Path("data/animals/animals")
 
-    if not data_path.exists():
-        raise FileNotFoundError(f"Selected data directory not found: {data_path}")
-
-    # 2. Locate Checkpoint
+    # 2. Locate and Filter Checkpoint
     if "*" in args.model_path:
         model_files = glob.glob(args.model_path)
-        if not model_files:
+        
+        # --- FIX: FILTER BY ARCHITECTURE ---
+        # Only keep checkpoints that have 'vgg16' or 'vgg11' in their filename
+        filtered_files = [f for f in model_files if args.architecture in Path(f).name.lower()]
+        
+        if not filtered_files:
+            print(f"⚠️ No checkpoints found for {args.architecture}. Checking all files in {args.model_path}...")
+            filtered_files = model_files # Fallback to any file if specific arch not found
+            
+        if not filtered_files:
             raise FileNotFoundError(f"No checkpoints found matching: {args.model_path}")
+        
+        # Pick the best among the filtered files
         try:
-            target_checkpoint = max(model_files, key=extract_version)
+            target_checkpoint = max(filtered_files, key=extract_version)
         except Exception:
-            model_files.sort(key=os.path.getmtime, reverse=True)
-            target_checkpoint = model_files[0]
+            filtered_files.sort(key=os.path.getmtime, reverse=True)
+            target_checkpoint = filtered_files[0]
     else:
         target_checkpoint = args.model_path
 
@@ -234,11 +225,7 @@ def main():
     )
 
     print(f"\n✅ Evaluation complete for: {Path(target_checkpoint).name}")
-    print(f"📊 Dataset: {args.dataset_choice} ({data_path})")
-    print(f"Accuracy: {results['accuracy']:.4f}")
-    print(f"F1 Score: {results['f1_macro']:.4f}")
-    print(f"AUC Score: {results['auc_macro']:.4f}")
-    print(f"Results saved to: {results['output_path']}")
+    print(f"Accuracy: {results['accuracy']:.4f} | F1: {results['f1_macro']:.4f}")
 
 if __name__ == "__main__":
     main()

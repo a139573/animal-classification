@@ -37,7 +37,7 @@ from matplotlib import pyplot as plt
 
 # --- Project Imports ---# 
 # These imports link the GUI to the core logic libraries
-from animal_classification.modeling.train import main as train_main
+from animal_classification.modeling.train import train_model as train_main
 from animal_classification.modeling.inference import run_inference
 from animal_classification.modeling.metrics import (
     get_dataset_stats, 
@@ -52,6 +52,21 @@ DEFAULT_MODELS_DIR = Path("models")
 
 # === WORKFLOW 1: DATA EXPLORATION ===
 def init_exploration():
+    """
+    Initializes the data exploration tab with dataset statistics and color analysis.
+
+    This function is triggered by the 'Load Dataset Analysis' button. It computes
+    global dataset metrics (total classes, image counts) and generates the 
+    RGB profile plot using the metrics module.
+
+    Returns
+    -------
+    tuple\n
+        (summary_md, color_plot, dropdown_update)
+        - summary_md (str): Markdown text containing class counts and image totals.
+        - color_plot (PIL.Image.Image): Stacked bar chart showing average RGB profiles.
+        - dropdown_update (dict): A Gradio update dictionary to populate the species selection list.
+    """
     df, n_classes, total_imgs, species_list = get_dataset_stats(DEFAULT_DATA_DIR)
     summary = f"""
     ### 📊 Dataset Overview
@@ -64,11 +79,23 @@ def init_exploration():
     return summary, color_plot, gr.update(choices=species_list, value=species_list[0])
 
 def update_species_gallery(species_name):
+    """
+    Retrieves and displays a gallery of image samples for the selected animal species.
+
+    Parameters
+    ----------
+    species_name : str\n
+        The folder name of the species to browse, selected from the dropdown menu.
+
+    Returns
+    -------
+    list.
+        A list of PIL.Image objects representing random samples of the chosen species.
+    """
     if not species_name:
         return []
     return get_species_samples(DEFAULT_DATA_DIR, species_name)
 
-# def reduce_and_visualize(images_per_class, image_size, progress=gr.Progress(track_tqdm=True)):
 # === WORKFLOW 2: TRAINING ===
 def run_training(model_choice, seed, epochs, lr_choice, num_workers, progress=gr.Progress()): 
     """ Orchestrates the training workflow triggered by the UI.
@@ -79,20 +106,21 @@ def run_training(model_choice, seed, epochs, lr_choice, num_workers, progress=gr
 
     Parameters
     ----------
-    model_choice : str
-        Dropdown selection (e.g., "VGG16").
-    seed : float
-        Random seed (cast to int internally).
-    epochs : float
-        Number of epochs (cast to int internally).
-    num_workers : float
-        Number of data loading workers.
-    progress : gradio.Progress
-        Automatically injected by Gradio to track the loop.
+    model_choice : str\n
+        Dropdown selection (e.g., "VGG16").\n
+    seed : float\n
+        Random seed (cast to int internally).\n
+    epochs : float\n
+        Number of epochs (cast to int internally).\n
+    num_workers : float\n
+        Number of data loading workers.\n
+    progress : gradio.Progress\n
+        Automatically injected by Gradio to track the loop.\n
 
     Returns
     -------
     tuple
+
         (Trained Model Object, Metrics Markdown, Loss Figure, Accuracy Figure)
     """
     results = train_main(
@@ -138,7 +166,7 @@ def run_inference_gr(architecture, trained_model, batch_size, num_workers):
 
     Returns
     -------
-    tuple
+    tuple\n
         (Metrics Markdown, Confusion Matrix Image, ROC Curve Image, Calibration Plot Image)
     """
     model_path = None
